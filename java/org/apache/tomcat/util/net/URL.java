@@ -30,7 +30,7 @@ import java.net.MalformedURLException;
  * package someplace.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2006/11/10 17:33:57 $
+ * @version $Revision: 1.4 $ $Date: 2007/05/05 05:33:16 $
  */
 
 public final class URL implements Serializable {
