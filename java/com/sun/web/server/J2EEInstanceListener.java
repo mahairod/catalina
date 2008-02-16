@@ -91,9 +91,7 @@ public final class J2EEInstanceListener implements InstanceListener {
             return;
         }
         WebModule wm = (WebModule)context;
-        if (!initialized) {
-            init(wm);
-        }
+        init(wm);
 
         String eventType = event.getType();
 	if(_logger.isLoggable(Level.FINEST)) {
@@ -106,7 +104,10 @@ public final class J2EEInstanceListener implements InstanceListener {
         }
     }
 
-    private void init(WebModule wm) {
+    private synchronized void init(WebModule wm) {
+        if (initialized) {
+            return;
+        }
         ServerContext serverContext = wm.getServerContext();
         if (serverContext == null) {
             String msg = _rb.getString("webmodule.noservercontext");
