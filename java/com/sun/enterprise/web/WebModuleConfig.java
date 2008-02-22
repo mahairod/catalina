@@ -36,7 +36,17 @@ public class WebModuleConfig {
      * by the web application (i.e compiled JSP class files etc) resides.
      */
     private String _baseDir = null;
-
+    
+    /**
+     * The source directory for the web application
+     */
+    private String _dir = null;
+    
+    /**
+     * The objectType property
+     */
+    private String _objectType = null;
+    
     /**
      * The parent classloader for the web application.
      */
@@ -56,10 +66,7 @@ public class WebModuleConfig {
     private String stubBaseDir;
     // END S1AS 6178005
 
-
-
     private ClassLoader _appClassLoader = null;
-
 
    /**
      * The string manager for this package.
@@ -100,7 +107,7 @@ public class WebModuleConfig {
      */
     public String getName() {
         String name = null;
-        if (_wmBean != null) {
+        if (_wbd != null) {
             StringBuffer buffer = new StringBuffer();
             String appName = getAppName();
             if (appName != null) {
@@ -120,8 +127,8 @@ public class WebModuleConfig {
      */
     public String getContextPath() {
         String ctxPath = null;
-        if (_wmBean != null) {
-                ctxPath = _wmBean.getContextRoot().trim();
+        if (_wbd != null) {
+                ctxPath = _wbd.getContextRoot().trim();
                 // Don't prefix a / if this web module is the default one
                 // i.e. has an empty context-root
                 if ((ctxPath.length() > 0) && !ctxPath.startsWith("/")) {
@@ -132,16 +139,19 @@ public class WebModuleConfig {
         }
         return ctxPath;
     }
+    
+    /**
+     * Set the directory in which the web application is deployed.
+     */
+    public void setLocation(String sourceDir) {
+        _dir = sourceDir;
+    }
 
     /**
      * Return the directory in which the web application is deployed.
      */
     public String getLocation() {
-        String dir = null;
-        if (_wmBean != null) {
-            dir = _wmBean.getLocation();
-        }
-        return dir;
+        return _dir;
     }
 
     /**
@@ -149,11 +159,6 @@ public class WebModuleConfig {
      * deployed.
      */
     public String getVirtualServers() {
-        /*String vsIDs = null;
-        if (_wmBean != null) {
-            vsIDs = _wmBean.getVirtualServers();
-        }
-         */
         return _vsIDs;
     }
 
@@ -248,7 +253,26 @@ public class WebModuleConfig {
     public void setDescriptor(WebBundleDescriptor wbd) {
         _wbd = wbd;
     }
+    
+    
+    /**
+     * Return the objectType property
+     */
+    public String getObjectType() {
+        return _objectType;
+    }
 
+
+    /**
+     * Set the objectType property.
+     *
+     * @param objectType objectType property
+     */
+    public void setObjectType(String objectType) {
+        _objectType = objectType;
+    }
+    
+    
     // --------------------------------------------------------Private metthods
 
     /**
@@ -274,8 +298,8 @@ public class WebModuleConfig {
      */
     private String getModuleName() {
         String name = null;
-        if (_wmBean != null) {
-            name = _wmBean.getName();
+        if (_wbd != null) {
+            name = _wbd.getName();
         }
         return name;
     }
