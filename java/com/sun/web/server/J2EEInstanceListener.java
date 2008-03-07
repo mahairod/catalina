@@ -333,7 +333,7 @@ public final class J2EEInstanceListener implements InstanceListener {
                 ex);
         } finally {
             if (eventType.equals(InstanceEvent.AFTER_DESTROY_EVENT)) {
-                tm.componentDestroyed(instance);                
+                tm.componentDestroyed(instance, inv);                
                 JndiNameEnvironment desc = wm.getWebBundleDescriptor();
                 if (desc != null
                         && instance.getClass() != DefaultServlet.class
@@ -376,7 +376,7 @@ public final class J2EEInstanceListener implements InstanceListener {
                         tm.cleanTxnTimeout();
                     } catch (Exception ex) {}
                 }
-                tm.componentDestroyed(instance);
+                tm.componentDestroyed(instance, inv);
             }
         }
     }
