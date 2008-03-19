@@ -31,7 +31,9 @@ import com.sun.enterprise.container.common.spi.util.InjectionException;
 import com.sun.enterprise.container.common.spi.util.InjectionManager;
 import com.sun.enterprise.deployment.*;
 // IASRI 4688449
-import com.sun.enterprise.security.integration.RealmAdapterProxy;
+import com.sun.enterprise.security.integration.AppServSecurityContext;
+import com.sun.enterprise.security.integration.RealmInitializer;
+import com.sun.enterprise.security.integration.SecurityConstants;
 import com.sun.enterprise.server.ServerContext;
 import com.sun.enterprise.web.WebComponentInvocation;
 import com.sun.enterprise.web.WebModule;
@@ -40,8 +42,6 @@ import com.sun.enterprise.web.WebModule;
 import java.util.logging.*;
 import com.sun.logging.*;
 //END OF IASRI 4660742
-import javax.security.auth.Subject;
-import org.jvnet.hk2.annotations.Inject;
 import org.jvnet.hk2.annotations.Service;
 
 /**
@@ -60,9 +60,7 @@ public final class J2EEInstanceListener implements InstanceListener {
 
     private static final HashSet beforeEvents = new HashSet(4);
     private static final HashSet afterEvents = new HashSet(4);
-
-    @Inject(optional=true)
-    private Realm realmAdapter;
+    
     
     static {
         beforeEvents.add(InstanceEvent.BEFORE_SERVICE_EVENT);
@@ -80,7 +78,9 @@ public final class J2EEInstanceListener implements InstanceListener {
     private JavaEETransactionManager tm;
     private InjectionManager injectionMgr;
     private boolean initialized = false;
-
+    
+    private AppServSecurityContext securityContext;
+    
     public J2EEInstanceListener() {
     }
 
@@ -120,6 +120,17 @@ public final class J2EEInstanceListener implements InstanceListener {
         injectionMgr = serverContext.getDefaultHabitat().getByContract(
                 InjectionManager.class);
         initialized = true;
+        
+        securityContext = serverContext.getDefaultHabitat().getByContract(AppServSecurityContext.class);
+        if (securityContext != null) {
+            if (_logger.isLoggable(Level.FINE)) {
+                _logger.log(Level.FINE, "Obtained securityContext implementation class " + securityContext);
+            }
+        } else {
+            if (_logger.isLoggable(Level.FINE)) {
+                _logger.log(Level.FINE, "Failed to obtain securityContext implementation class ");
+            }
+        }
     }
 
     private void handleBeforeEvent(InstanceEvent event, String eventType) {
@@ -206,10 +217,9 @@ public final class J2EEInstanceListener implements InstanceListener {
 		    break;
 		}
 
-		if (prin != null && prin == basePrincipal) {
-                    if (realmAdapter != null && realmAdapter instanceof RealmAdapterProxy) {
-                        ((RealmAdapterProxy)realmAdapter).setCurrentSecurityContextWithWebPrincipal(prin);
-                    }    
+		if (prin != null && prin == basePrincipal && 
+                        prin.getClass().getName().equals(SecurityConstants.WEB_PRINCIPAL_CLASS)) {
+                    securityContext.setSecurityContextWithPrincipal(prin);
 		} else if (prin != basePrincipal) {
 		    
 		    // the wrapper has overridden getUserPrincipal
@@ -217,9 +227,8 @@ public final class J2EEInstanceListener implements InstanceListener {
 		    // the necessary permission.
 
 		    checkObjectForDoAsPermission(hreq);
-                    if (realmAdapter != null && realmAdapter instanceof RealmAdapterProxy) {
-                        ((RealmAdapterProxy)realmAdapter).setCurrentSecurityContext(prin);
-                    }
+                    securityContext.setSecurityContextWithPrincipal(prin);
+                    
 		}
 
 	    }
@@ -344,8 +353,9 @@ public final class J2EEInstanceListener implements InstanceListener {
                     try {
                         // clear security context
                         Realm ra = context.getRealm();
-                        if (ra != null && (ra instanceof RealmAdapterProxy)) {
-                            ((RealmAdapterProxy)ra).logout();
+                        if (ra != null && (ra instanceof RealmInitializer)) {
+                            //((RealmInitializer)ra).logout();
+                            securityContext.setCurrentSecurityContext(null);
                         }
                     } catch (Exception ex) {
                         /** IASRI 4660742
