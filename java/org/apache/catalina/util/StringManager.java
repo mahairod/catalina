@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.net.URLClassLoader;
 
 /**
  * An internationalization / localization helper class which reduces
@@ -38,18 +37,8 @@ import java.net.URLClassLoader;
  */
 
 public class StringManager {
-
-    private static com.sun.org.apache.commons.logging.Log log=
-        com.sun.org.apache.commons.logging.LogFactory.getLog( StringManager.class );
-
-    /**
-     * The ResourceBundle for this StringManager.
-     */
-
-    private ResourceBundle bundle;
-
     // START SJSAS 6412710
-    private HashMap<Locale, ResourceBundle> bundles =
+    private final HashMap<Locale, ResourceBundle> bundles =
         new HashMap<Locale, ResourceBundle>(5);
     private String bundleName = null;
     // END SJSAS 6412710
@@ -74,11 +63,6 @@ public class StringManager {
         /* SJSAS 6412710
         try {
         */
-            bundle = ResourceBundle.getBundle(bundleName);
-            // START SJSAS 6412710
-            bundles.put(Locale.getDefault(), bundle);
-            // END SJSAS 6412710
-            return;
         /* SJSAS 6412710
         } catch( MissingResourceException ex ) {
             // Try from the current loader ( that's the case for trusted apps )
@@ -140,11 +124,6 @@ public class StringManager {
             throw new NullPointerException(msg);
         }
 
-        String str = null;
-
-        if( bundle==null )
-            return key;
-
         // START SJSAS 6412710
         ResourceBundle bundle = bundles.get(locale);
         if (bundle == null) {
@@ -158,13 +137,14 @@ public class StringManager {
         }
         // END SJSAS 6412710
 
-        try {
-            str = bundle.getString(key);
-        } catch (MissingResourceException mre) {
-            str = "Cannot find message associated with key '" + key + "'";
-        }
+        if( bundle==null )
+            return key;
 
-        return str;
+        try {
+            return bundle.getString(key);
+        } catch (MissingResourceException mre) {
+            return "Cannot find message associated with key '" + key + "'";
+        }
     }
 
     /**
