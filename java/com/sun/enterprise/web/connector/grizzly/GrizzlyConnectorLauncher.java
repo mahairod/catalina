@@ -20,7 +20,6 @@
 package com.sun.enterprise.web.connector.grizzly;
 
 import com.sun.grizzly.http.Management;
-import com.sun.grizzly.http.SecureSelector;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.ssl.SSLSelectorThread;
 import java.net.InetAddress;
@@ -256,13 +255,14 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
     
     
     public void setProcessorWorkerThreadsTimeout(int timeout){
-        selectorThread.setThreadsTimeout(timeout);
+//        selectorThread.setThreadsTimeout(timeout);
         setAttribute("threadsTimeout", "" + timeout);     
     }
     
     
     public int getProcessorWorkerThreadsTimeout(){
-        return selectorThread.getThreadsTimeout();
+//        return selectorThread.getThreadsTimeout();
+        return 0;
     }
     // -------------------- Tcp setup --------------------
 
@@ -396,34 +396,36 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
 
     @Override
     public int getSoLinger() {
-        return selectorThread.getSoLinger();
+        return selectorThread.getLinger();
     }
     
     @Override
     public void setSoLinger( int i ) {
-        selectorThread.setSoLinger( i );
+        selectorThread.setLinger( i );
         setAttribute("soLinger", "" + i);
     }
 
     @Override
     public int getSoTimeout() {
-        return selectorThread.getSoTimeout();
+//        return selectorThread.getSoTimeout();
+        return 0;
     }
     
     @Override
     public void setSoTimeout( int i ) {
-        selectorThread.setSoTimeout(i);
+//        selectorThread.setSoTimeout(i);
         setAttribute("soTimeout", "" + i);
     }
     
     @Override
     public int getServerSoTimeout() {
-        return selectorThread.getServerSoTimeout();
+//        return selectorThread.getServerSoTimeout();
+        return 0;
     }
     
     @Override
     public void setServerSoTimeout( int i ) {
-        selectorThread.setServerSoTimeout(i);
+//        selectorThread.setServerSoTimeout(i);
         setAttribute("serverSoTimeout", "" + i);
     }
     
@@ -500,7 +502,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Set the <code>reader-thread</code> from domain.xml.
      */
     public void setMaxReadWorkerThreads(int maxReadWorkerThreads){
-        selectorThread.setMaxReadWorkerThreads(maxReadWorkerThreads);
+//        selectorThread.setMaxReadWorkerThreads(maxReadWorkerThreads);
     }
     
     
@@ -508,7 +510,8 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Return the <code>read-thread</code> used by this <code>Selector</code>
      */   
     public int getMaxReadWorkerThreads(){
-        return selectorThread.getMaxReadWorkerThreads();
+//        return selectorThread.getMaxReadWorkerThreads();
+        return 0;
     }  
 
     
@@ -518,7 +521,8 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
         
     
     public boolean getDisplayConfiguration(){
-        return selectorThread.isDisplayConfiguration();
+//        return selectorThread.getDisplay();
+        return false;
     }
 
     
@@ -526,7 +530,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Set the <code>recycle-tasks</code> by this <code>Selector</code>
      */
     public void setRecycleTasks(boolean recycleTasks){
-        selectorThread.setRecycleTasks(recycleTasks);
+//        selectorThread.setRecycleTasks(recycleTasks);
     }
     
     
@@ -535,7 +539,8 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * <code>Selector</code>
      */     
     public boolean getRecycleTasks(){
-        return selectorThread.isRecycleTasks();
+//        return selectorThread.isRecycleTasks();
+        return false;
     }    
     
      
@@ -553,7 +558,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Set the <code>processor-thread</code> from domain.xml
      */   
     public void setMaxProcessorWorkerThreads(int maxProcessorWorkerThreads){
-        selectorThread.setMaxProcessorWorkerThreads(maxProcessorWorkerThreads);
+        selectorThread.setMaxThreads(maxProcessorWorkerThreads);
     }
     
     
@@ -561,7 +566,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Return the <code>processor-thread</code> used by this <code>Selector</code>
      */   
     public int getMaxProcessorWorkerThreads(){
-        return selectorThread.getMaxProcessorWorkerThreads();
+        return selectorThread.getMaxThreads();
     }
  
    
@@ -570,7 +575,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * on this <code>Selector</code>
      */
     public void setMinReadQueueLength(int minReadQueueLength){
-        selectorThread.setMinReadQueueLength(minReadQueueLength);
+//        selectorThread.setMinReadQueueLength(minReadQueueLength);
     }
 
     
@@ -579,7 +584,8 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * on this <code>Selector</code>
      */
     public int getMinReadQueueLength(){
-        return selectorThread.getMinReadQueueLength();
+//        return selectorThread.getMinReadQueueLength();
+        return 0;
     }
  
   
@@ -588,7 +594,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * on this <code>Selector</code>
      */
     public void setMinProcessorQueueLength(int minProcessorQueueLength){
-        selectorThread.setMinProcessorQueueLength(minProcessorQueueLength);
+//        selectorThread.setMinProcessorQueueLength(minProcessorQueueLength);
     }
  
      
@@ -597,7 +603,8 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * on this <code>Selector</code>
      */   
     public int getMinProcessorQueueLength(){
-        return selectorThread.getMinProcessorQueueLength();
+//        return selectorThread.getMinProcessorQueueLength();
+        return 0;
     }
     
     
@@ -830,7 +837,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Return the logger used by the Grizzly classes.
      */
     public static Logger getLogger(){
-        return SelectorThread.getLogger();
+        return SelectorThread.logger();
     }  
     
     
