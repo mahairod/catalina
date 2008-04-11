@@ -753,9 +753,8 @@ public class PEWebContainer extends WebContainer {
 
         configureConnectionPool(connector, httpService.getConnectionPool());
 
-        WebContainerFeatureFactory wcFeatureFactory = _serverContext.getDefaultHabitat().getComponent(WebContainerFeatureFactory.class);
         String sslImplementationName = 
-            webFeatureFactory.getSSLImplementationName();
+            webContainerFeatureFactory.getSSLImplementationName();
         
         if (sslImplementationName != null) {
             connector.setProperty("sSLImplementation",sslImplementationName);
@@ -1961,7 +1960,7 @@ public class PEWebContainer extends WebContainer {
                 || "denyRemoteAddress".equals(name)) {
             vs.configureRemoteAddressFilterValve();
         } else if (Constants.SSO_ENABLED.equals(name)) {
-            vs.configureSSOValve(globalSSOEnabled, webFeatureFactory);
+            vs.configureSSOValve(globalSSOEnabled, webContainerFeatureFactory);
         } else if ("authRealm".equals(name)) {
             vs.configureAuthRealm(securityService);
         } else if (name.startsWith("send-error")) {
