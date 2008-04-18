@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.jsp.tagext.BodyTag;
 import javax.servlet.jsp.tagext.DynamicAttributes;
@@ -1366,6 +1367,8 @@ abstract class Node implements TagConstants {
 	private boolean useTagPlugin;
 	private TagPluginContext tagPluginContext;
         private int jspId;
+        private HashMap<String, String> tempVars;
+                // The temporary name for saving and restoring a scripting var
 
 	/**
 	 * The following two fields are used for holding the Java
@@ -1754,6 +1757,21 @@ abstract class Node implements TagConstants {
 
 	     return hasEmptyBody;
 	 }
+
+         public String getTempScriptingVar(String scriptingVar) {
+             if (tempVars == null) {
+                 return null;
+             }
+             return tempVars.get(scriptingVar);
+         }
+
+         public void setTempScriptingVar(String scriptingVar,
+                                         String tempScriptingVar) {
+             if (tempVars == null) {
+                 tempVars = new HashMap<String,String>();
+             }
+             tempVars.put(scriptingVar, tempScriptingVar);
+         }
     }
 
     /**
