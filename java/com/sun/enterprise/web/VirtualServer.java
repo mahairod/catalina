@@ -7,7 +7,7 @@ package com.sun.enterprise.web;
 
 import com.sun.enterprise.config.serverbeans.ConfigBeansUtilities;
 import com.sun.enterprise.web.stats.PWCRequestStatsImpl;
-import com.sun.enterprise.v3.server.Globals;
+import org.glassfish.internal.api.Globals;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.text.MessageFormat;
@@ -37,9 +37,11 @@ import org.apache.catalina.valves.RemoteAddrValve;
 import org.apache.catalina.valves.RemoteHostValve;
 
 import com.sun.enterprise.config.serverbeans.Applications;
+import com.sun.enterprise.config.serverbeans.AuthRealm;
 import com.sun.enterprise.config.serverbeans.Domain;
 import com.sun.enterprise.config.serverbeans.HttpProtocol;
 import com.sun.enterprise.config.serverbeans.HttpService;
+import com.sun.enterprise.config.serverbeans.Property;
 import com.sun.enterprise.config.serverbeans.SecurityService;
 import com.sun.enterprise.config.serverbeans.Server;
 import com.sun.enterprise.config.serverbeans.ApplicationRef;
@@ -533,7 +535,7 @@ public class VirtualServer extends StandardHost {
 
             // Look up the list of standalone web modules
             if (wmInfo == null) {
-                WebModule wm = ConfigBeansUtilities.getModule(WebModule.class, appsBean, wmID);
+                WebModule wm = ConfigBeansUtilities.getModule(WebModule.class, wmID);
                 if (wm != null) {
                     if (isActive(wm, false)) {
                         // Create a copy as we need to change the name
@@ -824,7 +826,7 @@ public class VirtualServer extends StandardHost {
      */
     private String getVirtualServers(String appName) {
         String ret = null;
-        Server server = com.sun.enterprise.v3.server.Globals.getDefaultHabitat().getComponent(Server.class);
+        Server server = org.glassfish.internal.api.Globals.getDefaultHabitat().getComponent(Server.class);
         for (ApplicationRef appRef : server.getApplicationRef()) {
             if (appRef.getRef().equals(appName)) {
                 return appRef.getVirtualServers();
@@ -947,16 +949,33 @@ public class VirtualServer extends StandardHost {
      * @param securityService The security-service element from domain.xml
      */
     void configureAuthRealm(SecurityService securityService) {
-        /*
-        ElementProperty prop = vsBean.getElementPropertyByName("authRealm");
-        if (prop != null && prop.getValue() != null) {
-            if (securityService.getAuthRealmByName(prop.getValue()) != null) {
-                authRealmName = prop.getValue();
-            } else {
-                _logger.log(Level.SEVERE, "vs.invalidAuthRealm",
-                            new Object[] { getID(), prop.getValue() });
+        List<Property> properties = vsBean.getProperty();
+        if (properties != null && properties.size() > 0) {
+            for (Property p: properties) {
+                if (p != null && "authRealm".equals(p.getName())) {
+                    authRealmName = p.getValue();
+                    if (authRealmName != null) {
+                        AuthRealm realm = null;
+                        List<AuthRealm> rs = securityService.getAuthRealm();
+                        if (rs != null && rs.size() > 0) {
+                            for (AuthRealm r : rs) {
+                                if (r != null &&
+                                        r.getName().equals(authRealmName)) {
+                                    realm = r;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (realm == null) {
+                            _logger.log(Level.SEVERE, "vs.invalidAuthRealm",
+                                new Object[] { getID(), authRealmName });
+                        }
+                    }
+                    break;
+                }
             }
-        }*/
+        }
     }
      
 
