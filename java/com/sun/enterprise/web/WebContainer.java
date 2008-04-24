@@ -1,26 +1,7 @@
 /*
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License).  You may not use this file except in
- * compliance with the License.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
- * You can obtain a copy of the license at
- * https://glassfish.dev.java.net/public/CDDLv1.0.html or
- * glassfish/bootstrap/legal/CDDLv1.0.txt.
- * See the License for the specific language governing
- * permissions and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at glassfish/bootstrap/legal/CDDLv1.0.txt.
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * you own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * Copyright 2006 Sun Microsystems, Inc. All rights reserved.
  */
-
 
 package com.sun.enterprise.web;
 
@@ -87,7 +68,7 @@ import com.sun.enterprise.config.serverbeans.HttpService;
 import com.sun.enterprise.config.serverbeans.HttpProtocol;
 import com.sun.enterprise.config.serverbeans.KeepAlive;
 import com.sun.enterprise.config.serverbeans.HttpListener;
-import com.sun.enterprise.config.serverbeans.Property; 
+import com.sun.enterprise.config.serverbeans.Property;
 import com.sun.enterprise.config.serverbeans.RequestProcessing;
 import com.sun.enterprise.config.serverbeans.SecurityService;
 import com.sun.enterprise.config.serverbeans.SessionProperties;
@@ -394,6 +375,8 @@ public class WebContainer implements org.glassfish.api.container.Container, Post
 
     private Config cfg;
 
+    private ServerConfigLookup serverConfigLookup;
+
     /**
      * Static initialization
      */
@@ -462,10 +445,10 @@ public class WebContainer implements org.glassfish.api.container.Container, Post
         }
          */
 
-        LogService logService = null;
         cfg = _serverContext.getDefaultHabitat().getComponent(Config.class);
+        serverConfigLookup = new ServerConfigLookup(cfg);
         getDynamicReloadingSettings(cfg.getAdminService().getDasConfig());
-        logService = cfg.getLogService();
+        LogService logService = cfg.getLogService();
         initLogLevel(logService);
         initMonitoringLevel(cfg.getMonitoringService());
         
@@ -3124,7 +3107,6 @@ public class WebContainer implements org.glassfish.api.container.Container, Post
         }
     }
 
-
     /**
      * Utility Method to access the ServerContext
      */
@@ -3132,6 +3114,9 @@ public class WebContainer implements org.glassfish.api.container.Container, Post
         return _serverContext;
     }
 
+    ServerConfigLookup getServerConfigLookup() {
+        return serverConfigLookup;
+    }
 
     /**
      * @return The work root directory of all webapps bundled in EAR Files
@@ -3140,14 +3125,12 @@ public class WebContainer implements org.glassfish.api.container.Container, Post
         return _appsWorkRoot;
     }
 
-
     /**
      * @return The work root directory of all standalone webapps
      */
     String getModulesWorkRoot() {
         return _modulesWorkRoot;
     }
-
 
     /**
      * Configure the class loader for the web module based on the
@@ -4635,8 +4618,8 @@ public class WebContainer implements org.glassfish.api.container.Container, Post
      */
     private void initInstanceSessionProperties() {
 
-        ServerConfigLookup lookup = new ServerConfigLookup(cfg);
-        SessionProperties spBean = lookup.getInstanceSessionProperties();
+        SessionProperties spBean =
+            serverConfigLookup.getInstanceSessionProperties();
 
         if (spBean == null || spBean.getProperty() == null) {
             return;
