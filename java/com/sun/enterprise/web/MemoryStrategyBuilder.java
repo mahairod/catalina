@@ -43,6 +43,7 @@ public class MemoryStrategyBuilder extends BasePersistenceStrategyBuilder {
         sctx.restrictedSetPipeline(new PESessionLockingStandardPipeline(sctx));
 
         mgr.setMaxActiveSessions(maxSessions);
+
         // START OF 6364900
         mgr.setSessionLocker(new PESessionLocker(ctx));
         // END OF 6364900        
@@ -64,7 +65,6 @@ public class MemoryStrategyBuilder extends BasePersistenceStrategyBuilder {
         }
         // END CR 6275709
         
-        // This must be after ctx.setManager(mgr);       
         if (!sctx.isSessionTimeoutOveridden()) {
             mgr.setMaxInactiveInterval(sessionMaxInactiveInterval); 
         }        
