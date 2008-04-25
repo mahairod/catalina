@@ -1,24 +1,6 @@
 /*
- * The contents of this file are subject to the terms 
- * of the Common Development and Distribution License 
- * (the License).  You may not use this file except in
- * compliance with the License.
- * 
- * You can obtain a copy of the license at 
- * https://glassfish.dev.java.net/public/CDDLv1.0.html or
- * glassfish/bootstrap/legal/CDDLv1.0.txt.
- * See the License for the specific language governing 
- * permissions and limitations under the License.
- * 
- * When distributing Covered Code, include this CDDL 
- * Header Notice in each file and include the License file 
- * at glassfish/bootstrap/legal/CDDLv1.0.txt.  
- * If applicable, add the following below the CDDL Header, 
- * with the fields enclosed by brackets [] replaced by
- * you own identifying information: 
- * "Portions Copyrighted [year] [name of copyright owner]"
- * 
- * Copyright 2006 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ *
  */
 
 package com.sun.enterprise.web;
@@ -33,10 +15,9 @@ import org.apache.coyote.tomcat5.CoyoteAdapter;
 import com.sun.enterprise.deployment.WebBundleDescriptor;
 import com.sun.enterprise.util.StringUtils;
 import com.sun.enterprise.v3.common.Result;
-import com.sun.enterprise.v3.deployment.DeployCommand;
+import com.sun.enterprise.v3.services.impl.EndpointRegistrationException;
 import com.sun.enterprise.v3.services.impl.GrizzlyService;
 import com.sun.logging.LogDomains;
-import com.sun.grizzly.tcp.Adapter;
 
 import java.util.List;
 import java.util.Collection;
@@ -89,8 +70,13 @@ public class WebApplication implements ApplicationContainer<WebBundleDescriptor>
                 if (loadToAll || vsList.contains(vs.getName())
                         || isAliasMatched(vsList,vs)) {
                     for (int port : vs.getPorts()) {
-                        CoyoteAdapter adapter = container.adapterMap.get(Integer.valueOf(port));
-                        grizzlyAdapter.registerEndpoint(contextRoot, adapter.getPort(), c, adapter, this);
+                            CoyoteAdapter adapter = container.adapterMap.get(Integer.valueOf(port));
+                        //@TODO change EndportRegistrationException processing if required
+                        try {
+                            grizzlyAdapter.registerEndpoint(contextRoot, adapter.getPort(), c, adapter, this);
+                        } catch(EndpointRegistrationException e) {
+                            logger.log(Level.WARNING, "Error while deploying", e);
+                        }
                     }
                 }
             } else {
@@ -137,7 +123,12 @@ public class WebApplication implements ApplicationContainer<WebBundleDescriptor>
                             + " from virtual server "
                             + vs.getName());
                     // ToDo : dochez : not good, we unregister from everywhere...
-                    grizzlyAdapter.unregisterEndpoint(ctxtRoot, this);
+                    //@TODO change EndportRegistrationException processing if required
+                    try {
+                        grizzlyAdapter.unregisterEndpoint(ctxtRoot, this);
+                    } catch (EndpointRegistrationException e) {
+                        logger.log(Level.WARNING, "Error while undeploying", e);
+                    }
                 } else {
                     isLeftOver = true;
                 }
