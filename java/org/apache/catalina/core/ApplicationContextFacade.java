@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.naming.NamingException;
 import javax.naming.Binding;
@@ -60,7 +61,7 @@ import org.apache.catalina.security.SecurityUtil;
  *
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
- * @version $Revision: 1.6 $ $Date: 2006/11/21 17:39:39 $
+ * @version $Revision: 1.7.6.1 $ $Date: 2008/04/17 18:37:06 $
  */
 
 public final class ApplicationContextFacade
@@ -369,6 +370,41 @@ public final class ApplicationContextFacade
             return (String) doPrivileged("getServletContextName", null);
         } else {
             return context.getServletContextName();
+        }
+    }
+
+
+    /*
+     * Adds the servlet with the given name, description, class name,
+     * init parameters, and loadOnStartup, to this servlet context.
+     */
+    public void addServlet(String servletName,
+                           String description,
+                           String className,
+                           Map<String, String> initParameters,
+                           int loadOnStartup) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addServlet",
+                         new Object[] {servletName, description, className,
+                                       initParameters, loadOnStartup});
+        } else {
+            context.addServlet(servletName, description, className,
+                               initParameters, loadOnStartup);
+        }
+    }
+
+
+    /**
+     * Adds servlet mappings from the given url patterns to the servlet
+     * with the given servlet name to this servlet context.
+     */
+    public void addServletMapping(String servletName,
+                                  String[] urlPatterns) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addServletMapping",
+                         new Object[] {servletName, urlPatterns});
+        } else {
+            context.addServletMapping(servletName, urlPatterns);
         }
     }
 
