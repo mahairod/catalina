@@ -2652,6 +2652,15 @@ public class CoyoteRequest
 
 
     /**
+     * This object does not implement a session ID generator. Provide
+     * a dummy implementation so that the default one will be used.
+     */
+    public String generateSessionId() {
+        return null;
+    }
+
+
+    /**
      * Gets the servlet context to which this servlet request was last
      * dispatched.
      *
@@ -2763,7 +2772,15 @@ public class CoyoteRequest
         // START S1AS8PE 4817642
         } else {
         // END S1AS8PE 4817642
-            session = manager.createSession();
+            // Use the connector's random number generator (if any) to generate
+            // a session ID. Fallback to the default session ID generator if
+            // the connector does not implement one.
+            String id = generateSessionId();
+            if (id != null) {
+                session = manager.createSession(id);
+            } else {
+                session = manager.createSession();
+            } 
         // START S1AS8PE 4817642
         }
         // END S1AS8PE 4817642
