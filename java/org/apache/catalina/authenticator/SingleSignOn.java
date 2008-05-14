@@ -525,7 +525,7 @@ public class SingleSignOn
                 principal.getName() + "' with auth type '" + authType + "'");
 
         synchronized (cache) {
-            cache.put(ssoId, new SingleSignOnEntry(principal, authType,
+            cache.put(ssoId, new SingleSignOnEntry(ssoId, principal, authType,
                                                    username, password));
         }
 
@@ -596,6 +596,8 @@ public class SingleSignOn
  */
 class SingleSignOnEntry {
 
+    public String id = null;
+
     public String authType = null;
 
     public String password = null;
@@ -606,13 +608,21 @@ class SingleSignOnEntry {
 
     public String username = null;
 
-    public SingleSignOnEntry(Principal principal, String authType,
+    public SingleSignOnEntry(String id, Principal principal, String authType,
                              String username, String password) {
         super();
+        this.id = id;
         this.principal = principal;
         this.authType = authType;
         this.username = username;
         this.password = password;
+    }
+
+    /**
+     * Gets the id of this SSO entry.
+     */
+    public String getId() {
+        return id;
     }
 
     public synchronized void addSession(SingleSignOn sso, Session session) {
