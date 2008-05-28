@@ -1109,7 +1109,8 @@ public class WebModule extends PwcWebModule {
                           + builder.getClass().getName());
         }
 
-        builder.initializePersistenceStrategy(this, smBean);
+        builder.initializePersistenceStrategy(this, smBean,
+            webContainer.getServerConfigLookup());
     }
 
     /**
