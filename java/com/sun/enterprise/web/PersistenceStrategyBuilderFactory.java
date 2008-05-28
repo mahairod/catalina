@@ -83,8 +83,7 @@ public class PersistenceStrategyBuilderFactory {
         }
         
         String passedInPersistenceType = persistenceType;
-        PersistenceStrategyBuilder builder =
-            new MemoryStrategyBuilder(serverConfigLookup);
+        PersistenceStrategyBuilder builder = new MemoryStrategyBuilder();
         String className = createClassNameFrom(resolvedPersistenceType,
             resolvedPersistenceFrequency, resolvedPersistenceScope);
         if (_logger.isLoggable(Level.FINEST)) {
@@ -122,8 +121,7 @@ public class PersistenceStrategyBuilderFactory {
      */     
     PersistenceStrategyBuilder createPersistenceStrategyBuilder(String persistenceType, String frequency, String scope) {
         String passedInPersistenceType = persistenceType;
-        PersistenceStrategyBuilder builder =
-            new MemoryStrategyBuilder(serverConfigLookup);
+        PersistenceStrategyBuilder builder = new MemoryStrategyBuilder();
         String className = createClassNameFrom(persistenceType, frequency,
                                                scope);
         if (_logger.isLoggable(Level.FINEST)) {
