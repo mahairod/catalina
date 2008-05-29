@@ -725,8 +725,11 @@ public class WebappLoader
 
             setPermissions();
 
-            if (classLoader instanceof Lifecycle)
-                ((Lifecycle) classLoader).start();
+            try {
+                classLoader.start();
+            } catch (Exception e) {
+                throw new LifecycleException(e);
+            }
 
             // Binding the Webapp class loader to the directory context
             DirContextURLStreamHandler.bind
@@ -776,8 +779,10 @@ public class WebappLoader
      * Stops the nested classloader
      */
     public void stopNestedClassLoader() throws LifecycleException {
-        if (classLoader instanceof Lifecycle) {
-            ((Lifecycle) classLoader).stop();
+        try {
+            classLoader.stop();
+        } catch (Exception e) {
+            throw new LifecycleException(e);
         }
     }
 

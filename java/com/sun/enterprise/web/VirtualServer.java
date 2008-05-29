@@ -635,13 +635,7 @@ public class VirtualServer extends StandardHost {
             wmInfo.setLocation(docroot);            
             wmInfo.setDescriptor(wbd);
             wmInfo.setParentLoader(EmbeddedWebContainer.class.getClassLoader());
-            WebappClassLoader cloader = new WebappClassLoader(wmInfo.getParentLoader());
-            wmInfo.setAppClassLoader(cloader);
-            try {
-                cloader.start();
-            } catch (Exception e) {
-                logger.log("Cannot start default web application class loader", e);
-            }
+            wmInfo.setAppClassLoader(new WebappClassLoader(wmInfo.getParentLoader()));
             if ( wbd.getApplication() == null ) {
                 Application application = new Application();
                 application.setVirtual(true);
