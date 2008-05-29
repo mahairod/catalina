@@ -94,7 +94,6 @@ import com.sun.enterprise.util.io.FileUtils;
 import com.sun.enterprise.web.connector.coyote.PECoyoteConnector;
 import com.sun.enterprise.web.logger.IASLogger;
 import com.sun.enterprise.web.pluggable.WebContainerFeatureFactory;
-import com.sun.enterprise.security.CipherInfo;
 import com.sun.appserv.ProxyHandler;
 //import com.sun.appserv.server.ServerLifecycleException;
 import com.sun.appserv.server.util.ASClassLoaderUtil;
@@ -147,6 +146,7 @@ import javax.servlet.jsp.JspFactory;
 import java.lang.reflect.Method;
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.catalina.Realm;
+import org.glassfish.security.common.CipherInfo;
 
 import com.sun.enterprise.security.integration.RealmInitializer;
 import com.sun.enterprise.v3.services.impl.EndpointRegistrationException;
