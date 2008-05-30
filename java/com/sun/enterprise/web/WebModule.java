@@ -32,7 +32,6 @@ import com.sun.enterprise.deployment.runtime.web.WebProperty;
 import com.sun.enterprise.config.serverbeans.J2eeApplication;
 import com.sun.enterprise.config.serverbeans.Property;
 import com.sun.enterprise.security.integration.RealmInitializer;
-import com.sun.enterprise.server.ServerContext;
 import com.sun.enterprise.web.pwc.PwcWebModule;
 import com.sun.enterprise.web.session.PersistenceType;
 import com.sun.enterprise.web.session.SessionCookieConfig;
@@ -51,8 +50,8 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.core.StandardPipeline;
 import org.apache.catalina.deploy.FilterMaps;
-import org.apache.catalina.loader.WebappClassLoader;
-import org.apache.catalina.loader.WebappLoader;
+import org.glassfish.internal.api.ServerContext;
+import org.glassfish.web.loader.WebappClassLoader;
 
 /**
  * Class representing a web module for use by the Application Server.
