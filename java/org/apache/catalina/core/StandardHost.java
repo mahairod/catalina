@@ -48,7 +48,7 @@ import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.util.RequestUtil;
 // END GlassFish 862
 import org.apache.catalina.valves.ValveBase;
-import com.sun.org.apache.commons.modeler.Registry;
+import org.apache.commons.modeler.Registry;
 
 
 /**
@@ -67,8 +67,8 @@ public class StandardHost
  {
     /* Why do we implement deployer and delegate to deployer ??? */
 
-    private static com.sun.org.apache.commons.logging.Log log=
-        com.sun.org.apache.commons.logging.LogFactory.getLog( StandardHost.class );
+    private static org.apache.commons.logging.Log log=
+        org.apache.commons.logging.LogFactory.getLog( StandardHost.class );
     
     // ----------------------------------------------------------- Constructors
 
