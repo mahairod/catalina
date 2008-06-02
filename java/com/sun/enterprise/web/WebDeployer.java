@@ -38,7 +38,7 @@ import com.sun.enterprise.v3.services.impl.GrizzlyService;
 import com.sun.enterprise.v3.common.Result;
 import com.sun.enterprise.module.ModuleDefinition;
 import com.sun.enterprise.module.Module;
-import com.sun.appserv.server.util.ASClassLoaderUtil;
+import org.glassfish.web.loader.util.ASClassLoaderUtil;
 import com.sun.logging.LogDomains;
 import org.apache.catalina.Container;
 import org.apache.catalina.core.StandardContext;
