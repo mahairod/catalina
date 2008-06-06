@@ -18,9 +18,7 @@
  * limitations under the License.
  */
 
-
 package org.apache.catalina.realm;
-
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -36,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Date;
 //END SJSAS 6202703
+import java.util.logging.*;
 
 import javax.management.Attribute;
 import javax.management.MBeanRegistration;
@@ -55,7 +54,6 @@ import org.apache.catalina.HttpResponse;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.Logger;
 import org.apache.catalina.Realm;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.deploy.LoginConfig;
@@ -68,8 +66,6 @@ import org.apache.catalina.util.StringManager;
 //START SJSAS 6202703
 import org.apache.catalina.util.DateTool;
 //END SJSAS 6202703
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.modeler.Registry;
 // START SJSWS 6324431
 import org.apache.catalina.core.StandardContext;
@@ -87,7 +83,7 @@ import org.apache.catalina.core.StandardContext;
 public abstract class RealmBase
     implements Lifecycle, Realm, MBeanRegistration {
 
-    private static Log log = LogFactory.getLog(RealmBase.class);
+    private static Logger log = Logger.getLogger(RealmBase.class.getName());
     
     //START SJSAS 6202703
     /**
@@ -398,7 +394,9 @@ public abstract class RealmBase
             try {
                 valueBytes = serverDigestValue.getBytes(getDigestEncoding());
             } catch (UnsupportedEncodingException uee) {
-                log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
+                log.log(Level.SEVERE,
+                        "Illegal digestEncoding: " + getDigestEncoding(),
+                        uee);
                 throw new IllegalArgumentException(uee.getMessage());
             }
         }
@@ -409,12 +407,12 @@ public abstract class RealmBase
             serverDigest = md5Encoder.encode(md5Helper.digest(valueBytes));
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Digest : " + clientDigest + " Username:" + username 
-                    + " ClientSigest:" + clientDigest + " nOnce:" + nOnce 
-                    + " nc:" + nc + " cnonce:" + cnonce + " qop:" + qop 
-                    + " realm:" + realm + "md5a2:" + md5a2 
-                    + " Server digest:" + serverDigest);
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("Digest : " + clientDigest + " Username:" + username 
+                     + " ClientSigest:" + clientDigest + " nOnce:" + nOnce 
+                     + " nc:" + nc + " cnonce:" + cnonce + " qop:" + qop 
+                     + " realm:" + realm + "md5a2:" + md5a2 
+                     + " Server digest:" + serverDigest);
         }
         
         if (serverDigest.equals(clientDigest))
@@ -438,18 +436,18 @@ public abstract class RealmBase
             return (null);
 
         // Check the validity of each certificate in the chain
-        if (log.isDebugEnabled())
-            log.debug("Authenticating client certificate chain");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Authenticating client certificate chain");
         if (validate) {
             for (int i = 0; i < certs.length; i++) {
-                if (log.isDebugEnabled())
-                    log.debug(" Checking validity for '" +
-                        certs[i].getSubjectDN().getName() + "'");
+                if (log.isLoggable(Level.FINE))
+                    log.fine("Checking validity for '" +
+                             certs[i].getSubjectDN().getName() + "'");
                 try {
                     certs[i].checkValidity();
                 } catch (Exception e) {
-                    if (log.isDebugEnabled())
-                        log.debug("  Validity exception", e);
+                    if (log.isLoggable(Level.FINE))
+                        log.log(Level.FINE, "Validity exception", e);
                     return (null);
                 }
             }
@@ -484,8 +482,8 @@ public abstract class RealmBase
         // Are there any defined security constraints?
         SecurityConstraint constraints[] = context.findConstraints();
         if ((constraints == null) || (constraints.length == 0)) {
-            if (log.isDebugEnabled())
-                log.debug("  No applicable constraints defined");
+            if (log.isLoggable(Level.FINE))
+                log.fine("  No applicable constraints defined");
             return (null);
         }
 
@@ -514,17 +512,17 @@ public abstract class RealmBase
                 continue;
             }
 
-            if (log.isTraceEnabled()) {
+            if (log.isLoggable(Level.FINEST)) {
                 /* SJSWS 6324431
                 log.trace("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
                 */
                 // START SJSWS 6324431
-                log.trace("  Checking constraint '" + constraints[i] +
-                          "' against " + method + " " + origUri + " --> " +
-                          constraints[i].included(uri, method, 
-                                                  caseSensitiveMapping));
+                log.finest("Checking constraint '" + constraints[i] +
+                           "' against " + method + " " + origUri + " --> " +
+                           constraints[i].included(uri, method, 
+                                                   caseSensitiveMapping));
                 // END SJSWS 6324431
             }
             /* SJSWS 6324431
@@ -534,11 +532,11 @@ public abstract class RealmBase
             }
             */
             // START SJSWS 6324431
-            if (log.isDebugEnabled()
+            if (log.isLoggable(Level.FINE)
                     && constraints[i].included(uri, method,
                                                caseSensitiveMapping)) {
-                log.debug("  Matched constraint '" + constraints[i] +
-                    "' against " + method + " " + origUri);
+                log.fine("  Matched constraint '" + constraints[i] +
+                         "' against " + method + " " + origUri);
             }
             // END SJSWS 6324431
 
@@ -587,17 +585,17 @@ public abstract class RealmBase
                 continue;
             }
 
-            if (log.isTraceEnabled()) {
+            if (log.isLoggable(Level.FINEST)) {
                 /* SJSWS 6324431
                 log.trace("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
                 */
                 // START SJSWS 6324431
-                log.trace("  Checking constraint '" + constraints[i] +
-                          "' against " + method + " " + origUri + " --> " +
-                          constraints[i].included(uri, method,
-                                                  caseSensitiveMapping));
+                log.finest("  Checking constraint '" + constraints[i] +
+                           "' against " + method + " " + origUri + " --> " +
+                           constraints[i].included(uri, method,
+                                                   caseSensitiveMapping));
                 // END SJSWS 6324431
             }
             /* SJSWS 6324431
@@ -607,11 +605,11 @@ public abstract class RealmBase
             }
             */
             // START SJSWS 6324431
-            if (log.isDebugEnabled()
+            if (log.isLoggable(Level.FINE)
                     && constraints[i].included(uri, method,
                                                caseSensitiveMapping)) {
-                log.debug("  Matched constraint '" + constraints[i] +
-                    "' against " + method + " " + origUri);
+                log.fine("  Matched constraint '" + constraints[i] +
+                         "' against " + method + " " + origUri);
             }
             // END SJSWS 6324431
 
@@ -682,17 +680,17 @@ public abstract class RealmBase
                 continue;
             }
             
-            if (log.isTraceEnabled()) {
+            if (log.isLoggable(Level.FINEST)) {
                 /* SJSWS 6324431
                 log.trace("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
                 */
                 // START SJSWS 6324431
-                log.trace("  Checking constraint '" + constraints[i] +
-                          "' against " + method + " " + origUri + " --> " +
-                          constraints[i].included(uri, method, 
-                                                  caseSensitiveMapping));
+                log.finest("  Checking constraint '" + constraints[i] +
+                           "' against " + method + " " + origUri + " --> " +
+                           constraints[i].included(uri, method, 
+                                                   caseSensitiveMapping));
                 // END SJSWS 6324431
             }
             /* SJSWS 6324431
@@ -702,11 +700,11 @@ public abstract class RealmBase
             }
             */
             // START SJSWS 6324431
-            if (log.isDebugEnabled()
+            if (log.isLoggable(Level.FINE)
                     && constraints[i].included(uri, method,
                                                caseSensitiveMapping)) {
-                log.debug("  Matched constraint '" + constraints[i] +
-                    "' against " + method + " " + origUri);
+                log.fine("  Matched constraint '" + constraints[i] +
+                         "' against " + method + " " + origUri);
             }
             // END SJSWS 6324431
 
@@ -767,17 +765,17 @@ public abstract class RealmBase
                 continue;
             }
 
-            if (log.isTraceEnabled()) {
+            if (log.isLoggable(Level.FINEST)) {
                 /* SJSWS 6324431
                 log.trace("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
                 */
                 // START SJSWS 6324431
-                log.trace("  Checking constraint '" + constraints[i] +
-                          "' against " + method + " " + origUri + " --> " +
-                          constraints[i].included(uri, method,
-                                                  caseSensitiveMapping));
+                log.finest("  Checking constraint '" + constraints[i] +
+                           "' against " + method + " " + origUri + " --> " +
+                           constraints[i].included(uri, method,
+                                                   caseSensitiveMapping));
                 // END SJSWS 6324431
             }
             /* SJSWS 6324431
@@ -787,11 +785,11 @@ public abstract class RealmBase
             }
             */
             // START SJSWS 6324431
-            if (log.isDebugEnabled()
+            if (log.isLoggable(Level.FINE)
                     && constraints[i].included(uri, method,
                                                caseSensitiveMapping)) {
-                log.debug("  Matched constraint '" + constraints[i] +
-                    "' against " + method + " " + origUri);
+                log.fine("  Matched constraint '" + constraints[i] +
+                         "' against " + method + " " + origUri);
             }
             // END SJSWS 6324431
 
@@ -828,8 +826,8 @@ public abstract class RealmBase
 
         if(results == null) {
             // No applicable security constraint was found
-            if (log.isDebugEnabled())
-                log.debug("  No applicable constraint located");
+            if (log.isLoggable(Level.FINE))
+                log.fine("  No applicable constraint located");
         }
         return resultsToArray(results);
     }
@@ -876,19 +874,19 @@ public abstract class RealmBase
             String requestURI = request.getRequestPathMB().toString();
             String loginPage = config.getLoginPage();
             if (loginPage.equals(requestURI)) {
-                if (log.isDebugEnabled())
-                    log.debug(" Allow access to login page " + loginPage);
+                if (log.isLoggable(Level.FINE))
+                    log.fine(" Allow access to login page " + loginPage);
                 return (true);
             }
             String errorPage = config.getErrorPage();
             if (errorPage.equals(requestURI)) {
-                if (log.isDebugEnabled())
-                    log.debug(" Allow access to error page " + errorPage);
+                if (log.isLoggable(Level.FINE))
+                    log.fine(" Allow access to error page " + errorPage);
                 return (true);
             }
             if (requestURI.endsWith(Constants.FORM_ACTION)) {
-                if (log.isDebugEnabled())
-                    log.debug(" Allow access to username/password submission");
+                if (log.isLoggable(Level.FINE))
+                    log.fine(" Allow access to username/password submission");
                 return (true);
             }
         }
@@ -905,8 +903,8 @@ public abstract class RealmBase
             if (constraint.getAllRoles())
                 return (true);
 
-            if (log.isDebugEnabled())
-                log.debug("  Checking roles " + principal);
+            if (log.isLoggable(Level.FINE))
+                log.fine("  Checking roles " + principal);
 
             if (roles.length == 0) {
                 if(constraint.getAuthConstraint()) {
@@ -922,15 +920,15 @@ public abstract class RealmBase
                     response.setDetailMessage(sm.getString("realmBase.forbidden"));
                     // END S1AS 4878272
 
-                    if( log.isDebugEnabled() ) log.debug("No roles ");
+                    if (log.isLoggable(Level.FINE)) log.fine("No roles ");
                     return (false); // No listed roles means no access at all
                 } else {
-                    log.debug("Passing all access");
+                    log.fine("Passing all access");
                     return (true);
                 }
             } else if (principal == null) {
-                if (log.isDebugEnabled())
-                    log.debug("  No user authenticated, cannot grant access");
+                if (log.isLoggable(Level.FINE))
+                    log.fine("  No user authenticated, cannot grant access");
 
                 /* S1AS 4878272
                 ((HttpServletResponse) response.getResponse()).sendError
@@ -949,8 +947,8 @@ public abstract class RealmBase
             for (int j = 0; j < roles.length; j++) {
                 if (hasRole(principal, roles[j]))
                     return (true);
-                if( log.isDebugEnabled() )
-                    log.debug( "No role found:  " + roles[j]);
+                if (log.isLoggable(Level.FINE))
+                    log.fine("No role found:  " + roles[j]);
             }
         }
         // Return a "Forbidden" message denying access to this resource
@@ -1080,15 +1078,15 @@ public abstract class RealmBase
 
         GenericPrincipal gp = (GenericPrincipal) principal;
         if (!(gp.getRealm() == this)) {
-            log.debug("Different realm " + this + " " + gp.getRealm());//    return (false);
+            log.fine("Different realm " + this + " " + gp.getRealm());//    return (false);
         }
         boolean result = gp.hasRole(role);
-        if (log.isDebugEnabled()) {
+        if (log.isLoggable(Level.FINE)) {
             String name = principal.getName();
             if (result)
-                log.debug(sm.getString("realmBase.hasRoleSuccess", name, role));
+                log.fine(sm.getString("realmBase.hasRoleSuccess", name, role));
             else
-                log.debug(sm.getString("realmBase.hasRoleFailure", name, role));
+                log.fine(sm.getString("realmBase.hasRoleFailure", name, role));
         }
         return (result);
 
@@ -1114,29 +1112,29 @@ public abstract class RealmBase
 
         // Is there a relevant user data constraint?
         if (constraints == null || constraints.length == 0) {
-            if (log.isDebugEnabled())
-                log.debug("  No applicable security constraint defined");
+            if (log.isLoggable(Level.FINE))
+                log.fine("  No applicable security constraint defined");
             return (true);
         }
         for(int i=0; i < constraints.length; i++) {
             SecurityConstraint constraint = constraints[i];
             String userConstraint = constraint.getUserConstraint();
             if (userConstraint == null) {
-                if (log.isDebugEnabled())
-                    log.debug("  No applicable user data constraint defined");
+                if (log.isLoggable(Level.FINE))
+                    log.fine("  No applicable user data constraint defined");
                 return (true);
             }
             if (userConstraint.equals(Constants.NONE_TRANSPORT)) {
-                if (log.isDebugEnabled())
-                    log.debug("  User data constraint has no restrictions");
+                if (log.isLoggable(Level.FINE))
+                    log.fine("  User data constraint has no restrictions");
                 return (true);
             }
 
         }
         // Validate the request against the user data constraint
         if (request.getRequest().isSecure()) {
-            if (log.isDebugEnabled())
-                log.debug("  User data constraint already satisfied");
+            if (log.isLoggable(Level.FINE))
+                log.fine("  User data constraint already satisfied");
             return (true);
         }
         // Initialize variables we need to determine the appropriate action
@@ -1147,8 +1145,8 @@ public abstract class RealmBase
 
         // Is redirecting disabled?
         if (redirectPort <= 0) {
-            if (log.isDebugEnabled())
-                log.debug("  SSL redirect is disabled");
+            if (log.isLoggable(Level.FINE))
+                log.fine("  SSL redirect is disabled");
             /* S1AS 4878272
             hresponse.sendError
             response.sendError
@@ -1185,8 +1183,8 @@ public abstract class RealmBase
             file.append('?');
             file.append(queryString);
         }
-        if (log.isDebugEnabled())
-            log.debug("  Redirecting to " + file.toString());
+        if (log.isLoggable(Level.FINE))
+            log.fine("Redirecting to " + file.toString());
         hresponse.sendRedirect(file.toString());
         return (false);
 
@@ -1310,9 +1308,9 @@ public abstract class RealmBase
         if ( oname!=null ) {   
             try {   
                 Registry.getRegistry(null, null).unregisterComponent(oname); 
-                log.debug( "unregistering realm " + oname );   
+                log.fine( "unregistering realm " + oname );   
             } catch( Exception ex ) {   
-                log.error( "Can't unregister realm " + oname, ex);   
+                log.log(Level.SEVERE, "Can't unregister realm " + oname, ex);
             }      
         }
           
@@ -1347,7 +1345,9 @@ public abstract class RealmBase
                     try {
                         bytes = credentials.getBytes(getDigestEncoding());
                     } catch (UnsupportedEncodingException uee) {
-                        log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
+                        log.log(Level.SEVERE,
+                                "Illegal digestEncoding: " + getDigestEncoding(),
+                                uee);
                         throw new IllegalArgumentException(uee.getMessage());
                     }
                 }
@@ -1355,7 +1355,7 @@ public abstract class RealmBase
 
                 return (HexUtils.convert(md.digest()));
             } catch (Exception e) {
-                log.error(sm.getString("realmBase.digest"), e);
+                log.log(Level.SEVERE, sm.getString("realmBase.digest"), e);
                 return (credentials);
             }
         }
@@ -1374,7 +1374,7 @@ public abstract class RealmBase
             try {
                 md5Helper = MessageDigest.getInstance("MD5");
             } catch (NoSuchAlgorithmException e) {
-                log.error("Couldn't get MD5 digest: ", e);
+                log.log(Level.SEVERE, "Couldn't get MD5 digest: ", e);
                 throw new IllegalStateException(e.getMessage());
             }
         }
@@ -1394,7 +1394,9 @@ public abstract class RealmBase
             try {
                 valueBytes = digestValue.getBytes(getDigestEncoding());
             } catch (UnsupportedEncodingException uee) {
-                log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
+                log.log(Level.SEVERE,
+                        "Illegal digestEncoding: " + getDigestEncoding(),
+                        uee);
                 throw new IllegalArgumentException(uee.getMessage());
             }
         }
@@ -1435,7 +1437,7 @@ public abstract class RealmBase
      */
     protected void log(String message) {
 
-        Logger logger = null;
+        org.apache.catalina.Logger logger = null;
         String name = null;
         if (container != null) {
             logger = container.getLogger();
@@ -1459,7 +1461,7 @@ public abstract class RealmBase
      */
     protected void log(String message, Throwable throwable) {
 
-        Logger logger = null;
+        org.apache.catalina.Logger logger = null;
         String name = null;
         if (container != null) {
             logger = container.getLogger();
@@ -1641,7 +1643,7 @@ public abstract class RealmBase
                             host + path);
                 }
                 if( mserver.isRegistered(parent ))  {
-                    log.debug("Register with " + parent);
+                    log.fine("Register with " + parent);
                     mserver.setAttribute(parent, new Attribute("realm", this));
                 }
             } catch (Exception e) {
@@ -1655,9 +1657,9 @@ public abstract class RealmBase
                 ContainerBase cb=(ContainerBase)container;
                 oname=new ObjectName(cb.getDomain()+":type=Realm" + cb.getContainerSuffix());
                 Registry.getRegistry(null, null).registerComponent(this, oname, null );
-                log.debug("Register Realm "+oname);
+                log.fine("Register Realm "+oname);
             } catch (Throwable e) {
-                log.error( "Can't register " + oname, e);
+                log.log(Level.SEVERE,  "Can't register " + oname, e);
             }
         }
 
