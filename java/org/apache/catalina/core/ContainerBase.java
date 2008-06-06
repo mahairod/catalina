@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.locks.*;
+import java.util.logging.*;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -52,7 +53,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
-import org.apache.catalina.Logger;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
@@ -130,8 +130,8 @@ import org.apache.naming.resources.ProxyDirContext;
 public abstract class ContainerBase
     implements Container, Lifecycle, Pipeline, MBeanRegistration, Serializable {
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( ContainerBase.class );
+    private static Logger log = Logger.getLogger(
+        ContainerBase.class.getName());
 
     /**
      * Perform addChild with the permissions of this class.
@@ -211,7 +211,7 @@ public abstract class ContainerBase
     /**
      * The Logger implementation with which this Container is associated.
      */
-    protected Logger logger = null;
+    protected org.apache.catalina.Logger logger = null;
 
     /**
      * The Manager implementation with which this Container is associated.
@@ -414,7 +414,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldLoader).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setLoader: stop: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setLoader: stop: ",
+                            e);
                 }
             }
 
@@ -426,7 +427,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) loader).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setLoader: start: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setLoader: start: ",
+                            e);
                 }
             }
         } finally {
@@ -444,7 +446,7 @@ public abstract class ContainerBase
      * no associated Logger, return the Logger associated with our parent
      * Container (if any); otherwise return <code>null</code>.
      */
-    public Logger getLogger() {
+    public org.apache.catalina.Logger getLogger() {
 
         try {
             readLock.lock();
@@ -466,9 +468,9 @@ public abstract class ContainerBase
      *
      * @param logger The newly associated Logger
      */
-    public void setLogger(Logger logger) {
+    public void setLogger(org.apache.catalina.Logger logger) {
 
-        Logger oldLogger;
+        org.apache.catalina.Logger oldLogger;
 
         try {
             writeLock.lock();
@@ -484,7 +486,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldLogger).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setLogger: stop: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setLogger: stop: ",
+                            e);
                 }
             }
 
@@ -497,7 +500,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) logger).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setLogger: start: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setLogger: start: ",
+                            e);
                 }
             }
         } finally {
@@ -555,7 +559,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldManager).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setManager: stop: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setManager: stop: ",
+                            e);
                 }
             }
 
@@ -567,7 +572,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) manager).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setManager: start: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setManager: start: ",
+                            e);
                 }
             }
         } finally {
@@ -632,7 +638,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldCluster).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: stop: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setCluster: stop: ",
+                            e);
                 }
             }
 
@@ -645,7 +652,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) cluster).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: start: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setCluster: start: ",
+                            e);
                 }
             }
         } finally {
@@ -829,7 +837,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldRealm).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: stop: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setRealm: stop: ",
+                            e);
                 }
             }
 
@@ -841,7 +850,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) realm).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: start: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.setRealm: start: ",
+                            e);
                 }
             }
         } finally {
@@ -942,8 +952,8 @@ public abstract class ContainerBase
 
     private void addChildInternal(Container child) {
 
-        if( log.isTraceEnabled() )
-            log.trace("Add child " + child + " " + this);
+        if(log.isLoggable(Level.FINEST))
+            log.finest("Add child " + child + " " + this);
         synchronized(children) {
             if (children.get(child.getName()) != null)
                 throw new IllegalArgumentException("addChild:  Child name '" +
@@ -954,7 +964,8 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) child).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.addChild: start: ", e);
+                    log.log(Level.SEVERE, "ContainerBase.addChild: start: ",
+                            e);
                     throw new IllegalStateException
                         ("ContainerBase.addChild: start: " + e);
                 }
@@ -1087,7 +1098,7 @@ public abstract class ContainerBase
                     ((Lifecycle) child).stop();
                 }
             } catch (LifecycleException e) {
-                log.error("ContainerBase.removeChild: stop: ", e);
+                log.log(Level.SEVERE, "ContainerBase.removeChild: stop: ", e);
             }
         }
         
@@ -1170,7 +1181,7 @@ public abstract class ContainerBase
 
         // Validate and update our current component state
         if (started) {
-            if (log.isInfoEnabled()) {
+            if (log.isLoggable(Level.INFO)) {
                 log.info(sm.getString("containerBase.alreadyStarted",
                                       logName()));
             }
@@ -1185,7 +1196,8 @@ public abstract class ContainerBase
                     Registry.getRegistry().registerComponent(lb, lname,
                                                              null);
                 } catch( Exception ex ) {
-                    log.error( "Can't register logger " + lname, ex);
+                    log.log(Level.SEVERE, "Can't register logger " + lname,
+                            ex);
                 }
             }
         }
@@ -1238,7 +1250,7 @@ public abstract class ContainerBase
 
         // Validate and update our current component state
         if (!started) {
-            if (log.isInfoEnabled()) {
+            if (log.isLoggable(Level.INFO)) {
                 log.info(sm.getString("containerBase.notStarted",
                                       logName()));
             }
@@ -1267,8 +1279,10 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) children[i]).stop();
                 } catch (Throwable t) {
-                    log.error(sm.getString("containerBase.errorStopping",
-                                           children[i]), t);
+                    log.log(Level.SEVERE,
+                            sm.getString("containerBase.errorStopping",
+                                         children[i]),
+                            t);
                 }
             }
         }
@@ -1305,8 +1319,9 @@ public abstract class ContainerBase
                 try {
                     Registry.getRegistry().unregisterComponent(lb.getObjectName());
                 } catch( Exception ex ) {
-                    log.error("Can't unregister logger "
-                              + lb.getObjectName(), ex);
+                    log.log(Level.SEVERE,
+                            "Can't unregister logger " + lb.getObjectName(),
+                            ex);
                 }
             }
         }
@@ -1358,12 +1373,12 @@ public abstract class ContainerBase
             try {
                 if( controller == oname ) {
                     Registry.getRegistry(null, null).unregisterComponent(oname);
-                    if (log.isDebugEnabled()) {
-                        log.debug("unregistering " + oname);
+                    if (log.isLoggable(Level.FINE)) {
+                        log.fine("unregistering " + oname);
                     }
                 }
             } catch( Throwable t ) {
-                log.error("Error unregistering ", t );
+                log.log(Level.SEVERE, "Error unregistering ", t);
             }
         }
 
@@ -1532,8 +1547,10 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) children[i]).start();
                 } catch (Throwable t) {
-                    log.error(sm.getString("containerBase.notStarted",
-                                           children[i]), t);
+                    log.log(Level.SEVERE,
+                            sm.getString("containerBase.notStarted",
+                                         children[i]),
+                            t);
                     if (children[i] instanceof Context) {
                         ((Context) children[i]).setAvailable(false);
                     } else if (children[i] instanceof Wrapper) {
@@ -1569,11 +1586,11 @@ public abstract class ContainerBase
      */
     protected void log(String message, Throwable throwable) {
 
-        Logger logger = getLogger();
+        org.apache.catalina.Logger logger = getLogger();
         if (logger != null)
             logger.log(logName() + ": " + message, throwable);
         else {
-            log.error( message, throwable );
+            log.log(Level.SEVERE, message, throwable);
         }
 
     }
@@ -1688,8 +1705,8 @@ public abstract class ContainerBase
     public ObjectName createObjectName(String domain, ObjectName parent)
         throws Exception
     {
-        if( log.isDebugEnabled())
-            log.debug("Create ObjectName " + domain + " " + parent );
+        if (log.isLoggable(Level.FINE))
+            log.fine("Create ObjectName " + domain + " " + parent );
         return null;
     }
 
@@ -1803,7 +1820,8 @@ public abstract class ContainerBase
                 }
                 container.backgroundProcess();
             } catch (Throwable t) {
-                log.error("Exception invoking periodic operation: ", t);
+                log.log(Level.SEVERE,
+                        "Exception invoking periodic operation: ", t);
             } finally {
                 Thread.currentThread().setContextClassLoader(cl);
             }

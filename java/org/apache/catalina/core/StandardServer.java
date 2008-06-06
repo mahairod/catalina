@@ -43,6 +43,7 @@ import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
+import java.util.logging.*;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -59,7 +60,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
-import org.apache.catalina.Logger;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
@@ -83,8 +83,6 @@ import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.modeler.Registry;
 
 
@@ -99,7 +97,8 @@ import org.apache.commons.modeler.Registry;
 public final class StandardServer
     implements Lifecycle, Server, MBeanRegistration 
  {
-    private static Log log = LogFactory.getLog(StandardServer.class);
+    private static Logger log = Logger.getLogger(
+        StandardServer.class.getName());
    
 
     // -------------------------------------------------------------- Constants
@@ -463,7 +462,7 @@ public final class StandardServer
                 try {
                     service.initialize();
                 } catch (LifecycleException e) {
-                    log.error(e);
+                    log.log(Level.SEVERE, e.toString());
                 }
             }
 
@@ -494,8 +493,9 @@ public final class StandardServer
                 new ServerSocket(port, 1,
                                  InetAddress.getByName("127.0.0.1"));
         } catch (IOException e) {
-            log.error("StandardServer.await: create[" + port
-                               + "]: ", e);
+            log.log(Level.SEVERE,
+                    "StandardServer.await: create[" + port + "]: ",
+                    e);
             System.exit(1);
         }
 
@@ -510,11 +510,13 @@ public final class StandardServer
                 socket.setSoTimeout(10 * 1000);  // Ten seconds
                 stream = socket.getInputStream();
             } catch (AccessControlException ace) {
-                log.warn("StandardServer.accept security exception: "
-                                   + ace.getMessage(), ace);
+                log.log(Level.WARNING,
+                        "StandardServer.accept security exception: "
+                        + ace.getMessage(),
+                        ace);
                 continue;
             } catch (IOException e) {
-                log.error("StandardServer.await: accept: ", e);
+                log.log(Level.SEVERE, "StandardServer.await: accept: ", e);
                 System.exit(1);
             }
 
@@ -531,7 +533,7 @@ public final class StandardServer
                 try {
                     ch = stream.read();
                 } catch (IOException e) {
-                    log.warn("StandardServer.await: read: ", e);
+                    log.log(Level.WARNING, "StandardServer.await: read: ", e);
                     ch = -1;
                 }
                 if (ch < 32)  // Control character or EOF terminates loop
@@ -551,10 +553,10 @@ public final class StandardServer
             boolean match = command.toString().equals(shutdown);
             if (match) {
                 break;
-            } else
-                log.warn("StandardServer.await: Invalid command '" +
-                                   command.toString() + "' received");
-
+            } else {
+                log.warning("StandardServer.await: Invalid command '" +
+                            command.toString() + "' received");
+            }
         }
 
         // Close the server socket and return
@@ -1213,9 +1215,9 @@ public final class StandardServer
         }
 
         // Store nested <Logger> element
-        Logger logger = context.getLogger();
+        org.apache.catalina.Logger logger = context.getLogger();
         if (logger != null) {
-            Logger parentLogger = null;
+            org.apache.catalina.Logger parentLogger = null;
             if (context.getParent() != null) {
                 parentLogger = context.getParent().getLogger();
             }
@@ -1522,9 +1524,9 @@ public final class StandardServer
         }
 
         // Store nested <Logger> element
-        Logger logger = engine.getLogger();
+        org.apache.catalina.Logger logger = engine.getLogger();
         if (logger != null) {
-            Logger parentLogger = null;
+            org.apache.catalina.Logger parentLogger = null;
             if (engine.getParent() != null) {
                 parentLogger = engine.getParent().getLogger();
             }
@@ -1661,9 +1663,9 @@ public final class StandardServer
         }
 
         // Store nested <Logger> element
-        Logger logger = host.getLogger();
+        org.apache.catalina.Logger logger = host.getLogger();
         if (logger != null) {
-            Logger parentLogger = null;
+            org.apache.catalina.Logger parentLogger = null;
             if (host.getParent() != null) {
                 parentLogger = host.getParent().getLogger();
             }
@@ -1762,7 +1764,8 @@ public final class StandardServer
      * @exception Exception if an exception occurs while storing
      */
     private void storeLogger(PrintWriter writer, int indent,
-                             Logger logger) throws Exception {
+                             org.apache.catalina.Logger logger)
+            throws Exception {
 
         for (int i = 0; i < indent; i++) {
             writer.print(' ');
@@ -2282,7 +2285,7 @@ public final class StandardServer
 
         // Validate and update our current component state
         if (started) {
-            log.debug(sm.getString("standardServer.start.started"));
+            log.fine(sm.getString("standardServer.start.started"));
             return;
         }
 
@@ -2350,7 +2353,8 @@ public final class StandardServer
         throws LifecycleException 
     {
         if (initialized) {
-                log.info(sm.getString("standardServer.initialize.initialized"));
+                log.info(sm.getString(
+                    "standardServer.initialize.initialized"));
             return;
         }
         // START GlassFish 2439
@@ -2363,7 +2367,7 @@ public final class StandardServer
                 oname=new ObjectName( "Catalina:type=Server");
                 Registry.getRegistry().registerComponent(this, oname, null );
             } catch (Exception e) {
-                log.error("Error registering ",e);
+                log.log(Level.SEVERE, "Error registering ",e);
             }
         }
         

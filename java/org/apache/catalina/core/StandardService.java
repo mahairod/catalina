@@ -26,6 +26,7 @@ package org.apache.catalina.core;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.logging.*;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -40,8 +41,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.ServerFactory;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.modeler.Registry;
 
 
@@ -56,7 +55,8 @@ import org.apache.commons.modeler.Registry;
 public class StandardService
         implements Lifecycle, Service, MBeanRegistration 
  {
-    private static Log log = LogFactory.getLog(StandardService.class);
+    private static Logger log = Logger.getLogger(
+        StandardService.class.getName());
    
 
     // ----------------------------------------------------- Instance Variables
@@ -295,7 +295,7 @@ public class StandardService
                 try {
                     connector.initialize();
                 } catch (LifecycleException e) {
-                    log.error("Connector.initialize", e);
+                    log.log(Level.SEVERE, "Connector.initialize", e);
                 }
             }
 
@@ -303,7 +303,7 @@ public class StandardService
                 try {
                     ((Lifecycle) connector).start();
                 } catch (LifecycleException e) {
-                    log.error("Connector.start", e);
+                    log.log(Level.SEVERE, "Connector.start", e);
                 }
             }
 
@@ -534,8 +534,7 @@ public class StandardService
 
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
 
-        log.info
-            (sm.getString("standardService.stop.name", this.name));
+        log.info(sm.getString("standardService.stop.name", this.name));
         started = false;
 
         // Stop our defined Connectors first
@@ -593,8 +592,10 @@ public class StandardService
                 this.controller=oname;
                 Registry.getRegistry().registerComponent(this, oname, null);
             } catch (Exception e) {
-                log.error(sm.getString("standardService.register.failed",
-                                       domain),e);
+                log.log(Level.SEVERE,
+                        sm.getString("standardService.register.failed",
+                                     domain),
+                        e);
             }
             
             
@@ -635,8 +636,9 @@ public class StandardService
         try {
             initialize();
         } catch( Throwable t ) {
-            log.error(sm.getString("standardService.initialize.failed",
-                                   domain),t);
+            log.log(Level.SEVERE,
+                    sm.getString("standardService.initialize.failed", domain),
+                    t);
         }
     }
 

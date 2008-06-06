@@ -22,6 +22,7 @@
 package org.apache.catalina.core;
 
 import java.io.*;
+import java.util.logging.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -37,9 +38,6 @@ import org.apache.catalina.util.ResponseUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.valves.ErrorReportValve;
 import org.apache.coyote.tomcat5.CoyoteResponseFacade;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Class responsible for processing the result of a RD.forward() invocation
@@ -63,8 +61,8 @@ import org.apache.commons.logging.LogFactory;
  */
 class ApplicationDispatcherForward {
 
-    private static Log log = LogFactory.getLog(
-        ApplicationDispatcherForward.class);
+    private static Logger log = Logger.getLogger(
+        ApplicationDispatcherForward.class.getName());
 
     private static final StringManager sm =
         StringManager.getManager(org.apache.catalina.valves.Constants.Package);
@@ -178,7 +176,8 @@ class ApplicationDispatcherForward {
                 try {
                     serveErrorPage(response, errorPage, statusCode);
                 } catch (Exception e) {
-                    log.warn("Exception processing " + errorPage, e);
+                    log.log(Level.WARNING,
+                            "Exception processing " + errorPage, e);
                 }
             }
         }
@@ -213,9 +212,9 @@ class ApplicationDispatcherForward {
                 servletContext.getRequestDispatcher(errorPage.getLocation());
             rd.forward(request, response);
         } catch (IllegalStateException ise) {
-            log.warn("Exception processing " + errorPage, ise);
+            log.log(Level.WARNING, "Exception processing " + errorPage, ise);
         } catch (Throwable t) {
-            log.warn("Exception processing " + errorPage, t);
+            log.log(Level.WARNING, "Exception processing " + errorPage, t);
         }
     }
 
@@ -348,7 +347,7 @@ class ApplicationDispatcherForward {
             response.setContentType("text/html");
             response.getWriter().write(responseContents);
         } catch (Throwable t) {
-            log.warn("Exception sending default error page", t);
+            log.log(Level.WARNING, "Exception sending default error page", t);
         }
     }
 

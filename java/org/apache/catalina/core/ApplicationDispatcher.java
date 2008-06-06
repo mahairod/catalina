@@ -25,6 +25,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.*;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
@@ -40,13 +41,11 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.HttpRequest;
 import org.apache.catalina.HttpResponse;
 import org.apache.catalina.InstanceEvent;
-import org.apache.catalina.Logger;
 //START OF 6364900
 import org.apache.catalina.Manager;
 //END OF 6364900
@@ -67,8 +66,6 @@ import org.apache.catalina.util.StringManager;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.tomcat5.CoyoteRequest;
 import org.apache.coyote.tomcat5.CoyoteRequestFacade;
 
@@ -88,7 +85,6 @@ import org.apache.coyote.tomcat5.CoyoteRequestFacade;
 
 final class ApplicationDispatcher
     implements RequestDispatcher {
-
 
     protected class PrivilegedForward implements PrivilegedExceptionAction {
         private ServletRequest request;
@@ -207,8 +203,8 @@ final class ApplicationDispatcher
         this.support = ((StandardWrapper) wrapper).getInstanceSupport();
         // END GlassFish 6386229
 
-        if ( log.isDebugEnabled() )
-            log.debug("servletPath=" + this.servletPath + ", pathInfo=" +
+        if (log.isLoggable(Level.FINE))
+            log.fine("servletPath=" + this.servletPath + ", pathInfo=" +
                 this.pathInfo + ", queryString=" + queryString +
                 ", name=" + this.name);
 
@@ -217,7 +213,8 @@ final class ApplicationDispatcher
 
     // ----------------------------------------------------- Instance Variables
 
-    private static Log log = LogFactory.getLog(ApplicationDispatcher.class);
+    private static Logger log = Logger.getLogger(
+        ApplicationDispatcher.class.getName());
 
 
     //START OF 6364900
@@ -361,16 +358,16 @@ final class ApplicationDispatcher
         
         // Reset any output that has been buffered, but keep headers/cookies
         if (response.isCommitted()) {
-            if ( log.isDebugEnabled() )
-                log.debug("  Forward on committed response --> ISE");
+            if (log.isLoggable(Level.FINE))
+                log.fine("  Forward on committed response --> ISE");
             throw new IllegalStateException
                 (sm.getString("applicationDispatcher.forward.ise"));
         }
         try {
             response.resetBuffer();
         } catch (IllegalStateException e) {
-            if ( log.isDebugEnabled() )
-                log.debug("  Forward resetBuffer() returned ISE: " + e);
+            if (log.isLoggable(Level.FINE))
+                log.fine("  Forward resetBuffer() returned ISE: " + e);
             throw e;
         }
 
@@ -398,8 +395,8 @@ final class ApplicationDispatcher
         // Handle a non-HTTP forward by passing the existing request/response
         if ((hrequest == null) || (hresponse == null)) {
 
-            if ( log.isDebugEnabled() )
-                log.debug(" Non-HTTP Forward");
+            if (log.isLoggable(Level.FINE))
+                log.fine(" Non-HTTP Forward");
             
             processRequest(hrequest,hresponse,state);
 
@@ -408,8 +405,8 @@ final class ApplicationDispatcher
         // Handle an HTTP named dispatcher forward
         else if ((servletPath == null) && (pathInfo == null)) {
 
-            if ( log.isDebugEnabled() )
-                log.debug(" Named Dispatcher Forward");
+            if (log.isLoggable(Level.FINE))
+                log.fine(" Named Dispatcher Forward");
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -428,8 +425,8 @@ final class ApplicationDispatcher
         // Handle an HTTP path-based forward
         else {
 
-            if ( log.isDebugEnabled() )
-                log.debug(" Path Based Forward");
+            if (log.isLoggable(Level.FINE))
+                log.fine(" Path Based Forward");
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -595,8 +592,8 @@ final class ApplicationDispatcher
         // Handle an HTTP named dispatcher include
         if (name != null) {
         // END GlassFish 6386229
-            if ( log.isDebugEnabled() )
-                log.debug(" Named Dispatcher Include");
+            if (log.isLoggable(Level.FINE))
+                log.fine("Named Dispatcher Include");
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -620,8 +617,8 @@ final class ApplicationDispatcher
         // Handle an HTTP path based include
         else {
 
-            if ( log.isDebugEnabled() )
-                log.debug(" Path Based Include");
+            if (log.isLoggable(Level.FINE))
+                log.fine("Path Based Include");
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -887,8 +884,10 @@ final class ApplicationDispatcher
             if (filterChain != null)
                 filterChain.release();
         } catch (Throwable e) {
-            log.error(sm.getString("standardWrapper.releaseFilters",
-                             wrapper.getName()), e);
+            log.log(Level.SEVERE,
+                    sm.getString("standardWrapper.releaseFilters",
+                                 wrapper.getName()),
+                    e);
           //FIXME Exception handling needs to be simpiler to what is in the StandardWrapperValue
         }
 
@@ -930,7 +929,7 @@ final class ApplicationDispatcher
      * @param message Message to be logged
      */
     private void log(String message) {
-        Logger logger = context.getLogger();
+        org.apache.catalina.Logger logger = context.getLogger();
         if (logger != null)
             logger.log("ApplicationDispatcher[" + context.getPath() +
                        "]: " + message);
@@ -948,7 +947,7 @@ final class ApplicationDispatcher
      * @param throwable Associated exception
      */
     private void log(String message, Throwable throwable) {
-        Logger logger = context.getLogger();
+        org.apache.catalina.Logger logger = context.getLogger();
         if (logger != null)
             logger.log("ApplicationDispatcher[" + context.getPath() +
                        "] " + message, throwable);

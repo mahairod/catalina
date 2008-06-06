@@ -25,9 +25,10 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
-import java.lang.reflect.Method;
+import java.util.logging.*;
  
 import javax.management.ObjectName;
 import javax.management.MBeanServer;
@@ -67,8 +68,7 @@ public class StandardHost
  {
     /* Why do we implement deployer and delegate to deployer ??? */
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( StandardHost.class );
+    private static Logger log = Logger.getLogger(StandardHost.class.getName());
     
     // ----------------------------------------------------------- Constructors
 
@@ -454,7 +454,6 @@ public class StandardHost
         support.firePropertyChange("errorReportValveClass",
                                    oldErrorReportValveClassClass, 
                                    this.errorReportValveClass);
-
     }
 
 
@@ -463,9 +462,7 @@ public class StandardHost
      * this Container represents.
      */
     public String getName() {
-
         return (name);
-
     }
 
 
@@ -490,7 +487,6 @@ public class StandardHost
         String oldName = this.name;
         this.name = name;
         support.firePropertyChange("name", oldName, this.name);
-
     }
 
 
@@ -498,9 +494,7 @@ public class StandardHost
      * Unpack WARs flag accessor.
      */
     public boolean isUnpackWARs() {
-
         return (unpackWARs);
-
     }
 
 
@@ -554,7 +548,6 @@ public class StandardHost
      * Host work directory base.
      */
     public String getWorkDir() {
-
         return (workDir);
     }
 
@@ -563,7 +556,6 @@ public class StandardHost
      * Host work directory base.
      */
     public void setWorkDir(String workDir) {
-
         this.workDir = workDir;
     }
 
@@ -736,14 +728,14 @@ public class StandardHost
      */
     public Context map(String uri) {
 
-        if (log.isDebugEnabled())
-            log.debug("Mapping request URI '" + uri + "'");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Mapping request URI '" + uri + "'");
         if (uri == null)
             return (null);
 
         // Match on the longest possible context path prefix
-        if (log.isTraceEnabled())
-            log.trace("  Trying the longest context path prefix");
+        if (log.isLoggable(Level.FINEST))
+            log.finest("Trying the longest context path prefix");
         Context context = null;
         String mapuri = uri;
         while (true) {
@@ -758,20 +750,20 @@ public class StandardHost
 
         // If no Context matches, select the default Context
         if (context == null) {
-            if (log.isTraceEnabled())
-                log.trace("  Trying the default context");
+            if (log.isLoggable(Level.FINEST))
+                log.finest("Trying the default context");
             context = (Context) findChild("");
         }
 
         // Complain if no Context has been selected
         if (context == null) {
-            log.error(sm.getString("standardHost.mappingError", uri));
+            log.severe(sm.getString("standardHost.mappingError", uri));
             return (null);
         }
 
         // Return the mapped Context (if any)
-        if (log.isDebugEnabled())
-            log.debug(" Mapped to context '" + context.getPath() + "'");
+        if (log.isLoggable(Level.FINE))
+            log.fine(" Mapped to context '" + context.getPath() + "'");
         return (context);
 
     }
@@ -899,8 +891,8 @@ public class StandardHost
                     );            
                 }
             } catch( Throwable t ) {
-                if (log.isDebugEnabled()) {
-                    log.debug("No realm for this host " + realmName);
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine("No realm for this host " + realmName);
                 }
             }
         }
@@ -918,18 +910,18 @@ public class StandardHost
                 ((StandardHostValve) pipeline.getBasic()).setErrorReportValve(valve);
                 // END SJSAS 6374691
             } catch (Throwable t) {
-                log.error(sm.getString
-                    ("standardHost.invalidErrorReportValveClass", 
-                     errorReportValveClass));
+                log.severe(
+                    sm.getString("standardHost.invalidErrorReportValveClass", 
+                                 errorReportValveClass));
             }
         }
 
         // START SJSAS_PE 8.1 5034793
-        if (log.isDebugEnabled()) {
+        if (log.isLoggable(Level.FINE)) {
             if (xmlValidation) {
-                log.debug( sm.getString("standardHost.validationEnabled"));
+                log.fine(sm.getString("standardHost.validationEnabled"));
             } else {
-                log.debug( sm.getString("standardHost.validationDisabled"));
+                log.fine(sm.getString("standardHost.validationDisabled"));
             }
         }
         // END SJSAS_PE 8.1 5034793 
@@ -1195,7 +1187,7 @@ public class StandardHost
             Method m=c.getMethod("setHost", new Class[] {Host.class} );
             m.invoke( deployer,  new Object[] { this } );
         } catch( Throwable t ) {
-            log.error( "Error creating deployer ", t);
+            log.log(Level.SEVERE, "Error creating deployer ", t);
         }
         return deployer;
     }
@@ -1246,7 +1238,7 @@ public class StandardHost
                 ObjectName serviceName=new ObjectName(domain + ":type=Engine");
                 
                 if( mserver.isRegistered( serviceName )) {
-                    log.debug("Registering with the Engine");
+                    log.fine("Registering with the Engine");
                     mserver.invoke( serviceName, "addChild",
                             new Object[] { this },
                             new String[] { "org.apache.catalina.Container" } );
@@ -1261,9 +1253,9 @@ public class StandardHost
             try {
                 StandardEngine engine=(StandardEngine)parent;
                 domain=engine.getName();
-                if (log.isDebugEnabled()) {
-                    log.debug("Registering host " + getName()
-                              + " with domain " + domain);
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine("Registering host " + getName()
+                             + " with domain " + domain);
                 }
                 oname=new ObjectName(domain + ":type=Host,host=" +
                         this.getName());
@@ -1272,7 +1264,7 @@ public class StandardHost
                 // END CR 6368091
                 Registry.getRegistry().registerComponent(this, oname, null);
             } catch( Throwable t ) {
-                log.info("Error registering ", t );
+                log.log(Level.INFO, "Error registering ", t);
             }
         }
         // START CR 6368085
@@ -1293,8 +1285,8 @@ public class StandardHost
     public ObjectName createObjectName(String domain, ObjectName parent)
         throws Exception
     {
-        if( log.isDebugEnabled())
-            log.debug("Create ObjectName " + domain + " " + parent );
+        if( log.isLoggable(Level.FINE))
+            log.fine("Create ObjectName " + domain + " " + parent );
         return new ObjectName( domain + ":type=Host,host=" + getName());
     }
 }

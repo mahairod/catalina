@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.logging.*;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Deployer;
@@ -59,8 +60,8 @@ import org.xml.sax.SAXParseException;
 
 public class StandardHostDeployer implements Deployer {
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( StandardHostDeployer.class );
+    private static Logger log = Logger.getLogger(
+        StandardHostDeployer.class.getName());
 
     // ----------------------------------------------------------- Constructors
 
@@ -281,9 +282,9 @@ public class StandardHostDeployer implements Deployer {
             host.addChild(context);
             host.fireContainerEvent(INSTALL_EVENT, context);
         } catch (ClassNotFoundException e) {
-            log.info("", e);
+            log.log(Level.INFO, "", e);
         } catch (Exception e) {
-            log.info("Error installing", e);
+            log.log(Level.INFO, "Error installing", e);
             throw new IOException(e.toString());
         }
 
@@ -386,8 +387,9 @@ public class StandardHostDeployer implements Deployer {
             StandardServer server = (StandardServer) engine.getService().getServer();
             //server.storeContext(context);
         } catch (Exception e) {
-            log.error(sm.getString("standardHost.installError", contextPath),
-                      e);
+            log.log(Level.SEVERE,
+                    sm.getString("standardHost.installError", contextPath),
+                    e);
             throw new IOException(e.toString());
         }
 
@@ -564,7 +566,8 @@ public class StandardHostDeployer implements Deployer {
             host.removeChild(context);
             host.fireContainerEvent(REMOVE_EVENT, context);
         } catch (Exception e) {
-            log.error(sm.getString("standardHost.removeError", contextPath), e);
+            log.log(Level.SEVERE,
+                    sm.getString("standardHost.removeError", contextPath), e);
             throw new IOException(e.toString());
         }
 
@@ -723,7 +726,8 @@ public class StandardHostDeployer implements Deployer {
         try {
             ((Lifecycle) context).start();
         } catch (LifecycleException e) {
-            log.info("standardHost.start " + contextPath + ": ", e);
+            log.log(Level.INFO, "standardHost.start " + contextPath + ": ",
+                    e);
             throw new IllegalStateException
                 ("standardHost.start " + contextPath + ": " + e);
         }
@@ -760,7 +764,8 @@ public class StandardHostDeployer implements Deployer {
         try {
             ((Lifecycle) context).stop();
         } catch (LifecycleException e) {
-            log.error("standardHost.stop " + contextPath + ": ", e);
+            log.log(Level.SEVERE, "standardHost.stop " + contextPath + ": ",
+                    e);
             throw new IllegalStateException
                 ("standardHost.stop " + contextPath + ": " + e);
         }
