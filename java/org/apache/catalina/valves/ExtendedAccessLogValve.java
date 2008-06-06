@@ -18,11 +18,7 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.valves;
-
 
 import java.io.File;
 import java.io.FileWriter;
@@ -36,6 +32,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TimeZone;
+import java.util.logging.*;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -59,10 +56,6 @@ import org.apache.catalina.util.LifecycleSupport;
 */
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
 
 
 /**
@@ -159,22 +152,19 @@ public final class ExtendedAccessLogValve
     // END CR 6411114
 
 
-    // ----------------------------------------------------------- Constructors
-
+    // --------------------------------------------------------- Constructors
 
     /**
      * Construct a new instance of this class with default property values.
      */
     public ExtendedAccessLogValve() {
-
         super();
-
-
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-    private static Log log = LogFactory.getLog(ExtendedAccessLogValve.class);
+    // --------------------------------------------------- Instance Variables
+    private static Logger log = Logger.getLogger(
+        ExtendedAccessLogValve.class.getName());
 
 
     /**
@@ -669,7 +659,7 @@ public final class ExtendedAccessLogValve
             try {
                 holder.renameTo(new File(newFileName));
             } catch(Throwable e){
-                log.error("rotate failed", e);
+                log.log(Level.SEVERE, "rotate failed", e);
             }
 
             /* Make sure date is correct */
@@ -941,7 +931,8 @@ public final class ExtendedAccessLogValve
                     try {
                         close();
                     } catch (Throwable e){
-                        log.info("at least this wasn't swallowed", e);
+                        log.log(Level.INFO, "at least this wasn't swallowed",
+                                e);
                     }
 
                     /* Make sure date is correct */
@@ -1161,8 +1152,8 @@ public final class ExtendedAccessLogValve
      */
     public FieldInfo[] decodePattern(String fields) {
 
-        if (log.isDebugEnabled())
-            log.debug("decodePattern, fields=" + fields);
+        if (log.isLoggable(Level.FINE))
+            log.fine("decodePattern, fields=" + fields);
 
         LinkedList list = new LinkedList();
 
@@ -1177,8 +1168,8 @@ public final class ExtendedAccessLogValve
 
         int j;
         while(i<fields.length()) {
-            if (log.isDebugEnabled())
-                log.debug("fields.substring(i)=" + fields.substring(i));
+            if (log.isLoggable(Level.FINE))
+                log.fine("fields.substring(i)=" + fields.substring(i));
 
             FieldInfo currentFieldInfo = new FieldInfo();
 
@@ -1243,8 +1234,8 @@ public final class ExtendedAccessLogValve
                 i = decodeAppSpecific(fields, i, currentFieldInfo);
             } else {
                 // Unable to decode ...
-                log.error("unable to decode with rest of chars being: " +
-                            fields.substring(i));
+                log.severe("unable to decode with rest of chars being: " +
+                           fields.substring(i));
                 return null;
             }
 
@@ -1273,8 +1264,8 @@ public final class ExtendedAccessLogValve
         for (Iterator k = list.iterator(); k.hasNext();)
              f[i++] = (FieldInfo)k.next();
 
-        if (log.isDebugEnabled())
-            log.debug("finished decoding with length of: " + i);
+        if (log.isLoggable(Level.FINE))
+            log.fine("finished decoding with length of: " + i);
 
         return f;
     }
@@ -1314,13 +1305,14 @@ public final class ExtendedAccessLogValve
             i++;                                  /* Move past the ( */
             int j = fields.indexOf(')', i);
             if (j==-1) {                          /* Not found */
-                log.error("No closing ) found for in decode");
+                log.severe("No closing ) found for in decode");
                 return -1;
             }
             fieldInfo.value = fields.substring(i,j);
             i=j+1;                                // Move pointer past ) */
         } else {
-            log.error("The next characters couldn't be decoded: " + fields.substring(i));
+            log.severe("The next characters couldn't be decoded: " +
+                       fields.substring(i));
             return -1;
         }
 
@@ -1350,7 +1342,7 @@ public final class ExtendedAccessLogValve
         i+=2;
 
         if (i>=fields.length()) {
-            log.error("End of line reached before decoding x- param");
+            log.severe("End of line reached before decoding x- param");
             return -1;
         }
 
@@ -1379,7 +1371,7 @@ public final class ExtendedAccessLogValve
 
         /* test that next char is a ( */
         if (i+1!=fields.indexOf('(',i)) {
-            log.error("x param in wrong format. Needs to be 'x-#(...)' read the docs!");
+            log.severe("x param in wrong format. Needs to be 'x-#(...)' read the docs!");
             return -1;
         }
         i+=2; /* Move inside of the () */
@@ -1387,7 +1379,7 @@ public final class ExtendedAccessLogValve
         /* Look for ending ) and return error if not found. */
         int j = fields.indexOf(')',i);
         if (j==-1) {
-            log.error("x param in wrong format. No closing ')'!");
+            log.severe("x param in wrong format. No closing ')'!");
             return -1;
         }
 
@@ -1417,8 +1409,9 @@ public final class ExtendedAccessLogValve
             } else if ("secure".equals(fieldInfo.value)){
                 fieldInfo.location = FieldInfo.X_LOC_SECURE;
             } else {
-                log.error("x param for servlet request, couldn't decode value: " +
-                            fieldInfo.location);
+                log.severe(
+                    "x param for servlet request, couldn't decode value: " +
+                    fieldInfo.location);
                 return -1;
             }
         }
