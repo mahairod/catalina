@@ -33,11 +33,10 @@ import java.nio.channels.FileChannel;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.*;
 
 import org.apache.catalina.Host;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Expand out a WAR in a Host's appBase.
@@ -50,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ExpandWar {
 
-    private static Log log = LogFactory.getLog(ExpandWar.class);
+    private static Logger log = Logger.getLogger(ExpandWar.class.getName());
 
     /**
      * The string resources for this package.
@@ -218,8 +217,9 @@ public class ExpandWar {
                     oc = (new FileOutputStream(fileDest)).getChannel();
                     ic.transferTo(0, ic.size(), oc);
                 } catch (IOException e) {
-                    log.error(sm.getString
-                            ("expandWar.copy", fileSrc, fileDest), e);
+                    log.log(Level.SEVERE,
+                            sm.getString("expandWar.copy", fileSrc, fileDest),
+                            e);
                     result = false;
                 } finally {
                     if (ic != null) {

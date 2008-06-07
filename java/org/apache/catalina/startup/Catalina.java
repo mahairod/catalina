@@ -18,11 +18,7 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.startup;
-
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,6 +26,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.logging.*;
 import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -41,7 +38,6 @@ import org.apache.commons.digester.Rule;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-
 
 /**
  * Startup/Shutdown shell program for Catalina.  The following command line
@@ -64,12 +60,13 @@ import org.xml.sax.InputSource;
 
 public class Catalina extends Embedded {
 
-
     private static final ClassLoader standardServerClassLoader =
         StandardServer.class.getClassLoader();
 
+    private static Logger log = Logger.getLogger(Catalina.class.getName());
 
-    // ----------------------------------------------------- Instance Variables
+
+    // --------------------------------------------------- Instance Variables
 
 
     /**
@@ -108,7 +105,7 @@ public class Catalina extends Embedded {
     protected Thread shutdownHook = new CatalinaShutdownHook();
 
 
-    // ------------------------------------------------------------- Properties
+    // ----------------------------------------------------------- Properties
 
 
     public void setConfig(String file) {
@@ -132,9 +129,7 @@ public class Catalina extends Embedded {
      * @param parentClassLoader The shared extensions class loader.
      */
     public void setParentClassLoader(ClassLoader parentClassLoader) {
-
         this.parentClassLoader = parentClassLoader;
-
     }
 
 
@@ -144,12 +139,10 @@ public class Catalina extends Embedded {
      * @param server The new server
      */
     public void setServer(Server server) {
-
         this.server = server;
-
     }
 
-    // ----------------------------------------------------------- Main Program
+    // --------------------------------------------------------- Main Program
 
     /**
      * The application main program.
@@ -342,8 +335,8 @@ public class Catalina extends Embedded {
                                                       parentClassLoader));
 
         long t2=System.currentTimeMillis();
-        if (log.isDebugEnabled())
-            log.debug("Digester for server.xml created " + ( t2-t1 ));
+        if (log.isLoggable(Level.FINE))
+            log.fine("Digester for server.xml created " + ( t2-t1 ));
         return (digester);
 
     }
@@ -389,7 +382,7 @@ public class Catalina extends Embedded {
                 digester.parse(is);
                 fis.close();
             } catch (Exception e) {
-                log.error("Catalina.stop: ", e);
+                log.log(Level.SEVERE, "Catalina.stop: ", e);
                 System.exit(1);
             }
         }
@@ -405,7 +398,7 @@ public class Catalina extends Embedded {
             stream.close();
             socket.close();
         } catch (IOException e) {
-            log.error("Catalina.stop: ", e);
+            log.log(Level.SEVERE, "Catalina.stop: ", e);
             System.exit(1);
         }
 
@@ -482,7 +475,8 @@ public class Catalina extends Embedded {
         }
 
         if (inputStream == null && file != null) {
-            log.warn("Can't load server.xml from " + file.getAbsolutePath());
+            log.warning("Can't load server.xml from " +
+                        file.getAbsolutePath());
             return;
         }
 
@@ -492,7 +486,7 @@ public class Catalina extends Embedded {
             digester.parse(inputSource);
             inputStream.close();
         } catch (Exception e) {
-            log.warn("Catalina.start: ", e);
+            log.log(Level.WARNING, "Catalina.start: ", e);
             return;
         }
 
@@ -507,7 +501,7 @@ public class Catalina extends Embedded {
             try {
                 server.initialize();
             } catch (LifecycleException e) {
-                log.error("Catalina.start", e);
+                log.log(Level.SEVERE, "Catalina.start", e);
             }
         }
 
@@ -556,7 +550,7 @@ public class Catalina extends Embedded {
             try {
                 ((Lifecycle) server).start();
             } catch (LifecycleException e) {
-                log.error("Catalina.start: ", e);
+                log.log(Level.SEVERE, "Catalina.start: ", e);
             }
         }
 
@@ -598,7 +592,7 @@ public class Catalina extends Embedded {
             try {
                 ((Lifecycle) server).stop();
             } catch (LifecycleException e) {
-                log.error("Catalina.stop", e);
+                log.log(Level.SEVERE, "Catalina.stop", e);
             }
         }
 
@@ -645,11 +639,6 @@ public class Catalina extends Embedded {
         }
 
     }
-    
-    
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( Catalina.class );
-
 }
 
 

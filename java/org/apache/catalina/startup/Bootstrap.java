@@ -18,11 +18,7 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.startup;
-
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -30,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.logging.*;
 import org.apache.catalina.security.SecurityClassLoad;
 
 
@@ -50,26 +47,23 @@ import org.apache.catalina.security.SecurityClassLoad;
 public final class Bootstrap {
 
 
-    // -------------------------------------------------------------- Constants
+    // ------------------------------------------------------------ Constants
 
 
     protected static final String CATALINA_HOME_TOKEN = "${catalina.home}";
     protected static final String CATALINA_BASE_TOKEN = "${catalina.base}";
 
 
-    // ------------------------------------------------------- Static Variables
-
+    // ----------------------------------------------------- Static Variables
 
     /**
      * Daemon object used by main.
      */
     private static Bootstrap daemon = null;
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( Bootstrap.class );
+    private static Logger log = Logger.getLogger(Bootstrap.class.getName());
 
-    // -------------------------------------------------------------- Variables
-
+    // ----------------------------------------------------------- Variables
 
     /**
      * Debugging detail level for processing the startup.
@@ -88,8 +82,7 @@ public final class Bootstrap {
     protected ClassLoader sharedLoader = null;
 
 
-    // -------------------------------------------------------- Private Methods
-
+    // ------------------------------------------------------ Private Methods
 
     private void initClassLoaders() {
         try {
@@ -104,7 +97,7 @@ public final class Bootstrap {
             catalinaLoader = createClassLoader("server", commonLoader);
             sharedLoader = createClassLoader("shared", commonLoader);
         } catch (Throwable t) {
-            log.error("Class loader creation threw exception", t);
+            log.log(Level.SEVERE, "Class loader creation threw exception", t);
             System.exit(1);
         }
     }
@@ -180,16 +173,16 @@ public final class Bootstrap {
         SecurityClassLoad.securityClassLoad(catalinaLoader);
 
         // Load our startup class and call its process() method
-        if (log.isDebugEnabled())
-            log.debug("Loading startup class");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Loading startup class");
         Class startupClass =
             catalinaLoader.loadClass
             ("org.apache.catalina.startup.Catalina");
         Object startupInstance = startupClass.newInstance();
 
         // Set the shared extensions class loader
-        if (log.isDebugEnabled())
-            log.debug("Setting startup class properties");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Setting startup class properties");
         String methodName = "setParentClassLoader";
         Class paramTypes[] = new Class[1];
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
@@ -225,8 +218,8 @@ public final class Bootstrap {
         }
         Method method = 
             catalinaDaemon.getClass().getMethod(methodName, paramTypes);
-        if (log.isDebugEnabled()) 
-            log.debug("Calling startup class " + method);
+        if (log.isLoggable(Level.FINE)) 
+            log.fine("Calling startup class " + method);
         method.invoke(catalinaDaemon, param);
 
     }

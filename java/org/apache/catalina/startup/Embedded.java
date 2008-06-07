@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.logging.*;
 
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Connector;
@@ -41,7 +42,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
-import org.apache.catalina.Logger;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardContext;
@@ -57,8 +57,6 @@ import org.apache.catalina.util.StringManager;
 // START SJSAS 6340446
 import org.apache.catalina.util.ServerInfo;
 // END SJSAS 6340446
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 
 
@@ -120,7 +118,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 
 public class Embedded  extends StandardService implements Lifecycle {
-    private static Log log = LogFactory.getLog(Embedded.class);
+
+    private static Logger log = Logger.getLogger(Embedded.class.getName());
 
     // ----------------------------------------------------------- Constructors
 
@@ -143,7 +142,7 @@ public class Embedded  extends StandardService implements Lifecycle {
      * @param realm Realm implementation to be inherited by all components
      *  (unless overridden further down the container hierarchy)
      */
-    public Embedded(Logger logger, Realm realm) {
+    public Embedded(org.apache.catalina.Logger logger, Realm realm) {
 
         super();
         setLogger(logger);
@@ -192,7 +191,7 @@ public class Embedded  extends StandardService implements Lifecycle {
      * The default logger to be used by this component itself.  Unless this
      * is overridden, log messages will be writted to standard output.
      */
-    protected Logger logger = null;
+    protected org.apache.catalina.Logger logger = null;
 
 
     /**
@@ -261,10 +260,8 @@ public class Embedded  extends StandardService implements Lifecycle {
     /**
      * Return the Logger for this component.
      */
-    public Logger getLogger() {
-
+    public org.apache.catalina.Logger getLogger() {
         return (this.logger);
-
     }
 
 
@@ -273,12 +270,10 @@ public class Embedded  extends StandardService implements Lifecycle {
      *
      * @param logger The new logger
      */
-    public void setLogger(Logger logger) {
-
-        Logger oldLogger = this.logger;
+    public void setLogger(org.apache.catalina.Logger logger) {
+        org.apache.catalina.Logger oldLogger = this.logger;
         this.logger = logger;
         support.firePropertyChange("logger", oldLogger, this.logger);
-
     }
 
 
@@ -286,9 +281,7 @@ public class Embedded  extends StandardService implements Lifecycle {
      * Return the default Realm for our Containers.
      */
     public Realm getRealm() {
-
         return (this.realm);
-
     }
 
 
@@ -364,8 +357,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public synchronized void addConnector(Connector connector) {
 
-        if( log.isDebugEnabled() ) {
-            log.debug("Adding connector (" + connector.getInfo() + ")");
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("Adding connector (" + connector.getInfo() + ")");
         }
 
         // Make sure we have a Container to send requests to
@@ -388,8 +381,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public synchronized void addEngine(Engine engine) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Adding engine (" + engine.getInfo() + ")");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Adding engine (" + engine.getInfo() + ")");
 
         // Add this Engine to our set of defined Engines
         Engine results[] = new Engine[engines.length + 1];
@@ -403,7 +396,7 @@ public class Embedded  extends StandardService implements Lifecycle {
             try {
                 ((Lifecycle) engine).start();
             } catch (LifecycleException e) {
-                log.error("Engine.start", e);
+                log.log(Level.SEVERE, "Engine.start", e);
             }
         }
 
@@ -462,10 +455,10 @@ public class Embedded  extends StandardService implements Lifecycle {
 	    }
 	}
 
-	if (log.isDebugEnabled()) {
-            log.debug("Creating connector for address='" +
-		      ((address == null) ? "ALL" : address) +
-		      "' port='" + port + "' protocol='" + protocol + "'");
+	if (log.isLoggable(Level.FINE)) {
+            log.fine("Creating connector for address='" +
+		     ((address == null) ? "ALL" : address) +
+		     "' port='" + port + "' protocol='" + protocol + "'");
 	}
 
         try {
@@ -495,12 +488,12 @@ public class Embedded  extends StandardService implements Lifecycle {
                         serverSocketFactoryClass.newInstance();
                     connector.setFactory(factory);
                 } catch (Exception e) {
-                    log.error("Couldn't load SSL server socket factory.");
+                    log.severe("Couldn't load SSL server socket factory.");
                 }
             }
 
         } catch (Exception e) {
-            log.error("Couldn't create connector.");
+            log.severe("Couldn't create connector.");
         } 
 
         return (connector);
@@ -532,9 +525,9 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public Context createContext(String path, String docBase) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Creating context '" + path + "' with docBase '" +
-                       docBase + "'");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Creating context '" + path + "' with docBase '" +
+                     docBase + "'");
 
         StandardContext context = new StandardContext();
 
@@ -559,8 +552,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public Engine createEngine() {
 
-        if( log.isDebugEnabled() )
-            log.debug("Creating engine");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Creating engine");
 
         StandardEngine engine = new StandardEngine();
 
@@ -602,9 +595,9 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public Host createHost(String name, String appBase) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Creating host '" + name + "' with appBase '" +
-                       appBase + "'");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Creating host '" + name + "' with appBase '" +
+                     appBase + "'");
 
         StandardHost host = new StandardHost();
 
@@ -626,8 +619,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public Loader createLoader(ClassLoader parent) {
 
-        if( log.isTraceEnabled() )
-            log.trace("Creating Loader with parent class loader '" +
+        if (log.isLoggable(Level.FINEST))
+            log.finest("Creating Loader with parent class loader '" +
                        parent + "'");
 
         WebappLoader loader = new WebappLoader(parent);
@@ -657,8 +650,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public synchronized void removeContext(Context context) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Removing context[" + context.getPath() + "]");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Removing context[" + context.getPath() + "]");
 
         // Is this Context actually among those that are defined?
         boolean found = false;
@@ -682,8 +675,8 @@ public class Embedded  extends StandardService implements Lifecycle {
             return;
 
         // Remove this Context from the associated Host
-        if( log.isDebugEnabled() )
-            log.debug(" Removing this Context");
+        if (log.isLoggable(Level.FINE))
+            log.fine(" Removing this Context");
         context.getParent().removeChild(context);
 
     }
@@ -698,8 +691,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public synchronized void removeEngine(Engine engine) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Removing engine (" + engine.getInfo() + ")");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Removing engine (" + engine.getInfo() + ")");
 
         // Is the specified Engine actually defined?
         int j = -1;
@@ -713,8 +706,8 @@ public class Embedded  extends StandardService implements Lifecycle {
             return;
 
         // Remove any Connector that is using this Engine
-        if( log.isDebugEnabled() )
-            log.debug(" Removing related Containers");
+        if (log.isLoggable(Level.FINE))
+            log.fine(" Removing related Containers");
         while (true) {
             int n = -1;
             for (int i = 0; i < connectors.length; i++) {
@@ -730,25 +723,25 @@ public class Embedded  extends StandardService implements Lifecycle {
             try{
                 removeConnector(connectors[n]);
             } catch (Exception ex){
-                log.error("Connector.stop", ex);
+                log.log(Level.SEVERE, "Connector.stop", ex);
             }
             // END SJSAS 6231069
         }
 
         // Stop this Engine if necessary
         if (engine instanceof Lifecycle) {
-            if( log.isDebugEnabled() )
-                log.debug(" Stopping this Engine");
+            if (log.isLoggable(Level.FINE))
+                log.fine(" Stopping this Engine");
             try {
                 ((Lifecycle) engine).stop();
             } catch (LifecycleException e) {
-                log.error("Engine.stop", e);
+                log.log(Level.SEVERE, "Engine.stop", e);
             }
         }
 
         // Remove this Engine from our set of defined Engines
-        if( log.isDebugEnabled() )
-            log.debug(" Removing this Engine");
+        if (log.isLoggable(Level.FINE))
+            log.fine(" Removing this Engine");
         int k = 0;
         Engine results[] = new Engine[engines.length - 1];
         for (int i = 0; i < engines.length; i++) {
@@ -769,8 +762,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public synchronized void removeHost(Host host) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Removing host[" + host.getName() + "]");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Removing host[" + host.getName() + "]");
 
         // Is this Host actually among those that are defined?
         boolean found = false;
@@ -790,8 +783,8 @@ public class Embedded  extends StandardService implements Lifecycle {
             return;
 
         // Remove this Host from the associated Engine
-        if( log.isDebugEnabled() )
-            log.debug(" Removing this Host");
+        if (log.isLoggable(Level.FINE))
+            log.fine(" Removing this Host");
         host.getParent().removeChild(host);
 
     }
@@ -885,9 +878,9 @@ public class Embedded  extends StandardService implements Lifecycle {
             log.info("Starting tomcat server");
          */
         // START SJSAS 6340446
-        if (log.isDebugEnabled()) {
-            log.debug("Starting Servlet container component of "
-                      + ServerInfo.getServerInfo());
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("Starting Servlet container component of "
+                     + ServerInfo.getServerInfo());
         }
         // END SJSAS 6340446
 
@@ -930,8 +923,8 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     public void stop() throws LifecycleException {
 
-        if( log.isDebugEnabled() )
-            log.debug("Stopping embedded server");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Stopping embedded server");
 
         // Validate and update our current component state
         if (!started)
@@ -973,7 +966,7 @@ public class Embedded  extends StandardService implements Lifecycle {
         if (!useNaming) {
             // START SJSAS 5031700
             //log.info( "Catalina naming disabled");
-            log.debug( "Catalina naming disabled");
+            log.fine("Catalina naming disabled");
             // END SJSAS 5031700
             System.setProperty("catalina.useNaming", "false");
         } else {
@@ -985,8 +978,8 @@ public class Embedded  extends StandardService implements Lifecycle {
                 value = value + ":" + oldValue;
             }
             System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
-            if( log.isDebugEnabled() )
-                log.debug("Setting naming prefix=" + value);
+            if (log.isLoggable(Level.FINE))
+                log.fine("Setting naming prefix=" + value);
             value = System.getProperty
                 (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
             if (value == null) {
@@ -994,7 +987,7 @@ public class Embedded  extends StandardService implements Lifecycle {
                     (javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                      "org.apache.naming.java.javaURLContextFactory");
             } else {
-                log.debug( "INITIAL_CONTEXT_FACTORY alread set " + value );
+                log.fine( "INITIAL_CONTEXT_FACTORY alread set " + value );
             }
         }
     }

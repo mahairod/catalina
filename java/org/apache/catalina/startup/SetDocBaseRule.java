@@ -18,11 +18,7 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.startup;
-
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -36,7 +32,6 @@ import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
 import org.xml.sax.Attributes;
 
-
 /**
  * <p>Rule that modifies the docBase of the host, setting it appropriately,
  * before adding the Context to the parent Host.</p>
@@ -46,7 +41,7 @@ import org.xml.sax.Attributes;
 public class SetDocBaseRule extends Rule {
 
 
-    // ----------------------------------------------------------- Constructors
+    // -------------------------------------------------------- Constructors
 
 
     /**
@@ -55,16 +50,14 @@ public class SetDocBaseRule extends Rule {
      * @param digester Digester we are associated with
      */
     public SetDocBaseRule(Digester digester) {
-
         super(digester);
-
     }
 
 
-    // ----------------------------------------------------- Instance Variables
+    // -------------------------------------------------- Instance Variables
 
 
-    // --------------------------------------------------------- Public Methods
+    // ------------------------------------------------------ Public Methods
 
 
     /**
