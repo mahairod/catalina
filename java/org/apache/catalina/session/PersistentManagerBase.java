@@ -31,6 +31,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.*;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
@@ -41,9 +42,6 @@ import org.apache.catalina.Store;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 
 /**
  * Extends the <b>ManagerBase</b> class to implement most of the
@@ -63,7 +61,8 @@ public abstract class PersistentManagerBase
     extends ManagerBase
     implements Lifecycle, PropertyChangeListener {
 
-    private static final Log log = LogFactory.getLog(PersistentManagerBase.class);
+    private static final Logger log = Logger.getLogger(
+        PersistentManagerBase.class.getName());
 
     // ---------------------------------------------------- Security Classes
      private class PrivilegedStoreClear
@@ -406,7 +405,9 @@ public abstract class PersistentManagerBase
             if ( super.findSession(id) != null )
                 return true;
         } catch (IOException e) {
-            log.error("checking isLoaded for id, " + id + ", "+e.getMessage(), e);
+            log.log(Level.SEVERE,
+                    "checking isLoaded for id, " + id + ", "+e.getMessage(),
+                    e);
         }
         return false;
     }
@@ -577,15 +578,15 @@ public abstract class PersistentManagerBase
                     AccessController.doPrivileged(new PrivilegedStoreClear());
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
-                    log.error("Exception clearing the Store: " + exception);
-                    exception.printStackTrace();                        
+                    log.log(Level.SEVERE,
+                            "Exception clearing the Store",
+                            exception);
                 }
             } else {
                 store.clear();
             }
         } catch (IOException e) {
-            log.error("Exception clearing the Store: " + e);
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Exception clearing the Store", e);
         }
 
     }
@@ -823,14 +824,15 @@ public abstract class PersistentManagerBase
                     ids = (String[])AccessController.doPrivileged(new PrivilegedStoreKeys());
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
-                    log.error("Exception in the Store during load: " + exception);
-                    exception.printStackTrace();                        
+                    log.log(Level.SEVERE,
+                            "Exception in the Store during load",
+                            exception);
                 }
             } else {
                 ids = store.keys();
             }
         } catch (IOException e) {
-            log.error("Can't load sessions from store, " + e.getMessage(), e);
+            log.log(Level.SEVERE, "Can't load sessions from store", e);
             return;
         }
 
@@ -838,14 +840,15 @@ public abstract class PersistentManagerBase
         if (n == 0)
             return;
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("persistentManager.loading", String.valueOf(n)));
+        if (log.isLoggable(Level.FINE))
+            log.fine(sm.getString("persistentManager.loading",
+                                  String.valueOf(n)));
 
         for (int i = 0; i < n; i++)
             try {
                 swapIn(ids[i]);
             } catch (IOException e) {
-                log.error("Failed load session from store, " + e.getMessage(), e);
+                log.log(Level.SEVERE, "Failed load session from store", e);
             }
 
     }
@@ -889,15 +892,15 @@ public abstract class PersistentManagerBase
                     AccessController.doPrivileged(new PrivilegedStoreRemove(id));
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
-                    log.error("Exception in the Store during removeSession: " + exception);
-                    exception.printStackTrace();                        
+                    log.log(Level.SEVERE,
+                            "Exception in the Store during removeSession",
+                            exception);
                 }
             } else {
                  store.remove(id);
             }               
         } catch (IOException e) {
-            log.error("Exception removing session  " + e.getMessage());
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Exception removing session", e);
         }        
     }
 
@@ -954,9 +957,9 @@ public abstract class PersistentManagerBase
         if (n == 0)
             return;
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("persistentManager.unloading",
-                             String.valueOf(n)));
+        if (log.isLoggable(Level.FINE))
+            log.fine(sm.getString("persistentManager.unloading",
+                                  String.valueOf(n)));
 
         for (int i = 0; i < n; i++)
             try {
@@ -1037,7 +1040,9 @@ public abstract class PersistentManagerBase
                     session = (Session) AccessController.doPrivileged(new PrivilegedStoreLoad(id));
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
-                    log.error("Exception in the Store during swapIn: " + exception);
+                    log.log(Level.SEVERE,
+                            "Exception in the Store during swapIn",
+                            exception);
                     if (exception instanceof IOException){
                         throw (IOException)exception;
                     } else if (exception instanceof ClassNotFoundException) {
@@ -1052,7 +1057,9 @@ public abstract class PersistentManagerBase
                 }
             }   
         } catch (ClassNotFoundException e) {
-            log.error(sm.getString("persistentManager.deserializeError", id, e));
+            log.log(Level.SEVERE,
+                    sm.getString("persistentManager.deserializeError", id,
+                    e));
             throw new IllegalStateException
                 (sm.getString("persistentManager.deserializeError", id, e));
         }
@@ -1061,7 +1068,7 @@ public abstract class PersistentManagerBase
             return (null);
 
         if (!session.isValid()) {
-            log.error("session swapped in is invalid or expired");
+            log.severe("session swapped in is invalid or expired");
             //6406580 START
             /* - these lines are calling remove on store redundantly
             session.expire();
@@ -1071,8 +1078,8 @@ public abstract class PersistentManagerBase
             return (null);
         }
 
-        if(log.isDebugEnabled())
-            log.debug(sm.getString("persistentManager.swapIn", id));
+        if (log.isLoggable(Level.FINE))
+            log.fine(sm.getString("persistentManager.swapIn", id));
 
         session.setManager(this);
         // make sure the listeners know about it.
@@ -1124,15 +1131,18 @@ public abstract class PersistentManagerBase
                     AccessController.doPrivileged(new PrivilegedStoreSave(session));
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
-                    log.error("Exception in the Store during writeSession: " + exception);
-                    exception.printStackTrace();                        
+                    log.log(Level.SEVERE,
+                            "Exception in the Store during writeSession",
+                            exception);
                 }
             } else {
                  store.save(session);
             }   
         } catch (IOException e) {
-            log.error(sm.getString
-                ("persistentManager.serializeError", session.getIdInternal(), e));
+            log.log(Level.SEVERE,
+                    sm.getString("persistentManager.serializeError",
+                                 session.getIdInternal(),
+                    e));
             throw e;
         }
 
@@ -1199,14 +1209,14 @@ public abstract class PersistentManagerBase
         started = true;
 
         // Force initialization of the random number generator
-        if (log.isTraceEnabled())
-            log.trace("Force random number initialization starting");
+        if (log.isLoggable(Level.FINEST))
+            log.finest("Force random number initialization starting");
         String dummy = generateSessionId();
-        if (log.isTraceEnabled())
-            log.trace("Force random number initialization completed");
+        if (log.isLoggable(Level.FINEST))
+            log.finest("Force random number initialization completed");
 
         if (store == null)
-            log.error("No Store configured, persistence disabled");
+            log.severe("No Store configured, persistence disabled");
         else if (store instanceof Lifecycle)
             ((Lifecycle)store).start();
 
@@ -1223,8 +1233,8 @@ public abstract class PersistentManagerBase
      */
    public void stop() throws LifecycleException {
 
-        if (log.isDebugEnabled())
-            log.debug("Stopping");
+        if (log.isLoggable(Level.FINE))
+            log.fine("Stopping");
 
         // Validate and update our current component state
         if (!isStarted()) {
@@ -1281,8 +1291,8 @@ public abstract class PersistentManagerBase
                 setMaxInactiveIntervalSeconds
                     ( ((Integer) event.getNewValue()).intValue()*60 );
             } catch (NumberFormatException e) {
-                log.error(sm.getString("standardManager.sessionTimeout",
-                                 event.getNewValue().toString()));
+                log.severe(sm.getString("standardManager.sessionTimeout",
+                                        event.getNewValue().toString()));
             }
         }
 
@@ -1314,8 +1324,8 @@ public abstract class PersistentManagerBase
                 int timeIdle = // Truncate, do not round up
                     (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
                 if (timeIdle > maxIdleSwap && timeIdle > minIdleSwap) {
-                    if (log.isDebugEnabled())
-                        log.debug(sm.getString
+                    if (log.isLoggable(Level.FINE))
+                        log.fine(sm.getString
                             ("persistentManager.swapMaxIdle",
                              session.getIdInternal(),
                              Integer.valueOf(timeIdle)));
@@ -1346,8 +1356,8 @@ public abstract class PersistentManagerBase
         if (getMaxActiveSessions() >= sessions.length)
             return;
 
-        if(log.isDebugEnabled())
-            log.debug(sm.getString
+        if(log.isLoggable(Level.FINE))
+            log.fine(sm.getString
                 ("persistentManager.tooManyActive",
                  Integer.valueOf(sessions.length)));        
 
@@ -1361,8 +1371,8 @@ public abstract class PersistentManagerBase
                 StandardSession session = (StandardSession) sessions[i];
                 //skip the session if it cannot be locked
                 if(session.lockBackground()) {
-                    if(log.isDebugEnabled())
-                        log.debug(sm.getString
+                    if(log.isLoggable(Level.FINE))
+                        log.fine(sm.getString
                             ("persistentManager.swapTooManyActive",
                             sessions[i].getIdInternal(),
                             Integer.valueOf(timeIdle)));                    
@@ -1408,8 +1418,8 @@ public abstract class PersistentManagerBase
                 if (timeIdle > maxIdleBackup) { 
                     //if session cannot be background locked then skip it
                     if (session.lockBackground()) {                         
-                        if (log.isDebugEnabled())
-                            log.debug(sm.getString
+                        if (log.isLoggable(Level.FINE))
+                            log.fine(sm.getString
                                 ("persistentManager.backupMaxIdle",
                                 session.getIdInternal(),
                                 Integer.valueOf(timeIdle))); 

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.logging.*;
 
 /**
  * This class implements a String cache for ByteChunk and CharChunk.
@@ -35,8 +36,7 @@ import java.util.TreeMap;
 public class StringCache {
 
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( StringCache.class );
+    private static Logger log = Logger.getLogger(StringCache.class.getName());
     
     
     // ------------------------------------------------------- Static Variables
@@ -278,9 +278,9 @@ public class StringCache {
                         bcCount = 0;
                         bcStats.clear();
                         bcCache = tempbcCache;
-                        if (log.isDebugEnabled()) {
+                        if (log.isLoggable(Level.FINE)) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("ByteCache generation time: " + (t2 - t1) + "ms");
+                            log.fine("ByteCache generation time: " + (t2 - t1) + "ms");
                         }
                     } else {
                         bcCount++;
@@ -392,9 +392,9 @@ public class StringCache {
                         ccCount = 0;
                         ccStats.clear();
                         ccCache = tempccCache;
-                        if (log.isDebugEnabled()) {
+                        if (log.isLoggable(Level.FINE)) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("CharCache generation time: " + (t2 - t1) + "ms");
+                            log.fine("CharCache generation time: " + (t2 - t1) + "ms");
                         }
                     } else {
                         ccCount++;

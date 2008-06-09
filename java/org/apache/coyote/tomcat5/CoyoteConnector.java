@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.*;
 
 // START OF SJSAS 8.1 PE 6191830
 import java.security.cert.X509Certificate;
@@ -37,8 +38,6 @@ import javax.management.MalformedObjectNameException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.modeler.Registry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 import com.sun.grizzly.util.http.mapper.Mapper;
@@ -52,7 +51,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.Logger;
 import org.apache.catalina.Request;
 import org.apache.catalina.Response;
 import org.apache.catalina.Service;
@@ -81,7 +79,7 @@ import com.sun.appserv.security.provider.ProxyHandler;
 public class CoyoteConnector
     implements Connector, Lifecycle, MBeanRegistration
 {
-    protected static Log log = LogFactory.getLog(CoyoteConnector.class);
+    protected static Logger log = Logger.getLogger(CoyoteConnector.class.getName());
 
     // ---------------------------------------------- Adapter Configuration --//
     
@@ -1367,7 +1365,7 @@ public class CoyoteConnector
      */
     private void log(String message) {
 
-        Logger logger = container.getLogger();
+        org.apache.catalina.Logger logger = container.getLogger();
         String localName = "CoyoteConnector";
         if (logger != null)
             logger.log(localName + " " + message);
@@ -1385,7 +1383,7 @@ public class CoyoteConnector
      */
     private void log(String message, Throwable throwable) {
 
-        Logger logger = container.getLogger();
+        org.apache.catalina.Logger logger = container.getLogger();
         String localName = "CoyoteConnector";
         if (logger != null)
             logger.log(localName + " " + message, throwable);
@@ -1461,10 +1459,10 @@ public class CoyoteConnector
                 Registry.getRegistry().registerComponent(this, oname, null);
                 controller=oname;
             } catch (Exception e) {
-                log.error( "Error registering connector ", e);
+                log.log(Level.SEVERE, "Error registering connector ", e);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Creating name for connector " + oname);
+            if (log.isLoggable(Level.FINE)) {
+                log.fine("Creating name for connector " + oname);
             }
         }
         
@@ -1644,8 +1642,9 @@ public class CoyoteConnector
                      "type=protocolHandler,className="
                      + protocolHandlerClassName);
             } catch (Exception ex) {
-                log.error(sm.getString
-                          ("coyoteConnector.protocolRegistrationFailed"), ex);
+                log.log(Level.SEVERE,
+                        sm.getString("coyoteConnector.protocolRegistrationFailed"),
+                        ex);
             }
         } else {
             log.info(sm.getString
@@ -1673,8 +1672,9 @@ public class CoyoteConnector
                         (mapper, this.domain, "Mapper",
                                 "type=Mapper");
             } catch (Exception ex) {
-                log.error(sm.getString
-                        ("coyoteConnector.protocolRegistrationFailed"), ex);
+                log.log(Level.SEVERE,
+                        sm.getString("coyoteConnector.protocolRegistrationFailed"),
+                        ex);
             }
         }
     }
@@ -1689,7 +1689,7 @@ public class CoyoteConnector
 
         // Validate and update our current state
         if (!started) {
-            log.error(sm.getString("coyoteConnector.notStarted"));
+            log.severe(sm.getString("coyoteConnector.notStarted"));
             return;
 
         }
@@ -1704,7 +1704,7 @@ public class CoyoteConnector
                         + ":type=protocolHandler,className="
                         + protocolHandlerClassName));
             } catch (MalformedObjectNameException e) {
-                log.info( "Error unregistering mapper ", e);
+                log.log(Level.INFO, "Error unregistering mapper ", e);
             }
         } 
         // END PWC 6393300
@@ -2016,7 +2016,7 @@ public class CoyoteConnector
                 stop();
             }
         } catch( Throwable t ) {
-            log.error( "Unregistering - can't stop", t);
+            log.log(Level.SEVERE, "Unregistering - can't stop", t);
         }
     }
     
@@ -2026,8 +2026,8 @@ public class CoyoteConnector
             ObjectName parentName=new ObjectName( domain + ":" +
                     "type=Service");
             
-            if (log.isDebugEnabled()) {
-                log.debug("Adding to " + parentName );
+            if (log.isLoggable(Level.FINE)) {
+                log.fine("Adding to " + parentName );
             }
             if( mserver.isRegistered(parentName )) {
                 mserver.invoke(parentName, "addConnector", new Object[] { this },
@@ -2041,31 +2041,31 @@ public class CoyoteConnector
             ObjectName engName=new ObjectName( domain + ":" + "type=Engine");
             if( mserver.isRegistered(engName )) {
                 Object obj=mserver.getAttribute(engName, "managedResource");
-                if (log.isDebugEnabled()) {
-                    log.debug("Found engine " + obj + " " + obj.getClass());
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine("Found engine " + obj + " " + obj.getClass());
                 }
                 container=(Container)obj;
                 
                 // Internal initialize - we now have the Engine
                 initialize();
                 
-                if (log.isDebugEnabled()) {
-                    log.debug("Initialized");
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine("Initialized");
                 }
                 // As a side effect we'll get the container field set
                 // Also initialize will be called
                 return;
             }
         } catch( Exception ex ) {
-            log.error( "Error finding container " + ex);
+            log.log(Level.SEVERE, "Error finding container", ex);
         }
     }
 
     public void init() throws Exception {
 
         if( this.getService() != null ) {
-            if (log.isDebugEnabled()) {
-                log.debug( "Already configured" );
+            if (log.isLoggable(Level.FINE)) {
+                log.fine( "Already configured" );
             }
             return;
         }
@@ -2076,8 +2076,8 @@ public class CoyoteConnector
 
     public void destroy() throws Exception {
         if( oname!=null && controller==oname ) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unregister itself " + oname );
+            if (log.isLoggable(Level.FINE)) {
+                log.fine("Unregister itself " + oname );
             }
             Registry.getRegistry().unregisterComponent(oname);
         }

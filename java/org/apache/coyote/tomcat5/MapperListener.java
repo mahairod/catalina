@@ -24,6 +24,7 @@ package org.apache.coyote.tomcat5;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.*;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerNotification;
 // START SJSAS 6290785
@@ -37,9 +38,6 @@ import javax.management.NotificationFilter;
 // END SJSAS 6313044
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.apache.commons.modeler.Registry;
 
@@ -68,7 +66,7 @@ public class MapperListener
     implements NotificationListener, NotificationFilter
     // END SJSAS 6313044
  {
-    private static Log log = LogFactory.getLog(MapperListener.class);
+    private static Logger log = Logger.getLogger(MapperListener.class.getName());
 
 
     // ----------------------------------------------------- Instance Variables
@@ -211,7 +209,7 @@ public class MapperListener
             mBeanServer.addNotificationListener(objectName, this, this, null);
             // END SJSAS 6313044
         } catch (Exception e) {
-            log.warn("Error registering contexts",e);
+            log.log(Level.WARNING, "Error registering contexts", e);
         }
 
     }
@@ -318,8 +316,8 @@ public class MapperListener
                 return;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug( "Handle " + objectName );
+            if (log.isLoggable(Level.FINE)) {
+                log.fine( "Handle " + objectName );
             }
 
             if (notification.getType().equals
@@ -329,7 +327,8 @@ public class MapperListener
                     try {
                         registerHost(objectName);
                     } catch (Exception e) {
-                        log.warn("Error registering Host " + objectName, e);  
+                        log.log(Level.WARNING,
+                                "Error registering Host " + objectName, e);  
                     }
                 }
     
@@ -338,13 +337,17 @@ public class MapperListener
                         try {
                             registerContext(objectName);
                         } catch (Throwable t) {
-                            log.warn("Error registering Context " + objectName,t);
+                            log.log(Level.WARNING,
+                                    "Error registering Context " + objectName,
+                                    t);
                         }
                     } else if (j2eeType.equals("Servlet")) {
                         try {
                             registerWrapper(objectName);
                         } catch (Throwable t) {
-                            log.warn("Error registering Wrapper " + objectName,t);
+                            log.log(Level.WARNING,
+                                    "Error registering Wrapper " + objectName,
+                                    t);
                         }
                     }
                 }
@@ -355,7 +358,9 @@ public class MapperListener
                     try {
                         unregisterHost(objectName);
                     } catch (Exception e) {
-                        log.warn("Error unregistering Host " + objectName,e);  
+                        log.log(Level.WARNING,
+                                "Error unregistering Host " + objectName,
+                                e);  
                     }
                 }
  
@@ -364,13 +369,14 @@ public class MapperListener
                         try {
                             unregisterContext(objectName);
                         } catch (Throwable t) {
-                            log.warn("Error unregistering webapp " + objectName,t);
+                            log.log(Level.WARNING,
+                                    "Error unregistering webapp " + objectName,
+                                    t);
                         }
                     }
                 }
             }
         }
-
     }
 
 
@@ -424,7 +430,7 @@ public class MapperListener
             }
             
             if (!isRegisteredWithAlias)
-                log.warn("Unknown default host: " + defaultHost);
+                log.warning("Unknown default host: " + defaultHost);
         }
 
         // This should probably be called later 
@@ -465,12 +471,12 @@ public class MapperListener
                 }
             }
             if (!portMatch) {
-                if (log.isDebugEnabled()) {
-                    log.debug("HTTP listener with port " + port
-                              + " ignoring registration of host with object "
-                              + "name " + objectName + ", because none of the "
-                              + "host's associated HTTP listeners matches "
-                              + "this port");
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine("HTTP listener with port " + port
+                             + " ignoring registration of host with object "
+                             + "name " + objectName + ", because none of the "
+                             + "host's associated HTTP listeners matches "
+                             + "this port");
                 }
                 return;
             }
@@ -558,9 +564,9 @@ public class MapperListener
             contextName = "";
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapperListener.registerContext",
-                                   contextName));
+        if (log.isLoggable(Level.FINE)) {
+            log.fine(sm.getString("mapperListener.registerContext",
+                                  contextName));
         }
 
         javax.naming.Context resources = context.findStaticResources();
@@ -597,9 +603,9 @@ public class MapperListener
             contextName = "";
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapperListener.unregisterContext",
-                                   contextName));
+        if (log.isLoggable(Level.FINE)) {
+            log.fine(sm.getString("mapperListener.unregisterContext",
+                                  contextName));
         }
 
         mapper.removeContext(hostName, contextName);
@@ -652,9 +658,9 @@ public class MapperListener
             contextName = "";
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapperListener.registerWrapper", 
-                                   wrapperName, contextName));
+        if (log.isLoggable(Level.FINE)) {
+            log.fine(sm.getString("mapperListener.registerWrapper", 
+                                  wrapperName, contextName));
         }
 
         String[] mappings = wrapper.findMappings();

@@ -29,6 +29,7 @@ import java.security.Principal;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
+import java.util.logging.*;
 
 import javax.security.auth.Subject;
 import javax.servlet.Filter;
@@ -69,8 +70,7 @@ public final class SecurityUtil{
      */
     private static HashMap objectCache = new HashMap();
         
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( SecurityUtil.class );
+    private static Logger log = Logger.getLogger(SecurityUtil.class.getName());
     
     private static String PACKAGE = "org.apache.catalina.security";
     
@@ -293,8 +293,8 @@ public final class SecurityUtil{
             Throwable e = ((InvocationTargetException)pe.getException())
                                 .getTargetException();
             
-            if (log.isDebugEnabled()){
-                log.debug(sm.getString("SecurityUtil.doAsPrivilege"), e); 
+            if (log.isLoggable(Level.FINE)){
+                log.log(Level.FINE, sm.getString("SecurityUtil.doAsPrivilege"), e);
             }
             
             if (e instanceof UnavailableException)

@@ -41,6 +41,7 @@ import java.net.URLClassLoader;
 import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.jar.JarFile;
+import java.util.logging.*;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -63,7 +64,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
-import org.apache.catalina.Logger;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
@@ -94,8 +94,15 @@ import org.glassfish.web.loader.WebappClassLoader;
 public class WebappLoader
     implements Lifecycle, Loader, PropertyChangeListener, MBeanRegistration  {
 
-    // ----------------------------------------------------------- Constructors
+    /**
+     * First load of the class.
+     */
+    private static boolean first = true;
 
+    private static Logger log = Logger.getLogger(
+        WebappLoader.class.getName());
+
+    // --------------------------------------------------------- Constructors
 
     /**
      * Construct a new WebappLoader with no defined parent class loader
@@ -120,14 +127,12 @@ public class WebappLoader
     }
 
 
-    // ----------------------------------------------------- Instance Variables
+    // --------------------------------------------------- Instance Variables
 
-
-    /**
-     * First load of the class.
-     */
-    private static boolean first = true;
-
+    private ObjectName oname;
+    private MBeanServer mserver;
+    private String domain;
+    private ObjectName controller;
 
     /**
      * The class loader being managed by this Loader component.
@@ -254,9 +259,7 @@ public class WebappLoader
      * Return the Java class loader to be used by this Container.
      */
     public ClassLoader getClassLoader() {
-
         return ((ClassLoader) classLoader);
-
     }
 
 
@@ -264,9 +267,7 @@ public class WebappLoader
      * Return the Container with which this Logger has been associated.
      */
     public Container getContainer() {
-
         return (container);
-
     }
 
 
@@ -459,8 +460,9 @@ public class WebappLoader
      */
     public void addRepository(String repository) {
 
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("webappLoader.addRepository", repository));
+        if (log.isLoggable(Level.FINEST))
+            log.finest(sm.getString("webappLoader.addRepository",
+                                    repository));
 
         for (int i = 0; i < repositories.length; i++) {
             if (repository.equals(repositories[i]))
@@ -635,12 +637,15 @@ public class WebappLoader
                     if (path.equals("")) {
                         path = "/";
                     }   
-                    oname=new ObjectName(ctx.getEngineName() + ":type=Loader,path=" +
-                                path + ",host=" + ctx.getParent().getName());
-                    Registry.getRegistry().registerComponent(this, oname, null);
-                    controller=oname;
+                    oname = new ObjectName(ctx.getEngineName() +
+                                           ":type=Loader,path=" +
+                                           path + ",host=" +
+                                           ctx.getParent().getName());
+                    Registry.getRegistry().registerComponent(this, oname,
+                                                             null);
+                    controller = oname;
                 } catch (Exception e) {
-                    log.error("Error registering loader", e );
+                    log.log(Level.SEVERE, "Error registering loader", e);
                 }
             }
         }
@@ -673,8 +678,8 @@ public class WebappLoader
         if (started)
             throw new LifecycleException
                 (sm.getString("webappLoader.alreadyStarted"));
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("webappLoader.starting"));
+        if (log.isLoggable(Level.FINEST))
+            log.finest(sm.getString("webappLoader.starting"));
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
 
@@ -691,7 +696,8 @@ public class WebappLoader
                 URL.setURLStreamHandlerFactory(streamHandlerFactory);
             } catch (Exception e) {
                 // Log and continue anyway, this is not critical
-                log.error("Error registering jndi stream handler", e);
+                log.log(Level.SEVERE,
+                        "Error registering jndi stream handler", e);
             } catch (Throwable t) {
                 // This is likely a dual registration
                 log.info("Dual registration of jndi stream handler: " 
@@ -738,7 +744,7 @@ public class WebappLoader
                 ((ClassLoader) classLoader, this.container.getResources());
 
         } catch (Throwable t) {
-            log.error( "LifecycleException ", t );
+            log.log(Level.SEVERE, "LifecycleException ", t);
             throw new LifecycleException("start: ", t);
         }
 
@@ -756,8 +762,8 @@ public class WebappLoader
         if (!started)
             throw new LifecycleException
                 (sm.getString("webappLoader.notStarted"));
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("webappLoader.stopping"));
+        if (log.isLoggable(Level.FINEST))
+            log.finest(sm.getString("webappLoader.stopping"));
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         started = false;
 
@@ -810,11 +816,11 @@ public class WebappLoader
                 setReloadable
                     ( ((Boolean) event.getNewValue()).booleanValue() );
             } catch (NumberFormatException e) {
-                log.error(sm.getString("webappLoader.reloadable",
-                                 event.getNewValue().toString()));
+                log.log(Level.SEVERE,
+                        sm.getString("webappLoader.reloadable",
+                                     event.getNewValue().toString()));
             }
         }
-
     }
 
 
@@ -852,7 +858,7 @@ public class WebappLoader
      */
     private void log(String message) {
 
-        Logger logger = null;
+        org.apache.catalina.Logger logger = null;
         if (container != null)
             logger = container.getLogger();
         if (logger != null)
@@ -877,7 +883,7 @@ public class WebappLoader
      */
     private void log(String message, Throwable throwable) {
 
-        Logger logger = null;
+        org.apache.catalina.Logger logger = null;
         if (container != null)
             logger = container.getLogger();
         if (logger != null) {
@@ -1008,8 +1014,9 @@ public class WebappLoader
             log.info("No work dir for " + servletContext);
         }
 
-        if( log.isTraceEnabled()) 
-            log.trace(sm.getString("webappLoader.deploy", workDir.getAbsolutePath()));
+        if (log.isLoggable(Level.FINEST)) 
+            log.finest(sm.getString("webappLoader.deploy",
+                                    workDir.getAbsolutePath()));
 
         classLoader.setWorkDir(workDir);
 
@@ -1049,15 +1056,14 @@ public class WebappLoader
 
             }
 
-            if(log.isTraceEnabled())
-                log.trace(sm.getString("webappLoader.classDeploy", classesPath,
-                             classRepository.getAbsolutePath()));
-
+            if (log.isLoggable(Level.FINEST))
+                log.finest(sm.getString("webappLoader.classDeploy",
+                                        classesPath,
+                                        classRepository.getAbsolutePath()));
 
             // Adding the repository to the class loader
             classLoader.addRepository(classesPath + "/", classRepository);
             loaderRepositories.add(classesPath + "/" );
-
         }
 
         // Setting up the JAR repository (/WEB-INF/lib), if it exists
@@ -1118,9 +1124,10 @@ public class WebappLoader
                     // impossible to update it or remove it at runtime)
                     File destFile = new File(destDir, binding.getName());
 
-                    if( log.isTraceEnabled()) {
-                        log.trace(sm.getString("webappLoader.jarDeploy", filename,
-                                  destFile.getAbsolutePath()));
+                    if (log.isLoggable(Level.FINEST)) {
+                        log.finest(sm.getString("webappLoader.jarDeploy",
+                                                filename,
+                                                destFile.getAbsolutePath()));
                     }
 
                     Resource jarResource = (Resource) binding.getObject();
@@ -1242,18 +1249,18 @@ public class WebappLoader
     private String getClasspath( ClassLoader loader ) {
         try {
             Method m=loader.getClass().getMethod("getClasspath", new Class[] {});
-            if( log.isTraceEnabled())
-                log.trace("getClasspath " + m );
+            if (log.isLoggable(Level.FINEST))
+                log.finest("getClasspath " + m );
             if( m==null ) return null;
             Object o=m.invoke( loader, new Object[] {} );
-            if( log.isTraceEnabled() )
-                log.trace("gotClasspath " + o);
-            if( o instanceof String )
+            if (log.isLoggable(Level.FINEST))
+                log.finest("gotClasspath " + o);
+            if (o instanceof String )
                 return (String)o;
             return null;
-        } catch( Exception ex ) {
-            if (log.isTraceEnabled())
-                log.trace("getClasspath ", ex);
+        } catch (Exception ex) {
+            if (log.isLoggable(Level.FINEST))
+                log.log(Level.FINEST, "getClasspath ", ex);
         }
         return null;
     }
@@ -1321,15 +1328,6 @@ public class WebappLoader
         return true;
 
     }
-
-
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( WebappLoader.class );
-
-    private ObjectName oname;
-    private MBeanServer mserver;
-    private String domain;
-    private ObjectName controller;
 
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {

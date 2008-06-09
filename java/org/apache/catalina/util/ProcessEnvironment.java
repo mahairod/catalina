@@ -43,6 +43,7 @@ import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Locale;
 import java.util.Date;
+import java.util.logging.*;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletContext;
@@ -68,8 +69,8 @@ import org.apache.catalina.Wrapper;
 public class ProcessEnvironment {
 
 
-    private static org.apache.commons.logging.Log log=
-    org.apache.commons.logging.LogFactory.getLog( ProcessEnvironment.class );
+    private static Logger log = Logger.getLogger(
+        ProcessEnvironment.class.getName());
 
     /** context of the enclosing servlet */
     private ServletContext context = null;
@@ -295,8 +296,8 @@ public class ProcessEnvironment {
 
 
     protected void log(String s) {
-        if (log.isDebugEnabled())
-            log.debug(s);
+        if (log.isLoggable(Level.FINE))
+            log.fine(s);
     }
 
 

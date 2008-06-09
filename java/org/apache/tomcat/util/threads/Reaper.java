@@ -21,6 +21,7 @@
 
 package org.apache.tomcat.util.threads;
 
+import java.util.logging.*;
 import org.apache.tomcat.util.*;
 
 /**
@@ -33,8 +34,7 @@ import org.apache.tomcat.util.*;
  */
 public class Reaper extends Thread {
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog(Reaper.class );
+    private static Logger log = Logger.getLogger(Reaper.class.getName());
 
     private boolean daemon=false;
 
@@ -98,8 +98,8 @@ public class Reaper extends Thread {
 
     public synchronized void stopReaper() {
 	running=false;
-        if (log.isDebugEnabled())
-	    log.debug("Stop reaper ");
+        if (log.isLoggable(Level.FINE))
+	    log.fine("Stop reaper ");
 	this.interrupt(); // notify() doesn't stop sleep
     }
     

@@ -32,9 +32,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.AccessControlException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.*;
 import org.apache.tomcat.util.collections.SimplePool;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ThreadPool;
@@ -95,7 +93,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
     // XXX Do we need it for backward compat ?
     //protected Log _log=Log.getLog("tc/PoolTcpEndpoint", "PoolTcpEndpoint");
 
-    static Log log=LogFactory.getLog(PoolTcpEndpoint.class );
+    static Logger log = Logger.getLogger(PoolTcpEndpoint.class.getName());
 
     protected boolean tcpNoDelay=false;
     protected int linger=100;
@@ -286,7 +284,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
     	    listener = new TcpWorkerThread(this);
             tp.runIt(listener);
         } else {
-	    log.error("XXX Error - need pool !");
+	    log.severe("XXX Error - need pool !");
 	}
     }
 
@@ -313,8 +311,9 @@ public class PoolTcpEndpoint { // implements Endpoint {
                 s.setSoLinger(true, 0);
             }
         } catch(Exception e) {
-            log.error("Caught exception trying to unlock accept on " + port
-                    + " " + e.toString());
+            log.log(Level.SEVERE,
+                    "Caught exception trying to unlock accept on " + port,
+                    e);
         } finally {
             if (s != null) {
                 try {
@@ -328,7 +327,8 @@ public class PoolTcpEndpoint { // implements Endpoint {
             if( serverSocket!=null)
                 serverSocket.close();
         } catch(Exception e) {
-            log.error("Caught exception trying to close socket.", e);
+            log.log(Level.SEVERE, "Caught exception trying to close socket.",
+                    e);
         }
         serverSocket = null;
     }
@@ -347,7 +347,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
                 accepted = factory.acceptSocket(serverSocket);
             }
             if (null == accepted) {
-                log.warn("Null socket returned by accept");
+                log.warning("Null socket returned by accept");
             } else {
                 if (!running) {
                     accepted.close();  // rude, but unlikely!
@@ -369,7 +369,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
             // Log the unauthorized access and continue
             String msg = sm.getString("endpoint.warn.security",
                                       serverSocket,ace);
-            log.warn(msg);
+            log.warning(msg);
         }
         catch (IOException e) {
 
@@ -378,7 +378,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
             if (running) {
                 msg = sm.getString("endpoint.err.nonfatal",
                         serverSocket, e);
-                log.error(msg, e);
+                log.log(Level.SEVERE, msg, e);
             }
 
             if (accepted != null) {
@@ -387,7 +387,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
                 } catch(Throwable ex) {
                     msg = sm.getString("endpoint.err.nonfatal",
                                        accepted, ex);
-                    log.warn(msg, ex);
+                    log.log(Level.WARNING, msg, ex);
                 }
                 accepted = null;
             }
@@ -404,17 +404,17 @@ public class PoolTcpEndpoint { // implements Endpoint {
                     // 2) Reinit endpoint (recreate server socket)
                     try {
                         msg = sm.getString("endpoint.warn.reinit");
-                        log.warn(msg);
+                        log.warning(msg);
                         initEndpoint();
                     } catch (Throwable t) {
                         msg = sm.getString("endpoint.err.nonfatal",
                                            serverSocket, t);
-                        log.error(msg, t);
+                        log.log(Level.SEVERE, msg, t);
                     }
                     // 3) If failed, attempt to restart endpoint
                     if (!initialized) {
                         msg = sm.getString("endpoint.warn.restart");
-                        log.warn(msg);
+                        log.warning(msg);
                         try {
                             stopEndpoint();
                             initEndpoint();
@@ -422,7 +422,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
                         } catch (Throwable t) {
                             msg = sm.getString("endpoint.err.fatal",
                                                serverSocket, t);
-                            log.error(msg, t);
+                            log.log(Level.SEVERE, msg, t);
                         } finally {
                             // Current thread is now invalid: kill it
                             throw new ThreadDeath();
@@ -447,7 +447,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
      */
     public void log(String msg, Throwable t)
     {
-	log.error( msg, t );
+	log.log(Level.SEVERE, msg, t);
     }
 
     /** @deprecated
@@ -460,7 +460,7 @@ public class PoolTcpEndpoint { // implements Endpoint {
     /** @deprecated
      */
     public void log(String msg, Throwable t, int level) {
-    	log.error( msg, t );
+    	log.log(Level.SEVERE, msg, t);
     }
 
     void setSocketOptions(Socket socket)
@@ -545,7 +545,7 @@ class TcpWorkerThread implements ThreadPoolRunnable {
                         .processConnection(con, (Object []) perThrData[1]);
 
                 } catch (SocketException se) {
-                    endpoint.log.error
+                    endpoint.log.severe
                         ("Remote Host " + s.getInetAddress() +
                          " SocketException: " + se.getMessage());
                     // Try to close the socket
@@ -554,9 +554,9 @@ class TcpWorkerThread implements ThreadPoolRunnable {
                     } catch (IOException e) {}
                 } catch (Throwable t) {
                     if (step == 2) {
-                        endpoint.log.error("Handshake failed", t);
+                        endpoint.log.log(Level.SEVERE, "Handshake failed", t);
                     } else {
-                        endpoint.log.error("Unexpected error", t);
+                        endpoint.log.log(Level.SEVERE, "Unexpected error", t);
                     }
                     // Try to close the socket
                     try {

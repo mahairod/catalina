@@ -29,12 +29,12 @@ import java.beans.PropertyChangeListener;
 import java.io.CharArrayWriter;
 import java.io.PrintWriter;
 import java.util.Set;
+import java.util.logging.*;
 import javax.servlet.ServletException;
 import javax.management.ObjectName;
 import javax.management.MBeanServer;
 import javax.management.MBeanRegistration;
 import org.apache.catalina.Container;
-import org.apache.catalina.Logger;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
@@ -43,8 +43,6 @@ import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.LifecycleSupport;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.modeler.Registry;
 
 
@@ -58,9 +56,9 @@ import org.apache.commons.modeler.Registry;
  */
 
 public class LoggerBase
-    implements Lifecycle, Logger, MBeanRegistration 
+    implements Lifecycle, org.apache.catalina.Logger, MBeanRegistration 
  {
-    private static Log log = LogFactory.getLog(LoggerBase.class);
+    private static Logger log = Logger.getLogger(LoggerBase.class.getName());
     
     // ----------------------------------------------------- Instance Variables
 
@@ -233,7 +231,7 @@ public class LoggerBase
      *  written to the log file
      */
     public void log(String msg) {
-        log.debug(msg);
+        log.fine(msg);
     }
 
 
@@ -380,7 +378,7 @@ public class LoggerBase
                     cname=new ObjectName(domain +":j2eeType=WebModule,name=//" +
                             host + "/" + path);
                 }
-                log.debug("Register with " + cname);
+                log.fine("Register with " + cname);
                 mserver.invoke(cname, "setLogger", new Object[] {this},
                         new String[] {"org.apache.catalina.Logger"});
             } catch (Exception e) {
@@ -429,12 +427,12 @@ public class LoggerBase
                 suffix= ",path=" + path + ",host=" + 
                         container.getParent().getName();
             } else {
-                log.error("Unknown container " + container );
+                log.severe("Unknown container " + container );
             }
             if( engine != null ) {
                 oname=new ObjectName(engine.getDomain()+ ":type=Logger" + suffix);
             } else {
-                log.error("Null engine !! " + container);
+                log.severe("Null engine !! " + container);
             }
         } catch (Throwable e) {
             e.printStackTrace();  //To change body of catch statement use Options | File Templates.
@@ -495,11 +493,11 @@ public class LoggerBase
             ObjectName oname = createObjectName();   
             try {   
                 Registry.getRegistry().registerComponent(this, oname, null);
-                if (log.isDebugEnabled()) {
-                    log.debug("Registering logger " + oname);
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine("Registering logger " + oname);
                 }
             } catch( Exception ex ) {   
-                log.error( "Can't register logger " + oname, ex);   
+                log.log(Level.SEVERE, "Can't register logger " + oname, ex);
             }      
         }     
 
@@ -521,11 +519,12 @@ public class LoggerBase
             ObjectName oname = createObjectName();   
             try {   
                 Registry.getRegistry().unregisterComponent(oname); 
-                if (log.isDebugEnabled()) {
-                    log.debug("Unregistering logger " + oname);
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine("Unregistering logger " + oname);
                 }
             } catch( Exception ex ) {   
-                log.error( "Can't unregister logger " + oname, ex);   
+                log.log(Level.SEVERE, "Can't unregister logger " + oname,
+                        ex);   
             }      
         }  
     }

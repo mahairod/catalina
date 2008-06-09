@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
-
+import java.util.logging.*;
 import javax.naming.Binding;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -57,8 +57,7 @@ import org.apache.naming.resources.Resource;
  */
 public final class ExtensionValidator {
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog(ExtensionValidator.class);
+    private static Logger log = Logger.getLogger(ExtensionValidator.class.getName());
 
     /**
      * The string resources for this package.
@@ -99,8 +98,10 @@ public final class ExtensionValidator {
                     try {
                         addSystemResource(item);
                     } catch (IOException e) {
-                        log.error(sm.getString
-                                  ("extensionValidator.failload", item), e);
+                        log.log(Level.SEVERE,
+                                sm.getString("extensionValidator.failload",
+                                             item),
+                                e);
                     }
                 }
             }
@@ -122,9 +123,10 @@ public final class ExtensionValidator {
                         try {
                             addSystemResource(files[i]);
                         } catch (IOException e) {
-                            log.error
-                                (sm.getString
-                                 ("extensionValidator.failload", files[i]), e);
+                            log.log(Level.SEVERE,
+                                    sm.getString("extensionValidator.failload",
+                                                 files[i]),
+                                    e);
                         }
                     }
                 }

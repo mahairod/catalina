@@ -28,6 +28,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.logging.*;
 import javax.management.ObjectName;
 import javax.management.MBeanServer;
 import javax.management.MBeanRegistration;
@@ -101,8 +102,9 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
     /** Pass config info
      */
     public void setAttribute( String name, Object value ) {
-        if( log.isTraceEnabled())
-            log.trace(sm.getString("http11protocol.setattribute", name, value));
+        if( log.isLoggable(Level.FINEST))
+            log.finest(sm.getString("http11protocol.setattribute", name,
+                                    value));
         attributes.put(name, value);
 /*
         if ("maxKeepAliveRequests".equals(name)) {
@@ -149,8 +151,9 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
 	try {
             checkSocketFactory();
         } catch( Exception ex ) {
-            log.error(sm.getString("http11protocol.socketfactory.initerror"),
-                      ex);
+            log.log(Level.SEVERE,
+                    sm.getString("http11protocol.socketfactory.initerror"),
+                    ex);
             throw ex;
         }
 
@@ -167,7 +170,8 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
         try {
             ep.initEndpoint();
         } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
+            log.log(Level.SEVERE,
+                    sm.getString("http11protocol.endpoint.initerror"), ex);
             throw ex;
         }
         log.info(sm.getString("http11protocol.init", "" + ep.getPort(),
@@ -188,7 +192,7 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
                 tp.setName("http" + ep.getPort());
                 tp.addThreadPoolListener(new MXPoolListener(this, tp));
             } catch (Exception e) {
-                log.error("Can't register threadpool" );
+                log.severe("Can't register threadpool");
             }
             rgOname=new ObjectName( domain + 
                     ":type=GlobalRequestProcessor,name=http" +
@@ -200,7 +204,8 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
         try {
             ep.startEndpoint();
         } catch (Exception ex) {
-            log.error(sm.getString("http11protocol.endpoint.starterror"), ex);
+            log.log(Level.SEVERE,
+                    sm.getString("http11protocol.endpoint.starterror"), ex);
             throw ex;
         }
         log.info(sm.getString("http11protocol.start", "" + ep.getPort(),
@@ -628,7 +633,7 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
                     Registry.getRegistry().registerComponent( rp, rpName, null);
                     thData[CoyoteConnectorLauncher.THREAD_DATA_OBJECT_NAME]=rpName;
                 } catch( Exception ex ) {
-                    log.warn("Error registering request");
+                    log.warning("Error registering request");
                 }
             }
 
@@ -677,14 +682,14 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
                 TcpConnection.shutdownInput( socket );
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
-                proto.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.socketexception.debug"), e);
+                proto.log.log(Level.FINE,
+                              sm.getString("http11protocol.proto.socketexception.debug"),
+                              e);
             } catch (java.io.IOException e) {
                 // IOExceptions are normal 
-                proto.log.debug
-                    (sm.getString
-                     ("http11protocol.proto.ioexception.debug"), e);
+                proto.log.log(Level.FINE,
+                              sm.getString("http11protocol.proto.ioexception.debug"),
+                              e);
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
@@ -693,7 +698,8 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                proto.log.error(sm.getString("http11protocol.proto.error"), e);
+                proto.log.log(Level.SEVERE,
+                              sm.getString("http11protocol.proto.error"), e);
             } finally {
                 //       if(proto.adapter != null) proto.adapter.recycle();
                 //                processor.recycle();
@@ -708,8 +714,8 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
         }
     }
 
-    protected static final org.apache.commons.logging.Log log 
-        = org.apache.commons.logging.LogFactory.getLog(CoyoteConnectorLauncher.class);
+    protected static final Logger log  = Logger.getLogger(
+        CoyoteConnectorLauncher.class.getName());
 
     // -------------------- Various implementation classes --------------------
 
