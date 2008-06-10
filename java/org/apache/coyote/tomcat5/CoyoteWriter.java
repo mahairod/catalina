@@ -28,7 +28,7 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletOutputStream;
 import org.apache.catalina.util.StringManager;
-import com.sun.enterprise.web.io.ByteWriter;
+// FIXME import com.sun.enterprise.web.io.ByteWriter;
 
 
 /**
@@ -38,7 +38,7 @@ import com.sun.enterprise.web.io.ByteWriter;
  * @author Kin-man Chung
  */
 public class CoyoteWriter
-    extends PrintWriter implements ByteWriter {
+    extends PrintWriter /* FIXME implements ByteWriter*/ {
 
 
     // -------------------------------------------------------------- Constants

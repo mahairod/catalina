@@ -351,6 +351,12 @@ public class StandardContext
      */
     private String instanceListeners[] = new String[0];
 
+    /**
+     * The set of already instantiated InstanceListeners that will be added
+     * to each newly created Wrapper by <code>createWrapper()</code>.
+     */
+    private ArrayList instanceListenerInstances = new ArrayList();
+
 
     /**
      * The login configuration descriptor for this web application.
@@ -2551,6 +2557,16 @@ public class StandardContext
         }
     }
 
+    public void addInstanceListener(InstanceListener listener) {
+        synchronized (instanceListenerInstances) {
+            instanceListenerInstances.add(listener);
+        }
+
+        if (notifyContainerListeners) {
+            fireContainerEvent("addInstanceListener", listener);
+        }
+    }
+
     /**
      * Add the given URL pattern as a jsp-property-group.  This maps
      * resources that match the given pattern so they will be passed
@@ -3018,6 +3034,14 @@ public class StandardContext
                         t);
                     return (null);
                 }
+            }
+        }
+
+        synchronized (instanceListenerInstances) {
+            for (Iterator<InstanceListener> iter =
+                    instanceListenerInstances.iterator();
+                        iter.hasNext();) {
+                wrapper.addInstanceListener(iter.next());
             }
         }
 
@@ -5531,6 +5555,7 @@ public class StandardContext
         // END SJSAS 6359401
 
         instanceListeners = new String[0];
+        instanceListenerInstances.clear();
     }
     
     private void resetContext() throws Exception, MBeanRegistrationException {

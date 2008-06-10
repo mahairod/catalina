@@ -118,7 +118,7 @@ public interface Wrapper extends Container {
     /**
      * Set the run-as identity for this servlet.
      *
-     * @param value New run-as identity value
+     * @param runAs New run-as identity value
      */
     public void setRunAs(String runAs);
 
@@ -191,7 +191,7 @@ public interface Wrapper extends Container {
     /**
      * Add a mapping associated with the Wrapper.
      * 
-     * @param pattern The new wrapper mapping
+     * @param mapping The new wrapper mapping
      */
     public void addMapping(String mapping);
 
@@ -202,7 +202,6 @@ public interface Wrapper extends Container {
      *
      * @param name Role name used within this servlet
      * @param link Role name used within the web application
-     * @param description Description of this security role reference
      */
     public void addSecurityReference(String name, String link);
 
