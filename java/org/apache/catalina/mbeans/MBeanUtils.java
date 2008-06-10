@@ -1617,7 +1617,6 @@ public class MBeanUtils {
             registry.loadDescriptors("org.apache.catalina.session", cl);
             registry.loadDescriptors("org.apache.catalina.startup", cl);
             registry.loadDescriptors("org.apache.catalina.users", cl);
-            registry.loadDescriptors("org.apache.catalina.cluster", cl);
             
             registry.loadDescriptors("org.apache.catalina.valves",  cl);
             registry.loadDescriptors("org.apache.coyote.tomcat5", cl);
