@@ -89,6 +89,7 @@ import org.apache.catalina.Response;
 import org.apache.catalina.Session;
 //END OF 6364900
 import org.apache.catalina.Wrapper;
+import static org.apache.catalina.InstanceEvent.EventType.AFTER_DISPATCH_EVENT;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.core.StandardWrapper;
@@ -839,7 +840,7 @@ final class ApplicationDispatcher
             if (jspFile != null) {
                 request.setAttribute(Globals.JSP_FILE_ATTR, jspFile);
             } 
-            support.fireInstanceEvent(InstanceEvent.BEFORE_DISPATCH_EVENT,
+            support.fireInstanceEvent(InstanceEvent.EventType.BEFORE_DISPATCH_EVENT,
                                       servlet, request, response);
             // for includes/forwards
             /* IASRI 4665318
@@ -872,27 +873,27 @@ final class ApplicationDispatcher
                 // END IASRI 4665318
             }
             // Servlet Service Method is called by the FilterChain
-            support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
+            support.fireInstanceEvent(AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
         } catch (ClientAbortException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
+            support.fireInstanceEvent(AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             ioException = e;
         } catch (IOException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
+            support.fireInstanceEvent(AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             log(sm.getString("applicationDispatcher.serviceException",
                              wrapper.getName()), e);
             ioException = e;
         } catch (UnavailableException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
+            support.fireInstanceEvent(AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             log(sm.getString("applicationDispatcher.serviceException",
                              wrapper.getName()), e);
             servletException = e;
             wrapper.unavailable(e);
         } catch (ServletException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
+            support.fireInstanceEvent(AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             Throwable rootCause = StandardWrapper.getRootCause(e);
             if (!(rootCause instanceof ClientAbortException)) {
@@ -901,7 +902,7 @@ final class ApplicationDispatcher
             }
             servletException = e;
         } catch (RuntimeException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_DISPATCH_EVENT,
+            support.fireInstanceEvent(AFTER_DISPATCH_EVENT,
                                       servlet, request, response);
             log(sm.getString("applicationDispatcher.serviceException",
                              wrapper.getName()), e);
