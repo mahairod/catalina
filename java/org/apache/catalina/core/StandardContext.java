@@ -2155,6 +2155,10 @@ public class StandardContext
                 // see GlassFish Issue 2563 for details
                 for (int i = 0; i < applicationListeners.length; i++) {
                     if (listener.equals(applicationListeners[i])) {
+                        if (log.isLoggable(Level.INFO)) {
+                            log.info(sm.getString(
+                                    "standardContext.duplicateListener", listener));
+                        }
                         return;
                     }
                     results[i+1] = applicationListeners[i];
@@ -2163,6 +2167,10 @@ public class StandardContext
             } else {
                 for (int i = 0; i < applicationListeners.length; i++) {
                     if (listener.equals(applicationListeners[i])) {
+                        if (log.isLoggable(Level.INFO)) {
+                            log.info(sm.getString(
+                                    "standardContext.duplicateListener", listener));
+                        }
                         return;
                     }
                     results[i] = applicationListeners[i];
@@ -5227,14 +5235,6 @@ public class StandardContext
                 // lifecycle.fireLifecycleEvent(START_EVENT, null);  
                 // END SJSAS 8.1 504911
                 
-                // Start manager
-                if ((manager != null) && (manager instanceof Lifecycle)) {
-                    ((Lifecycle) getManager()).start();
-                }
-
-                // Start ContainerBackgroundProcessor thread
-                super.threadStart();
-
                 mainOk = true;
             }
         } finally {
@@ -5281,12 +5281,27 @@ public class StandardContext
             }
 
 
-            // Configure and call application event listeners and filters
+            // Configure and call application event listeners
             if (ok) {
                 if (!listenerStart()) {
                     ok = false;
                 }
             }
+
+            try {
+                // Start manager
+                if ((manager != null) && (manager instanceof Lifecycle)) {
+                    ((Lifecycle) getManager()).start();
+                }
+
+                // Start ContainerBackgroundProcessor thread
+                super.threadStart();
+            } catch(Exception e) {
+                log.log(Level.SEVERE, sm.getString("standardContext.startManager.error"), e);
+                ok = false;
+            }
+
+            // Configure and call application filters
             if (ok) {
                 if (!filterStart()) {
                     ok = false;
@@ -5509,7 +5524,7 @@ public class StandardContext
             log.log(Level.SEVERE, sm.getString("standardContext.reset", this),
                     ex);
         }
-        
+
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
 
@@ -5987,7 +6002,7 @@ public class StandardContext
 
         // Acquire (or calculate) the work directory path
         String workDir = getWorkDir();
-        if (workDir == null) {
+        if (workDir == null || workDir.length() == 0) {
 
             // Retrieve our parent (normally a host) name
             String hostName = null;
@@ -6069,19 +6084,38 @@ public class StandardContext
             return (false);
         if (urlPattern.indexOf('\n') >= 0 || urlPattern.indexOf('\r') >= 0) {
             log.warning(sm.getString("standardContext.crlfinurl", urlPattern));
+            return false;
         }
         if (urlPattern.startsWith("*.")) {
-            if (urlPattern.indexOf('/') < 0)
+            if (urlPattern.indexOf('/') < 0) {
+                checkUnusualURLPattern(urlPattern);
                 return (true);
-            else
+            } else
                 return (false);
         }
         if ( (urlPattern.startsWith("/")) &&
-                (urlPattern.indexOf("*.") < 0))
+                (urlPattern.indexOf("*.") < 0)) {
+            checkUnusualURLPattern(urlPattern);
             return (true);
-        else
+        } else
             return (false);
 
+    }
+
+
+    /**
+     * Check for unusual but valid <code>&lt;url-pattern&gt;</code>s.
+     * See Bugzilla 34805, 43079 &amp; 43080
+     */
+    private void checkUnusualURLPattern(String urlPattern) {
+        if (log.isLoggable(Level.INFO)) {
+            if(urlPattern.endsWith("*") && (urlPattern.length() < 2 ||
+                    urlPattern.charAt(urlPattern.length()-2) != '/')) {
+                log.info("Suspicious url pattern: \"" + urlPattern + "\"" +
+                        " in context [" + getName() + "] - see" +
+                        " section SRV.11.2 of the Servlet specification" );
+            }
+        }
     }
 
 
