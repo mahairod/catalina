@@ -60,7 +60,7 @@ import org.apache.catalina.security.SecurityUtil;
  * @author Jean-Francois Arcand
  * @version $Revision: 1.7 $ $Date: 2007/08/01 19:04:28 $
  */
-public class CoyoteRequestFacade 
+public class RequestFacade 
     implements HttpServletRequest {
         
         
@@ -220,7 +220,7 @@ public class CoyoteRequestFacade
      *
      * @param request The request to be wrapped
      */
-    public CoyoteRequestFacade(CoyoteRequest request) {
+    public RequestFacade(CoyoteRequest request) {
 
         this.request = request;
 

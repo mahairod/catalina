@@ -439,7 +439,7 @@ public class CoyoteResponse
     /**
      * The facade associated with this response.
      */
-    protected CoyoteResponseFacade facade = null;
+    protected ResponseFacade facade = null;
 
     /**
      * Return the <code>ServletResponse</code> for which this object
@@ -447,7 +447,7 @@ public class CoyoteResponse
      */
     public HttpServletResponse getResponse() {
         if (facade == null) {
-            facade = new CoyoteResponseFacade(this);
+            facade = new ResponseFacade(this);
         }
         return (facade);
     }

@@ -737,7 +737,7 @@ public class CoyoteRequest
     /**
      * The facade associated with this request.
      */
-    protected CoyoteRequestFacade facade = null;
+    protected RequestFacade facade = null;
 
     /**
      * Return the <code>ServletRequest</code> for which this object
@@ -745,7 +745,7 @@ public class CoyoteRequest
      */
     public HttpServletRequest getRequest() {
         if (facade == null) {
-            facade = new CoyoteRequestFacade(this);
+            facade = new RequestFacade(this);
         } 
         return (facade);
     }
