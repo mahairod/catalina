@@ -56,8 +56,6 @@ import org.apache.catalina.Session;
 //END OF 6364900
 import org.apache.catalina.Wrapper;
 import static org.apache.catalina.InstanceEvent.EventType.AFTER_DISPATCH_EVENT;
-import org.apache.catalina.connector.RequestFacade;
-import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.core.StandardWrapper;
 //START OF 6364900
 import org.apache.catalina.session.StandardSession;
@@ -69,6 +67,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.coyote.tomcat5.CoyoteRequest;
 import org.apache.coyote.tomcat5.CoyoteRequestFacade;
+import org.apache.coyote.tomcat5.CoyoteResponseFacade;
 
 /**
  * Standard implementation of <code>RequestDispatcher</code> that allows a
@@ -975,7 +974,7 @@ final class ApplicationDispatcher
 
             // If we run into the container request we are done
             if ((current instanceof Request)
-                || (current instanceof RequestFacade))
+                || (current instanceof CoyoteRequestFacade))
                 break;
 
             // Remove the current request if it is our wrapper
@@ -1012,7 +1011,7 @@ final class ApplicationDispatcher
 
             // If we run into the container response we are done
             if ((current instanceof Response)
-                || (current instanceof ResponseFacade))
+                || (current instanceof CoyoteResponseFacade))
                 break;
 
             // Remove the current response if it is our wrapper

@@ -44,7 +44,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.Globals;
 import org.apache.catalina.session.StandardSessionFacade;
 import org.apache.catalina.util.StringManager;
@@ -62,7 +61,6 @@ import org.apache.catalina.security.SecurityUtil;
  * @version $Revision: 1.7 $ $Date: 2007/08/01 19:04:28 $
  */
 public class CoyoteRequestFacade 
-    extends RequestFacade
     implements HttpServletRequest {
         
         
@@ -224,7 +222,6 @@ public class CoyoteRequestFacade
      */
     public CoyoteRequestFacade(CoyoteRequest request) {
 
-        super(request);
         this.request = request;
 
     }
@@ -907,6 +904,50 @@ public class CoyoteRequestFacade
         }
 
         return request.isRequestedSessionIdFromURL();
+    }
+
+
+    public String getLocalAddr() {
+
+        if (request == null) {
+            throw new IllegalStateException(
+                            sm.getString("requestFacade.nullRequest"));
+        }
+
+        return request.getLocalAddr();
+    }
+
+
+    public String getLocalName() {
+
+        if (request == null) {
+            throw new IllegalStateException(
+                            sm.getString("requestFacade.nullRequest"));
+        }
+
+        return request.getLocalName();
+    }
+
+
+    public int getLocalPort() {
+
+        if (request == null) {
+            throw new IllegalStateException(
+                            sm.getString("requestFacade.nullRequest"));
+        }
+
+        return request.getLocalPort();
+    }
+
+
+    public int getRemotePort() {
+
+        if (request == null) {
+            throw new IllegalStateException(
+                            sm.getString("requestFacade.nullRequest"));
+        }
+
+        return request.getRemotePort();
     }
 
 
