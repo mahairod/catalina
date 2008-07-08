@@ -21,7 +21,7 @@
 
 
 
-package org.apache.coyote.tomcat5;
+package org.apache.catalina.connector;
 
 import java.io.IOException;
 

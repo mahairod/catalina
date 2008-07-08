@@ -464,7 +464,7 @@ public class Embedded  extends StandardService implements Lifecycle {
         try {
 
             Class clazz = 
-                Class.forName("org.apache.coyote.tomcat5.CoyoteConnector");
+                Class.forName("org.apache.catalina.connector.CoyoteConnector");
             connector = (Connector) clazz.newInstance();
 
             if (address != null) {
@@ -482,7 +482,7 @@ public class Embedded  extends StandardService implements Lifecycle {
                 connector.setSecure(true);
                 try {
                     Class serverSocketFactoryClass = Class.forName
-                       ("org.apache.coyote.tomcat5.CoyoteServerSocketFactory");
+                       ("org.apache.catalina.connector.CoyoteServerSocketFactory");
                     ServerSocketFactory factory = 
                         (ServerSocketFactory) 
                         serverSocketFactoryClass.newInstance();
