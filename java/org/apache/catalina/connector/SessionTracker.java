@@ -47,7 +47,7 @@ public class SessionTracker implements SessionListener {
     // The session id that is shared by all tracked sessions
     private String trackedSessionId;
 
-    private CoyoteResponse response;
+    private Response response;
 
     /*
      * The list of contexts whose sessions we're tracking.
@@ -148,7 +148,7 @@ public class SessionTracker implements SessionListener {
      * @param response The response from which to remove the Set-Cookie
      * header if the number of tracked sessions drops to zero
      */
-    public synchronized void setResponse(CoyoteResponse response) {
+    public synchronized void setResponse(Response response) {
         this.response = response;
     }
 

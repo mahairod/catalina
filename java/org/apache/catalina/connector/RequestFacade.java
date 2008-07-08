@@ -220,7 +220,7 @@ public class RequestFacade
      *
      * @param request The request to be wrapped
      */
-    public RequestFacade(CoyoteRequest request) {
+    public RequestFacade(Request request) {
 
         this.request = request;
 
@@ -244,7 +244,7 @@ public class RequestFacade
     /**
      * The wrapped request.
      */
-    protected CoyoteRequest request = null;
+    protected Request request = null;
 
 
     // --------------------------------------------------------- Public Methods
@@ -955,7 +955,7 @@ public class RequestFacade
     /**
      * Return the original <code>CoyoteRequest</code> object.
      */
-    public CoyoteRequest getUnwrappedCoyoteRequest()
+    public Request getUnwrappedCoyoteRequest()
         throws AccessControlException {
 
         // tomcat does not have any Permission types so instead of

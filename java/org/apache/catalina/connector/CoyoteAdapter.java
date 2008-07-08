@@ -40,8 +40,6 @@ import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.util.StringManager;
 import com.sun.grizzly.tcp.ActionCode;
 import com.sun.grizzly.tcp.Adapter;
-import com.sun.grizzly.tcp.Request;
-import com.sun.grizzly.tcp.Response;
 /* CR 6309511
 import org.apache.tomcat.util.buf.B2CConverter;
  */
@@ -165,18 +163,19 @@ public class CoyoteAdapter
     /**
      * Service method.
      */
-    public void service(Request req, Response res)
+    public void service(com.sun.grizzly.tcp.Request req,
+                        com.sun.grizzly.tcp.Response res)
         throws Exception {
 
-        CoyoteRequest request = (CoyoteRequest) req.getNote(ADAPTER_NOTES);
-        CoyoteResponse response = (CoyoteResponse) res.getNote(ADAPTER_NOTES);
+        Request request = (Request) req.getNote(ADAPTER_NOTES);
+        Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request == null) {
 
             // Create objects
-            request = (CoyoteRequest) connector.createRequest();
+            request = (Request) connector.createRequest();
             request.setCoyoteRequest(req);
-            response = (CoyoteResponse) connector.createResponse();
+            response = (Response) connector.createResponse();
             response.setCoyoteResponse(res);
 
             // Link objects
@@ -287,9 +286,11 @@ public class CoyoteAdapter
      * Finish the response and close the connection based on the connection
      * header.
      */
-    public void afterService(Request req,Response res) throws Exception{
-        CoyoteRequest request = (CoyoteRequest) req.getNote(ADAPTER_NOTES);
-        CoyoteResponse response = (CoyoteResponse) res.getNote(ADAPTER_NOTES);
+    public void afterService(com.sun.grizzly.tcp.Request req,
+                             com.sun.grizzly.tcp.Response res)
+            throws Exception{
+        Request request = (Request) req.getNote(ADAPTER_NOTES);
+        Response response = (Response) res.getNote(ADAPTER_NOTES);
         
         if ( request == null || response == null) return;
         
@@ -311,8 +312,10 @@ public class CoyoteAdapter
     /**
      * Parse additional request parameters.
      */
-    protected boolean postParseRequest(Request req, CoyoteRequest request,
-                                       Response res, CoyoteResponse response)
+    protected boolean postParseRequest(com.sun.grizzly.tcp.Request req,
+                                       Request request,
+                                       com.sun.grizzly.tcp.Response res,
+                                       Response response)
         throws Exception {
         // XXX the processor needs to set a correct scheme and port prior to this point, 
         // in ajp13 protocols dont make sense to get the port from the connector..

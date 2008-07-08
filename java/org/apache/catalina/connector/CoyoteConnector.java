@@ -50,8 +50,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.Request;
-import org.apache.catalina.Response;
 import org.apache.catalina.Service;
 // START OF SJSAS 8.1 PE 6191830
 import org.apache.catalina.Globals;
@@ -1332,9 +1330,9 @@ public class CoyoteConnector
      * Create (or allocate) and return a Request object suitable for
      * specifying the contents of a Request to the responsible Container.
      */
-    public Request createRequest() {
+    public org.apache.catalina.Request createRequest() {
 
-        CoyoteRequest request = new CoyoteRequest();
+        Request request = new Request();
         request.setConnector(this);
         return (request);
 
@@ -1345,9 +1343,9 @@ public class CoyoteConnector
      * Create (or allocate) and return a Response object suitable for
      * receiving the contents of a Response from the responsible Container.
      */
-    public Response createResponse() {
+    public org.apache.catalina.Response createResponse() {
 
-        CoyoteResponse response = new CoyoteResponse();
+        Response response = new Response();
         response.setConnector(this);
         return (response);
 
@@ -1946,11 +1944,11 @@ public class CoyoteConnector
     /**
      * Get the underlying WebContainer certificate for the request
      */
-    public X509Certificate[] getCertificates(Request request) {
+    public X509Certificate[] getCertificates(org.apache.catalina.Request request) {
         
-        CoyoteRequest cRequest = null;
-        if (request instanceof CoyoteRequest) {
-            cRequest=(CoyoteRequest) request;
+        Request cRequest = null;
+        if (request instanceof Request) {
+            cRequest=(Request) request;
         } else {
             return null;
         }
