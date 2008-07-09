@@ -43,7 +43,6 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
-import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardContext;
@@ -64,6 +63,8 @@ import org.apache.commons.logging.LogFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
+
+import org.glassfish.web.valve.GlassFishValve;
 
 /**
  * Startup event listener for a <b>Context</b> that configures the properties
@@ -464,10 +465,10 @@ public class ContextConfig
         if (context instanceof ContainerBase) {
             Pipeline pipeline = ((ContainerBase) context).getPipeline();
             if (pipeline != null) {
-                Valve basic = pipeline.getBasic();
+                GlassFishValve basic = pipeline.getBasic();
                 if ((basic != null) && (basic instanceof Authenticator))
                     return;
-                Valve valves[] = pipeline.getValves();
+                GlassFishValve valves[] = pipeline.getValves();
                 for (int i = 0; i < valves.length; i++) {
                     if (valves[i] instanceof Authenticator)
                         return;
@@ -505,7 +506,7 @@ public class ContextConfig
          * method. If so, use it. Otherwise, check if there is a mapping in
          * org/apache/catalina/startup/Authenticators.properties.
          */
-        Valve authenticator = null;
+        GlassFishValve authenticator = null;
         if (customAuthenticators != null) {
             /* PWC 6392537
             authenticator = (Valve)
@@ -515,7 +516,7 @@ public class ContextConfig
             String loginMethod = loginConfig.getAuthMethod();
             if (loginMethod != null
                     && customAuthenticators.containsKey(loginMethod)) {
-                authenticator = (Valve) customAuthenticators.get(loginMethod);
+                authenticator = (GlassFishValve) customAuthenticators.get(loginMethod);
                 if (authenticator == null) {
                     log.log(Level.SEVERE,
                             sm.getString("contextConfig.authenticatorMissing",
@@ -577,7 +578,7 @@ public class ContextConfig
             // Instantiate and install an Authenticator of the requested class
             try {
                 Class authenticatorClass = Class.forName(authenticatorName);
-                authenticator = (Valve) authenticatorClass.newInstance();
+                authenticator = (GlassFishValve) authenticatorClass.newInstance();
             } catch (Throwable t) {
                 log.log(Level.SEVERE,
                         sm.getString("contextConfig.authenticatorInstantiate",
@@ -986,7 +987,7 @@ public class ContextConfig
                 (context instanceof ContainerBase)) {
             log.finest("Pipline Configuration:");
             Pipeline pipeline = ((ContainerBase) context).getPipeline();
-            Valve valves[] = null;
+            GlassFishValve valves[] = null;
             if (pipeline != null)
                 valves = pipeline.getValves();
             if (valves != null) {

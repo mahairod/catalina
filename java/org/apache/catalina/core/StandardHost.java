@@ -40,7 +40,6 @@ import org.apache.catalina.Deployer;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Pipeline;
-import org.apache.catalina.Valve;
 import org.apache.catalina.authenticator.SingleSignOn;
 // START SJSAS 6324911
 import org.apache.catalina.deploy.ErrorPage;
@@ -51,6 +50,7 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.modeler.Registry;
 
+import org.glassfish.web.valve.GlassFishValve;
 
 /**
  * Standard implementation of the <b>Host</b> interface.  Each
@@ -901,8 +901,8 @@ public class StandardHost
         if ((errorReportValveClass != null)
             && (!errorReportValveClass.equals(""))) {
             try {
-                Valve valve = (Valve) Class.forName(errorReportValveClass)
-                    .newInstance();
+                GlassFishValve valve = (GlassFishValve)
+                    Class.forName(errorReportValveClass).newInstance();
                 /* START SJSAS 6374691
                 addValve(valve);
                 */
@@ -1151,7 +1151,7 @@ public class StandardHost
     }
 
 
-    public void addValve(Valve valve) {
+    public void addValve(GlassFishValve valve) {
         super.addValve(valve);
         if (valve instanceof SingleSignOn) {
             sso = (SingleSignOn) valve;
@@ -1159,7 +1159,7 @@ public class StandardHost
     }
 
 
-    public void removeValve(Valve valve) {
+    public void removeValve(GlassFishValve valve) {
         super.removeValve(valve);
         if (valve instanceof SingleSignOn) {
             sso = null;
@@ -1205,7 +1205,7 @@ public class StandardHost
      public String [] getValveNames()
          throws Exception
     {
-         Valve [] valves = this.getValves();
+         GlassFishValve [] valves = this.getValves();
          String [] mbeanNames = new String[valves.length];
          for (int i = 0; i < valves.length; i++) {
              if( valves[i] == null ) continue;

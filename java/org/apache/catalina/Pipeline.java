@@ -26,7 +26,7 @@ package org.apache.catalina;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
-
+import org.glassfish.web.valve.GlassFishValve;
 
 /**
  * <p>Interface describing a collection of Valves that should be executed
@@ -58,7 +58,7 @@ public interface Pipeline {
      * <p>Return the Valve instance that has been distinguished as the basic
      * Valve for this Pipeline (if any).
      */
-    public Valve getBasic();
+    public GlassFishValve getBasic();
 
 
     /**
@@ -73,7 +73,7 @@ public interface Pipeline {
      *
      * @param valve Valve to be distinguished as the basic Valve
      */
-    public void setBasic(Valve valve);
+    public void setBasic(GlassFishValve valve);
 
 
     // --------------------------------------------------------- Public Methods
@@ -98,7 +98,7 @@ public interface Pipeline {
      * @exception IllegalStateException if the specified Valve is already
      *  associated with a different Container
      */
-    public void addValve(Valve valve);
+    public void addValve(GlassFishValve valve);
 
 
     /**
@@ -106,7 +106,7 @@ public interface Pipeline {
      * Container, including the basic Valve (if any).  If there are no
      * such Valves, a zero-length array is returned.
      */
-    public Valve[] getValves();
+    public GlassFishValve[] getValves();
 
 
     /**
@@ -135,7 +135,7 @@ public interface Pipeline {
      *
      * @param valve Valve to be removed
      */
-    public void removeValve(Valve valve);
+    public void removeValve(GlassFishValve valve);
 
 
 }
