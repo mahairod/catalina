@@ -89,7 +89,6 @@ import org.apache.catalina.session.PersistentManagerBase;
 // END SJSAS 6406580
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
-import org.apache.catalina.ValveContext;
 import org.apache.catalina.Wrapper;
 
 import org.apache.catalina.authenticator.SingleSignOn;
@@ -837,28 +836,6 @@ public class Request
      */
     protected void setURIConverter(B2CConverter URIConverter) {
         this.URIConverter = URIConverter;
-    }
-
-
-    /**
-     * The valve context associated with this request.
-     */
-    protected ValveContext valveContext = null;
-
-    /**
-     * Get valve context.
-     */
-    public ValveContext getValveContext() {
-        return (this.valveContext);
-    }
-
-    /**
-     * Set valve context.
-     * 
-     * @param valveContext New valve context object
-     */
-    public void setValveContext(ValveContext valveContext) {
-        this.valveContext = valveContext;
     }
 
 
