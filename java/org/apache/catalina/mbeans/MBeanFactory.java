@@ -250,7 +250,7 @@ public class MBeanFactory extends BaseModelMBean {
         AccessLogValve accessLogger = new AccessLogValve();
         ContainerBase containerBase = getParentContainerFromParent(pname);
         // Add the new instance to its parent component
-        containerBase.addValve(accessLogger);
+        containerBase.addValve((GlassFishValve) accessLogger);
         ObjectName oname = accessLogger.getObjectName();
         return (oname.toString());
 
@@ -644,7 +644,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
+        containerBase.addValve((GlassFishValve) valve);
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
 
@@ -667,7 +667,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
+        containerBase.addValve((GlassFishValve) valve);
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
         
@@ -690,7 +690,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
+        containerBase.addValve((GlassFishValve) valve);
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
 
@@ -713,7 +713,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
+        containerBase.addValve((GlassFishValve) valve);
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
 
