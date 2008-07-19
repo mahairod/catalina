@@ -6690,4 +6690,13 @@ public class StandardContext
     public boolean isStatisticsProvider() {
         return false;
     }
+
+    /**
+     * Emits servletLoaded event.
+     *
+     * @param servletName the name of the servlet that was loaded
+     */
+    public void servletLoadedEvent(String servletName) {
+        // Deliberate noop
+    }
 }
