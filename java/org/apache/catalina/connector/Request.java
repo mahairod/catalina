@@ -723,6 +723,7 @@ public class Request
      */
     protected MappingData mappingData = new MappingData();
 
+    
     /**
      * Return mapping data.
      */
@@ -730,7 +731,15 @@ public class Request
         return (mappingData);
     }
 
-
+    
+    /**
+     * Return mapping data.
+     */
+    public void setMappingData(MappingData mappingData) {
+        this.mappingData = mappingData;
+    }
+    
+    
     /**
      * The facade associated with this request.
      */
