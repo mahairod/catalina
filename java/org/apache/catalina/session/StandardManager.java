@@ -49,6 +49,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.security.SecurityUtil;
@@ -152,7 +153,6 @@ public class StandardManager
     private String absPathName;
     // END SJSAS 6359401
 
-    int rejectedSessions=0;
     long processingTime=0;
 
 
@@ -207,25 +207,16 @@ public class StandardManager
 
     }
 
-    /** Number of session creations that failed due to maxActiveSessions
-     *
-     * @return
-     */
-    public int getRejectedSessions() {
-        return rejectedSessions;
-    }
-
-    public void setRejectedSessions(int rejectedSessions) {
-        this.rejectedSessions = rejectedSessions;
-    }
 
     public long getProcessingTime() {
         return processingTime;
     }
 
+
     public void setProcessingTime(long processingTime) {
         this.processingTime = processingTime;
     }
+
 
     /**
      * Set the maximum number of actives Sessions allowed, or -1 for
@@ -240,7 +231,6 @@ public class StandardManager
         support.firePropertyChange("maxActiveSessions",
                                    Integer.valueOf(oldMaxActiveSessions),
                                    Integer.valueOf(this.maxActiveSessions));
-
     }
 
 
@@ -296,6 +286,8 @@ public class StandardManager
         if ((maxActiveSessions >= 0) &&
                 (sessions.size() >= maxActiveSessions)) {
             rejectedSessions++;
+            ((StandardContext)container).sessionRejectedEvent(
+                maxActiveSessions);
             throw new IllegalStateException
                 (sm.getString("standardManager.createSession.ise"));
         }

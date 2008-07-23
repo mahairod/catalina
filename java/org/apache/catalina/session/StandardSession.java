@@ -107,10 +107,10 @@ public class StandardSession
     public StandardSession(Manager manager) {
 
         super();
-        this.manager = manager;
-        if (manager instanceof ManagerBase)
+        setManager(manager);
+        if (manager instanceof ManagerBase) {
             this.debug = ((ManagerBase) manager).getDebug();
-
+        }
         accessCount = new AtomicInteger();
 
     }
@@ -238,6 +238,12 @@ public class StandardSession
      * The Manager with which this Session is associated.
      */
     protected transient Manager manager = null;
+
+
+    /**
+     * The context with which this Session is associated.
+     */
+    protected transient StandardContext context = null;
 
 
     /**
@@ -400,7 +406,6 @@ public class StandardSession
         fireSessionEvent(Session.SESSION_CREATED_EVENT, null);
 
         // Notify interested application event listeners
-        Context context = (Context) manager.getContainer();
         Object listeners[] = context.getApplicationLifecycleListeners();
         if (listeners != null && (listeners.length > 0)) {
             HttpSessionEvent event =
@@ -502,9 +507,8 @@ public class StandardSession
      * @param manager The new Manager
      */
     public void setManager(Manager manager) {
-
         this.manager = manager;
-
+        context = (StandardContext) manager.getContainer();
     }
 
 
@@ -629,6 +633,7 @@ public class StandardSession
         */
         // START SJSAS 6329289
         if (hasExpired()) {
+            context.sessionExpiredEvent(this);
             expire(true);
         }
         // END SJSAS 6329289
@@ -745,7 +750,6 @@ public class StandardSession
         
             // Notify interested application event listeners
             // FIXME - Assumes we call listeners in reverse order
-            Context context = (Context) manager.getContainer();
             Object listeners[] = context.getApplicationLifecycleListeners();
             if (notify && (listeners != null) && (listeners.length > 0)) {
                 HttpSessionEvent event =
@@ -835,19 +839,24 @@ public class StandardSession
      */
     public void passivate() {
 
-        // Notify ActivationListeners
-        HttpSessionEvent event = null;
-        String keys[] = keys();
-        for (int i = 0; i < keys.length; i++) {
-            Object attribute = getAttributeInternal(keys[i]);
-            if (attribute instanceof HttpSessionActivationListener) {
-                if (event == null)
-                    event = new HttpSessionEvent(getSession());
-                // FIXME: Should we catch throwables?
-                ((HttpSessionActivationListener)attribute).sessionWillPassivate(event);
-            }
-        }
+        context.sessionPassivatedStartEvent(this);
 
+        try {
+            // Notify ActivationListeners
+            HttpSessionEvent event = null;
+            String keys[] = keys();
+            for (int i = 0; i < keys.length; i++) {
+                Object attribute = getAttributeInternal(keys[i]);
+                if (attribute instanceof HttpSessionActivationListener) {
+                    if (event == null)
+                        event = new HttpSessionEvent(getSession());
+                    // FIXME: Should we catch throwables?
+                    ((HttpSessionActivationListener)attribute).sessionWillPassivate(event);
+                }
+            }
+        } finally {
+            context.sessionPassivatedEndEvent(this);
+        }
     }
 
 
@@ -857,22 +866,27 @@ public class StandardSession
      */
     public void activate() {
 
+        context.sessionActivatedStartEvent(this);
+
         // Initialize access count
         accessCount = new AtomicInteger();
 
-        // Notify ActivationListeners
-        HttpSessionEvent event = null;
-        String keys[] = keys();
-        for (int i = 0; i < keys.length; i++) {
-            Object attribute = getAttributeInternal(keys[i]);
-            if (attribute instanceof HttpSessionActivationListener) {
-                if (event == null)
-                    event = new HttpSessionEvent(getSession());
-                // FIXME: Should we catch throwables?
-                ((HttpSessionActivationListener)attribute).sessionDidActivate(event);
+        try {
+            // Notify ActivationListeners
+            HttpSessionEvent event = null;
+            String keys[] = keys();
+            for (int i = 0; i < keys.length; i++) {
+                Object attribute = getAttributeInternal(keys[i]);
+                if (attribute instanceof HttpSessionActivationListener) {
+                    if (event == null)
+                        event = new HttpSessionEvent(getSession());
+                    // FIXME: Should we catch throwables?
+                    ((HttpSessionActivationListener)attribute).sessionDidActivate(event);
+                }
             }
+        } finally {
+            context.sessionActivatedEndEvent(this);
         }
-
     }
 
 
@@ -1117,7 +1131,6 @@ public class StandardSession
 
         if (manager == null)
             return (null);
-        Context context = (Context) manager.getContainer();
         if (context == null)
             return (null);
         else
@@ -1512,17 +1525,15 @@ public class StandardSession
         
         // Notify special event listeners on removeAttribute
         //HERCULES:add
-        StandardContext stdContext = (StandardContext) manager.getContainer();       
         // fire container event        
-        stdContext.fireContainerEvent("sessionRemoveAttributeCalled", event);
+        context.fireContainerEvent("sessionRemoveAttributeCalled", event);
         // fire sync container event if name equals SYNC_STRING
         if (SYNC_STRING.equals(name)) {
-            stdContext.fireContainerEvent("sessionSync",  (new HttpSessionBindingEvent(getSession(), name)));
+            context.fireContainerEvent("sessionSync",  (new HttpSessionBindingEvent(getSession(), name)));
         }         
         //END HERCULES:add         
 
         // Notify interested application event listeners
-        Context context = (Context) manager.getContainer();
         Object listeners[] = context.getApplicationEventListeners();
         if (listeners == null)
             return;
@@ -1652,15 +1663,14 @@ public class StandardSession
         }
         
         //HERCULES:add
-        StandardContext stdCtx = (StandardContext) manager.getContainer();        
         // fire sync container event if name equals SYNC_STRING
         if (SYNC_STRING.equals(name)) {
-            stdCtx.fireContainerEvent("sessionSync",  (new HttpSessionBindingEvent(getSession(), name)));
+            context.fireContainerEvent("sessionSync",
+                new HttpSessionBindingEvent(getSession(), name));
         }
         //end HERCULES:add
 
         // Notify interested application event listeners
-        Context context = (Context) manager.getContainer();
         Object listeners[] = context.getApplicationEventListeners();
         if (listeners == null)
             return;
@@ -2025,6 +2035,14 @@ public class StandardSession
      * @param data Event data
      */
     public void fireSessionEvent(String type, Object data) {
+
+        // Fire monitoring probe
+        if (Session.SESSION_CREATED_EVENT.equals(type)) {
+            context.sessionCreatedEvent(this);
+        }  else {
+            context.sessionDestroyedEvent(this);
+        }
+
         if (listeners.size() < 1)
             return;
         SessionEvent event = new SessionEvent(this, type, data);

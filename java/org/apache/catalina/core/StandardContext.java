@@ -59,6 +59,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
@@ -6691,6 +6692,9 @@ public class StandardContext
         return false;
     }
 
+
+    // Servlet related monitoring events
+
     /**
      * Emits servletLoaded event.
      *
@@ -6699,4 +6703,48 @@ public class StandardContext
     public void servletLoadedEvent(String servletName) {
         // Deliberate noop
     }
+
+
+    // HTTP session related monitoring events
+
+    public void sessionCreatedEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionDestroyedEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionRejectedEvent(int maxSessions) {
+        // Deliberate noop
+    }
+
+    public void sessionExpiredEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionPersistedStartEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionPersistedEndEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionActivatedStartEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionActivatedEndEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionPassivatedStartEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
+    public void sessionPassivatedEndEvent(HttpSession session) {
+        // Deliberate noop
+    }
+
 }
