@@ -1083,7 +1083,6 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
             devRandomSource=null;
             randomIS=null;
         }
-        Random random = getRandom();
         getRandom().nextBytes(bytes);
     }
     
