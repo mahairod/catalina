@@ -111,8 +111,6 @@ public class StandardSession
         if (manager instanceof ManagerBase) {
             this.debug = ((ManagerBase) manager).getDebug();
         }
-        accessCount = new AtomicInteger();
-
     }
 
 
@@ -301,12 +299,6 @@ public class StandardSession
      * The current accessed time for this session.
      */
     protected long thisAccessedTime = creationTime;
-
-
-    /**
-     * The access count for this session.
-     */
-    protected transient AtomicInteger accessCount = null;
 
 
     /**
@@ -618,7 +610,7 @@ public class StandardSession
             return false;
         }
 
-        if (accessCount.get() > 0) {
+        if (isForegroundLocked()) {
             return true;
         }
 
@@ -672,13 +664,10 @@ public class StandardSession
      * session, even if the application does not reference it.
      */
     public void access() {
-
         this.lastAccessedTime = this.thisAccessedTime;
         this.thisAccessedTime = System.currentTimeMillis();
 
-	evaluateIfValid();
-
-        accessCount.incrementAndGet();
+        evaluateIfValid();
     }
 
 
@@ -686,10 +675,7 @@ public class StandardSession
      * End the access.
      */
     public void endAccess() {
-
         isNew = false;
-        accessCount.decrementAndGet();       
-
     }
 
 
@@ -781,7 +767,7 @@ public class StandardSession
                     }
                 }
             }
-            accessCount.set(0);
+
             setValid(false);
 
             /*
@@ -868,9 +854,6 @@ public class StandardSession
 
         context.sessionActivatedStartEvent(this);
 
-        // Initialize access count
-        accessCount = new AtomicInteger();
-
         try {
             // Notify ActivationListeners
             HttpSessionEvent event = null;
@@ -924,7 +907,6 @@ public class StandardSession
         id = null;
         lastAccessedTime = 0L;
         maxInactiveInterval = -1;
-        accessCount = null;
         notes.clear();
         setPrincipal(null);
         isNew = false;
