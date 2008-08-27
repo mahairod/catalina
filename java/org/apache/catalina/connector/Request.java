@@ -3578,8 +3578,6 @@ public class Request
                 if (conv == null) {
                     conv = new B2CConverter(enc);
                     setURIConverter(conv);
-                } else {
-                    conv.recycle();
                 }
             } catch (IOException e) {
                 // Ignore
