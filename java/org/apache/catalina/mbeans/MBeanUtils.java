@@ -86,7 +86,7 @@ public class MBeanUtils {
     private static String exceptions[][] = {
         { "org.apache.ajp.tomcat4.Ajp13Connector",
           "Ajp13Connector" },
-        { "org.apache.coyote.tomcat4.Ajp13Connector",
+        { "com.sun.grizzly.tcp.tomcat4.Ajp13Connector",
           "CoyoteConnector" },
         { "org.apache.catalina.core.StandardDefaultContext",
           "DefaultContext" },

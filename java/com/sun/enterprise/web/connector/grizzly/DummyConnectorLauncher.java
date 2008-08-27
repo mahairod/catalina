@@ -33,10 +33,6 @@ public class DummyConnectorLauncher extends CoyoteConnectorLauncher {
         super(secure,blocking,selectorThreadImpl);     
     }   
 
-    @Override
-    protected void create() {         
-    }
-
     /** 
      * Start the protocol
      */
