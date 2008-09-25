@@ -513,7 +513,7 @@ final class ApplicationDispatcher
                 if (disInt.intValue() != ApplicationFilterFactory.ERROR) {
                     state.outerRequest.setAttribute
                         (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                        servletPath);
+                        getCombinedPath());
                     state.outerRequest.setAttribute
                         (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                         Integer.valueOf(ApplicationFilterFactory.FORWARD));
@@ -527,7 +527,23 @@ final class ApplicationDispatcher
     }
     
     
+    /**
+     * Combine the servletPath and the pathInfo. If pathInfo is
+     * <code>null</code> it is ignored. If servletPath is <code>null</code> then
+     * <code>null</code> is returned.
+     * @return The combined path with pathInfo appended to servletInfo
+     */
+    private String getCombinedPath() {
+        if (servletPath == null) {
+            return null;
+        }
+        if (pathInfo == null) {
+            return servletPath;
+        }
+        return servletPath + pathInfo;
+    }
     
+
     /**
      * Include the response from another resource in the current response.
      * Any runtime exception, IOException, or ServletException thrown by the
@@ -605,7 +621,7 @@ final class ApplicationDispatcher
                 Integer.valueOf(ApplicationFilterFactory.INCLUDE));
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                servletPath);
+                getCombinedPath());
             invoke(state.outerRequest, state.outerResponse, state);
 
             wrequest.recycle();
@@ -635,7 +651,7 @@ final class ApplicationDispatcher
                 Integer.valueOf(ApplicationFilterFactory.INCLUDE));
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                servletPath);
+                getCombinedPath());
             invoke(state.outerRequest, state.outerResponse, state);
 
             wrequest.recycle();
