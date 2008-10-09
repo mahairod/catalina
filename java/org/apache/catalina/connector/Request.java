@@ -1051,10 +1051,6 @@ public class Request
      */
     public void setSecure(boolean secure) {
         this.secure = secure;
-
-        if ( secure ){
-            populateSSLAttributes();
-        }
     }
 
 
