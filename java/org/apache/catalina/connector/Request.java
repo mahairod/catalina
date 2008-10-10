@@ -490,6 +490,8 @@ public class Request
 
     private String requestURI = null;
 
+    private boolean supportsAsync = false;
+
     /**
      * Associated context.
      */
@@ -3682,6 +3684,28 @@ public class Request
 
     }
     // END CR 6309511
+
+
+    /**
+     * Disables async support on this request.
+     */
+    public void disableAsyncSupport() {
+        supportsAsync = false;
+    }
+
+
+    /**
+     * Tests whether this request supports async mode.
+     *
+     * Async mode is disabled as soon as the request has passed a filter
+     * or servlet that does not support async (either via the designated
+     * annotation or declaratively).
+     *
+     * @return true if this request supports async mode, false otherwise
+     */
+    public boolean isAsyncSupported() {
+        return supportsAsync;
+    }
 
 
     /**

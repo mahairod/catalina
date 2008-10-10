@@ -345,4 +345,5 @@ public interface Wrapper extends Container {
     public void unload() throws ServletException;
 
 
+    public boolean isSupportsAsync();
 }

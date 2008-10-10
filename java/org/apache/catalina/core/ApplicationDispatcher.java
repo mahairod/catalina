@@ -808,8 +808,8 @@ final class ApplicationDispatcher
                 
         // Get the FilterChain Here
         ApplicationFilterFactory factory = ApplicationFilterFactory.getInstance();
-        ApplicationFilterChain filterChain = factory.createFilterChain(request,
-                                                                wrapper,servlet);
+        ApplicationFilterChain filterChain = factory.createFilterChain(
+            request, wrapper, servlet);
 
         // START OF S1AS 4703023
         Request origRequest = null;
@@ -845,11 +845,13 @@ final class ApplicationDispatcher
                 filterChain.doFilter(request, response);
                 */
                 // START IASRI 4665318
-                if (filterChain != null)
+                if (filterChain != null) {
+                    filterChain.setRequest(origRequest);
                     filterChain.doFilter(request, response);
-                else {
-                    ApplicationFilterChain.servletService(request, response,
-                                                          servlet, support);
+                } else {
+                    ApplicationFilterChain.servletService(
+                        request, response, servlet, wrapper.isSupportsAsync(),
+                        support, origRequest);
                 }
                 // END IASRI 4665318
             }
