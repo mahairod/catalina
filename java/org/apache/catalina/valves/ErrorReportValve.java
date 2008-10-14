@@ -468,7 +468,7 @@ public class ErrorReportValve
             // END SJSAS 6387790
             */
             // START GlassFish 823
-            sb.append(throwable);
+            sb.append(RequestUtil.filter(String.valueOf(throwable)));
             // END GlassFish 823
             sb.append("</pre></p>");
 
@@ -495,7 +495,7 @@ public class ErrorReportValve
                 // END SJSAS 6387790
                 */
                 // START GlassFish 823
-                sb.append(rootCause);
+                sb.append(RequestUtil.filter(String.valueOf(rootCause)));
                 // END GlassFish 823
                 sb.append("</pre></p>");
 
