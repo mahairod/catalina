@@ -267,6 +267,12 @@ public class StandardContext
 
 
     /**
+     *  Is the context initialized. 
+     */
+    private boolean isContextInitializedCalled = false;
+
+
+    /**
      * Compiler classpath to use.
      */
     private String compilerClasspath = null;
@@ -2580,7 +2586,7 @@ public class StandardContext
             throw new IllegalArgumentException
                     (sm.getString("standardContext.filterMap.either"));
         }
-        if (initialized) {
+        if (isContextInitializedCalled) {
             throw new IllegalStateException
                     (sm.getString("standardContext.filterMap.initialized"));
         }
@@ -2633,7 +2639,7 @@ public class StandardContext
             throw new IllegalArgumentException
                     (sm.getString("standardContext.filterMap.either"));
         }
-        if (initialized) {
+        if (isContextInitializedCalled) {
             throw new IllegalStateException
                     (sm.getString("standardContext.filterMap.initialized"));
         }
@@ -2667,7 +2673,7 @@ public class StandardContext
      */
     public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
                 
-        if (initialized) {
+        if (isContextInitializedCalled) {
             throw new IllegalStateException
                     (sm.getString("applicationContext.sessionCookieConfig.initialized"));
         }
@@ -4773,6 +4779,7 @@ public class StandardContext
                 ok = false;
             }
         }
+        isContextInitializedCalled = true;
         return (ok);
 
     }
