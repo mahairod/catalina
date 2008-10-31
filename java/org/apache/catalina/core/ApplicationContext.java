@@ -48,6 +48,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.ContainerEvent;
@@ -1053,9 +1054,7 @@ public class ApplicationContext
      * already been initialized
      */
     public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
-                
         context.setSessionCookieConfig(sessionCookieConfig);
-        
     }
  
      
@@ -1068,12 +1067,43 @@ public class ApplicationContext
      * was ever set for this <tt>ServletContext</tt>
      */
     public SessionCookieConfig getSessionCookieConfig() {
-        
-        return context.getSessionCookieConfig();
-        
+        return context.getSessionCookieConfig();        
     }
  
  
+    /**
+     * Sets the session tracking modes that are to become effective for this
+     * <tt>ServletContext</tt>.
+     */
+    public void setSessionTrackingModes(EnumSet<SessionTrackingMode> sessionTrackingModes) {
+        context.setSessionTrackingModes(sessionTrackingModes);
+    }
+
+
+    /**
+     * Gets the session tracking modes that are supported by default for this
+     * <tt>ServletContext</tt>.
+     *
+     * @return enum set of the session tracking modes supported by default for
+     * this <tt>ServletContext</tt>
+     */
+    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
+        return context.getDefaultSessionTrackingModes();
+    }
+
+
+    /**
+     * Gets the session tracking modes that are in effect for this
+     * <tt>ServletContext</tt>.
+     *
+     * @return enum set of the session tracking modes in effect for this
+     * <tt>ServletContext</tt>
+     */
+    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+        return context.getEffectiveSessionTrackingModes();
+    }
+
+
     // START PWC 1.2
     /**
      * Gets the underlying StandardContext to which this ApplicationContext is
