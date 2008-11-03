@@ -91,13 +91,15 @@ public class StandardManager
         implements PrivilegedExceptionAction {
 
         private boolean expire;
+        private boolean isShutdown;
 
-        PrivilegedDoUnloadToFile(boolean expire) {
+        PrivilegedDoUnloadToFile(boolean expire, boolean shutDown) {
             this.expire = expire;
+            isShutdown = shutDown;
         }
 
         public Object run() throws Exception{
-            doUnloadToFile(expire);
+            doUnloadToFile(expire, isShutdown);
             return null;
         }            
            
@@ -536,7 +538,7 @@ public class StandardManager
      * @exception IOException if an input/output error occurs
      */
     public void unload() throws IOException {
-        unload(true);
+        unload(true, false);
     }
 
 
@@ -559,14 +561,16 @@ public class StandardManager
      *
      * @doExpire true if the unloaded sessions are to be expired, false
      * otherwise
+     * @param isShutdown true if this manager is being stopped as part of a
+     * domain shutdown (as opposed to an undeployment), and false otherwise
      *
      * @exception IOException if an input/output error occurs
      */        
-    protected void unload(boolean doExpire) throws IOException {
+    protected void unload(boolean doExpire, boolean isShutdown) throws IOException {
         if (SecurityUtil.isPackageProtectionEnabled()){       
             try {
                 AccessController.doPrivileged(
-                    new PrivilegedDoUnloadToFile(doExpire));
+                    new PrivilegedDoUnloadToFile(doExpire, isShutdown));
             } catch (PrivilegedActionException ex){
                 Exception exception = ex.getException();
                 if (exception instanceof IOException){
@@ -577,7 +581,7 @@ public class StandardManager
                         + exception);                
             }        
         } else {
-            doUnloadToFile(doExpire);
+            doUnloadToFile(doExpire, isShutdown);
         }       
     }
         
@@ -590,12 +594,11 @@ public class StandardManager
      *
      * @exception IOException if an input/output error occurs
      */
-    private void doUnloadToFile(boolean doExpire) throws IOException {
-
+    private void doUnloadToFile(boolean doExpire, boolean isShutdown) throws IOException {
+        if(isShutdown) {
             if(log.isLoggable(Level.FINE)) {
                 log.fine("Unloading persisted sessions");
             }
-
             // Open an output stream to the specified pathname, if any
             File file = file();
             if(file == null || !isDirectoryValidFor(file.getAbsolutePath())) {
@@ -631,7 +634,7 @@ public class StandardManager
                 }
             }
         }
-
+    }
 
     /*
      * Writes all active sessions to the given output stream.
@@ -675,18 +678,16 @@ public class StandardManager
                 // START SJSAS 6375689
                 Session actSessions[] = findSessions();
                 if (actSessions != null) {
-                    for (int i = 0; i < actSessions.length; i++) {
-                        StandardSession session = (StandardSession)
-                            actSessions[i];
-                        ((StandardSession) session).passivate();
+                    for (Session actSession : actSessions) {
+                        StandardSession session = (StandardSession) actSession;
+                        session.passivate();
                     }
                 }
                 // END SJSAS 6375689
                 oos.writeObject(Integer.valueOf(sessions.size()));
-                Iterator elements = sessions.values().iterator();
-                while (elements.hasNext()) {
+                for (Object o : sessions.values()) {
                     StandardSession session =
-                        (StandardSession) elements.next();
+                        (StandardSession) o;
                     list.add(session);
                     /* SJSAS 6375689
                     ((StandardSession) session).passivate();
@@ -761,10 +762,7 @@ public class StandardManager
         }
         String result = fullPathFileName.substring(0, lastSlashIdx);
         //System.out.println("PATH name = " + result);
-        File file = new File(result);
-        boolean isDirValid = file.isDirectory();
-        //System.out.println("IS DIR VALID: " + result);
-        return isDirValid;
+        return new File(result).isDirectory();
     }    
 
 
@@ -852,6 +850,21 @@ public class StandardManager
      *  that needs to be reported
      */
     public void stop() throws LifecycleException {
+        stop(false);
+    }
+
+    /**
+     * Gracefully terminate the active use of the public methods of this
+     * component.  This method should be the last one called on a given
+     * instance of this component.
+     *
+     * @param isShutdown true if this manager is being stopped as part of a
+     * domain shutdown (as opposed to an undeployment), and false otherwise
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that needs to be reported
+     */
+    public void stop(boolean isShutdown) throws LifecycleException {
 
         if (log.isLoggable(Level.FINE))
             log.fine("Stopping");
@@ -865,7 +878,7 @@ public class StandardManager
 
         // Write out sessions
         try {
-            unload(false);
+            unload(false, isShutdown);
         } catch (IOException e) {
             log.log(Level.SEVERE,
                     sm.getString("standardManager.managerUnload"),
@@ -910,10 +923,10 @@ public class StandardManager
         Context context = (Context) event.getSource();
 
         // Process a relevant property change
-        if (event.getPropertyName().equals("sessionTimeout")) {
+        if ("sessionTimeout".equals(event.getPropertyName())) {
             try {
                 setMaxInactiveIntervalSeconds
-                    ( ((Integer) event.getNewValue()).intValue()*60 );
+                    ((Integer) event.getNewValue() *60 );
             } catch (NumberFormatException e) {
                 log.log(Level.SEVERE,
                         sm.getString("standardManager.sessionTimeout",

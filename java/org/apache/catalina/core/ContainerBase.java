@@ -944,7 +944,7 @@ public abstract class ContainerBase
         if (name == null)
             return (null);
         synchronized (children) {       // Required by post-start changes
-            return ((Container) children.get(name));
+            return children.get(name);
         }
 
     }
@@ -1464,7 +1464,7 @@ public abstract class ContainerBase
 
         ContainerEvent event = new ContainerEvent(this, type, data);
         for (int i = 0; i < list.length; i++) {
-            ((ContainerListener) list[i]).containerEvent(event);
+            list[i].containerEvent(event);
         }
     }
 
