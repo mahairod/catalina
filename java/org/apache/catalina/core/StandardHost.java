@@ -28,7 +28,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.logging.*; 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.ObjectName;
 import javax.management.MBeanServer;
 import javax.servlet.http.Cookie;
@@ -77,10 +78,7 @@ public class StandardHost
      * Create a new StandardHost component with the default basic Valve.
      */
     public StandardHost() {
-
-        super();
         pipeline.setBasic(new StandardHostValve());
-
     }
 
 
@@ -152,12 +150,6 @@ public class StandardHost
      */
     private static final String info =
         "org.apache.catalina.core.StandardHost/1.0";
-
-
-    /**
-     * The live deploy flag for this Host.
-     */
-    private boolean liveDeploy = true;
 
 
     /**
@@ -376,7 +368,7 @@ public class StandardHost
     /**
      * Set the deploy on startup flag value for this host.
      * 
-     * @param autoDeploy The new deploy on startup flag
+     * @param deployOnStartup The new deploy on startup flag
      */
     public void setDeployOnStartup(boolean deployOnStartup) {
 
@@ -461,6 +453,7 @@ public class StandardHost
      * Return the canonical, fully qualified, name of the virtual host
      * this Container represents.
      */
+    @Override
     public String getName() {
         return (name);
     }
@@ -474,6 +467,7 @@ public class StandardHost
      *
      * @exception IllegalArgumentException if name is null
      */
+    @Override
     public void setName(String name) {
 
         if (name == null)
@@ -568,7 +562,7 @@ public class StandardHost
      */
     public void setPorts(int[] ports) {
         int[] oldPorts = this.ports;
-        this.ports = (int[])ports.clone();
+        this.ports = ports.clone();
         support.firePropertyChange("ports", oldPorts, this.ports);
     }
 
@@ -580,7 +574,7 @@ public class StandardHost
      * or null if this StandardHost has not been associated with any ports
      */
     public int[] getPorts() {
-        return (int[])this.ports.clone();
+        return this.ports.clone();
     }
     // END S1AS 5000999
 
@@ -629,9 +623,10 @@ public class StandardHost
         // START OF PE 4989789
         
         // Skip duplicate aliases
-        for (int i = 0; i < aliases.length; i++) {
-            if (aliases[i].equals(alias))
+        for(String name : aliases) {
+            if(name.equals(alias)) {
                 return;
+            }
         }
 
         // Add this alias to the list
@@ -654,6 +649,7 @@ public class StandardHost
      *
      * @param child Child container to be added
      */
+    @Override
     public void addChild(Container child) {
 
         if (!(child instanceof Context))
@@ -672,6 +668,7 @@ public class StandardHost
      *
      * @return The context deployed at the given context root, or null
      */
+    @Override
     public Container findChild(String contextRoot) {
         return super.findChild(RequestUtil.URLDecode(contextRoot));
     }
@@ -713,6 +710,7 @@ public class StandardHost
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
+    @Override
     public String getInfo() {
 
         return (info);
@@ -825,10 +823,8 @@ public class StandardHost
 
         // Add the specified error page to our internal collections
         synchronized (statusPages) {
-            statusPages.put(Integer.valueOf(errorPage.getErrorCode()),
-                            errorPage);
+            statusPages.put(errorPage.getErrorCode(), errorPage);
         }
-
         fireContainerEvent("addErrorPage", errorPage);
 
     }
@@ -862,6 +858,7 @@ public class StandardHost
     /**
      * Return a String representation of this component.
      */
+    @Override
     public String toString() {
 
         StringBuffer sb = new StringBuffer();
@@ -883,6 +880,7 @@ public class StandardHost
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents it from being started
      */
+    @Override
     public synchronized void start() throws LifecycleException {
         if( started ) {
             return;
@@ -911,7 +909,7 @@ public class StandardHost
 
         // Set error report valve
         if ((errorReportValveClass != null)
-            && (!errorReportValveClass.equals(""))) {
+            && !"".equals(errorReportValveClass)) {
             try {
                 GlassFishValve valve = (GlassFishValve)
                     Class.forName(errorReportValveClass).newInstance();
@@ -950,6 +948,7 @@ public class StandardHost
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
+    @Override
     public void backgroundProcess() {
         lifecycle.fireLifecycleEvent("check", null);
     }
@@ -1165,6 +1164,7 @@ public class StandardHost
     }
 
 
+    @Override
     public void addValve(GlassFishValve valve) {
         super.addValve(valve);
         if (valve instanceof SingleSignOn) {
@@ -1173,6 +1173,7 @@ public class StandardHost
     }
 
 
+    @Override
     public void removeValve(GlassFishValve valve) {
         super.removeValve(valve);
         if (valve instanceof SingleSignOn) {
@@ -1239,6 +1240,7 @@ public class StandardHost
     private boolean initialized=false;
     */    
 
+    @Override
     public void init() {
         if( initialized ) return;
         /* CR 6368085
@@ -1286,7 +1288,8 @@ public class StandardHost
         // END CR 6368085
     }
 
-    public ObjectName preRegister(MBeanServer server, ObjectName oname ) 
+    @Override
+    public ObjectName preRegister(MBeanServer server, ObjectName oname )
         throws Exception
     {
         ObjectName res=super.preRegister(server, oname);
@@ -1296,6 +1299,7 @@ public class StandardHost
         return res;        
     }
     
+    @Override
     public ObjectName createObjectName(String domain, ObjectName parent)
         throws Exception
     {
