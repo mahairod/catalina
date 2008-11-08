@@ -115,9 +115,10 @@ final class ApplicationFilterChain implements FilterChain {
     private Request coyoRequest = null;
 
 
-    // Indicates whether the servlet at the end of the filter chain supports
-    // async
-    private boolean servletSupportsAsync = false;
+    /*
+     * Does the servlet at the end of the filter chain supports async?
+     */
+    private boolean isAsyncSupportedByServlet = false;
 
 
     /**
@@ -314,7 +315,7 @@ final class ApplicationFilterChain implements FilterChain {
 
         */
         // START IASRI 4665318
-        servletService(request, response, servlet, servletSupportsAsync,
+        servletService(request, response, servlet, isAsyncSupportedByServlet,
                        support, coyoRequest);
         // END IASRI 4665318
     }
@@ -352,7 +353,7 @@ final class ApplicationFilterChain implements FilterChain {
         servlet = null;
         support = null;
         coyoRequest = null;
-        servletSupportsAsync = false;
+        isAsyncSupportedByServlet = false;
     }
 
 
@@ -367,11 +368,11 @@ final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * @param servletSupportsAsync true if the servlet at the end of the
+     * @param isAsyncSupportedByServlet true if the servlet at the end of the
      * filter chain supports async, false otherwise
      */
-    void setServletSupportsAsync(boolean servletSupportsAsync) {
-        this.servletSupportsAsync = servletSupportsAsync;
+    void setIsAsyncSupportedByServlet(boolean isAsyncSupportedByServlet) {
+        this.isAsyncSupportedByServlet = isAsyncSupportedByServlet;
     }
 
 
@@ -401,13 +402,13 @@ final class ApplicationFilterChain implements FilterChain {
 
     static void servletService(ServletRequest request, 
                                ServletResponse response,
-                               Servlet serv, boolean servletSupportsAsync,
+                               Servlet serv, boolean isAsyncSupportedByServlet,
                                InstanceSupport supp, Request coyoRequest)
         throws IOException, ServletException {
         try {
             supp.fireInstanceEvent(BEFORE_SERVICE_EVENT,
                                    serv, request, response);
-            if (coyoRequest != null && !servletSupportsAsync) {
+            if (coyoRequest != null && !isAsyncSupportedByServlet) {
                 coyoRequest.disableAsyncSupport();
             }
             if ((request instanceof HttpServletRequest) &&

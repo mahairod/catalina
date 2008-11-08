@@ -258,7 +258,7 @@ public class StandardWrapper
 
 
     /** supportsAsync */
-    private boolean supportsAsync = false;
+    private boolean isAsyncSupported = false;
 
 
     /**
@@ -554,13 +554,13 @@ public class StandardWrapper
 
 
     /* set supportsAsync */
-    public void setSupportsAsync(boolean supportsAsync) {
-        this.supportsAsync = supportsAsync;
+    public void setIsAsyncSupported(boolean isAsyncSupported) {
+        this.isAsyncSupported = isAsyncSupported;
     }
 
 
-    public boolean isSupportsAsync() {
-        return supportsAsync;
+    public boolean isAsyncSupported() {
+        return isAsyncSupported;
     }
 
 

@@ -370,6 +370,8 @@ public final class ApplicationFilterFactory {
         }
         return false;
     }
+
+
     // START IASRI 4665318
     private ApplicationFilterChain internalCreateFilterChain(ServletRequest request, Wrapper wrapper, Servlet servlet) {
         ApplicationFilterChain filterChain = null;
@@ -386,9 +388,7 @@ public final class ApplicationFilterFactory {
         }
 
         filterChain.setServlet(servlet);
-
-        filterChain.setServletSupportsAsync(wrapper.isSupportsAsync());
-
+        filterChain.setIsAsyncSupportedByServlet(wrapper.isAsyncSupported());
         filterChain.setSupport
             (((StandardWrapper)wrapper).getInstanceSupport());
 

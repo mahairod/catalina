@@ -345,5 +345,9 @@ public interface Wrapper extends Container {
     public void unload() throws ServletException;
 
 
-    public boolean isSupportsAsync();
+    /**
+     * @return true if the wrapped servlet supports async (either via the
+     * designated annotation or declaratively), and false otherwise
+     */
+    public boolean isAsyncSupported();
 }

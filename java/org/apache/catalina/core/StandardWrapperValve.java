@@ -427,7 +427,7 @@ final class StandardWrapperValve
                     filterChain.doFilter(hreq, hres);
                 } else {
                     ApplicationFilterChain.servletService(
-                        hreq, hres, servlet, wrapper.isSupportsAsync(),
+                        hreq, hres, servlet, wrapper.isAsyncSupported(),
                         wrapper.getInstanceSupport(), request);
 
                 }
