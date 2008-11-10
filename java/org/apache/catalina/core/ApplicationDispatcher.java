@@ -606,9 +606,11 @@ final class ApplicationDispatcher
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR, 
                                              //origServletPath);
                                              servletPath);
-            invoke(request, state.outerResponse, state);
-            unwrapResponse(state);
-
+            try{
+                invoke(request, state.outerResponse, state);
+            } finally {
+                unwrapResponse(state);
+            }
         }
 
         // Handle an HTTP named dispatcher include
@@ -632,11 +634,13 @@ final class ApplicationDispatcher
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                 getCombinedPath());
-            invoke(state.outerRequest, state.outerResponse, state);
-
-            wrequest.recycle();
-            unwrapRequest(state);
-            unwrapResponse(state);
+            try{
+                invoke(state.outerRequest, state.outerResponse, state);
+            } finally {
+                wrequest.recycle();
+                unwrapRequest(state);
+                unwrapResponse(state);
+            }
 
         }
 
@@ -662,11 +666,13 @@ final class ApplicationDispatcher
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                 getCombinedPath());
-            invoke(state.outerRequest, state.outerResponse, state);
-
-            wrequest.recycle();
-            unwrapRequest(state);
-            unwrapResponse(state);
+            try{
+                invoke(state.outerRequest, state.outerResponse, state);
+            } finally {
+                wrequest.recycle();
+                unwrapRequest(state);
+                unwrapResponse(state);
+           }
 
         }
 
