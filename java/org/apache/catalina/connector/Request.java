@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -54,6 +55,7 @@ import java.security.PrivilegedActionException;
 import javax.security.auth.Subject;
 
 import javax.servlet.AsyncDispatcher;
+import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
@@ -495,9 +497,14 @@ public class Request
 
     private String requestURI = null;
 
-    private boolean isAsyncSupported = false;
 
+    /**
+     * Async processing
+     */
+    private boolean isAsyncSupported = false;
     private boolean isAsyncStarted = false;
+    private LinkedList<AsyncListenerHolder> asyncListenerHolders;
+
 
     /**
      * Associated context.
@@ -3749,7 +3756,7 @@ public class Request
      * Completes any async processing on this request, causing the response
      * to be committed.
      */
-    public void doneAsync() {
+    public synchronized void doneAsync() {
         if (!isAsyncStarted) {
             throw new IllegalStateException("startAsync not called");
         }
@@ -3757,6 +3764,21 @@ public class Request
         isAsyncStarted = false;
 
         // TBD
+
+        AsyncListener asyncListener = null;
+        if (asyncListenerHolders != null) {
+            for (AsyncListenerHolder asyncListenerHolder : asyncListenerHolders) {
+                asyncListener = asyncListenerHolder.getAsyncListener();
+                try {
+                    asyncListener.onDoneAsync(new AsyncEvent(
+                        asyncListenerHolder.getServletRequest(),
+                        asyncListenerHolder.getServletResponse()));
+                } catch (IOException ioe) {
+                    log.log(Level.WARNING, "Error invoking AsyncListener",
+                            ioe);
+                }
+            }
+        }
     }
 
 
@@ -3821,9 +3843,21 @@ public class Request
      * that will be passed to the AsyncListener as part of the AsyncEvent 
      */
     public void addAsyncListener(AsyncListener listener,
-                                 ServletRequest servletRequest,
-                                 ServletResponse servletResponse) {
-        // TBD
+                                 ServletRequest request,
+                                 ServletResponse response) {
+        if (listener == null || request == null || response == null) {
+            throw new IllegalArgumentException(
+                "Null argument in Request.addAsyncListener");
+        }
+
+        synchronized(this) {
+            if (asyncListenerHolders == null) {
+                asyncListenerHolders = new LinkedList<AsyncListenerHolder>();
+            }
+
+            asyncListenerHolders.add(new AsyncListenerHolder(
+                                            listener, request, response));
+        }
     }
 
 
@@ -3926,4 +3960,35 @@ public class Request
             && context.getManager().isSessionVersioningSupported());
     }
 
+
+    /**
+     * Class holding all the information required for invoking an
+     * AsyncListener (including the AsyncListener itself).
+     */
+    private static class AsyncListenerHolder {
+
+        private AsyncListener listener;
+        private ServletRequest request;
+        private ServletResponse response;
+
+        public AsyncListenerHolder(AsyncListener listener,
+                                   ServletRequest request,
+                                   ServletResponse response) {
+            this.listener = listener;
+            this.request = request;
+            this.response = response;
+        }
+
+        public AsyncListener getAsyncListener() {
+            return listener;
+        }
+
+        public ServletRequest getServletRequest() {
+            return request;
+        }
+
+        public ServletResponse getServletResponse() {
+            return response;
+        }
+    }
 }
