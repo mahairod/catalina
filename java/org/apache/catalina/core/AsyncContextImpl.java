@@ -79,7 +79,7 @@ public class AsyncContextImpl implements AsyncContext {
 
     public void complete() {
         if (!request.isAsyncStarted()) {
-            throw new IllegalStateException("startAsync not called");
+            throw new IllegalStateException("Request not in async mode");
         }
 
         // TBD
