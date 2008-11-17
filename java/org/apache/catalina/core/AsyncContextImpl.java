@@ -109,7 +109,7 @@ public class AsyncContextImpl implements AsyncContext {
 
         // TBD
 
-        request.complete();
+        request.asyncComplete();
     }
 
 
