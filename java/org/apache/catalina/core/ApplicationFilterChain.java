@@ -209,7 +209,7 @@ final class ApplicationFilterChain implements FilterChain {
             if (origRequest != null) {
                 if (!filterConfig.isAsyncSupported()) {
                     origRequest.disableAsyncSupport();
-                } else {
+                } else if (!origRequest.isSetAsyncTimeoutCalled()) {
                     origRequest.setAsyncTimeout(filterConfig.getAsyncTimeout());
                 }
             }
@@ -404,7 +404,7 @@ final class ApplicationFilterChain implements FilterChain {
             if (origRequest != null) {
                 if (!wrapper.isAsyncSupported()) {
                     origRequest.disableAsyncSupport();
-                } else {
+                } else if (!origRequest.isSetAsyncTimeoutCalled()) {
                     origRequest.setAsyncTimeout(wrapper.getAsyncTimeout());
                 }
             } 

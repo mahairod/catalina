@@ -524,6 +524,9 @@ public class Request
     // Has AsyncContext.complete been called?
     private boolean isAsyncComplete = false;
 
+    // Has setAsyncTimeout been called on this request?
+    private boolean isSetAsyncTimeoutCalled;
+
 
     /**
      * Associated context.
@@ -3838,13 +3841,11 @@ public class Request
 
     /**
      * Sets the timeout (in milliseconds) for any asynchronous operations
-     * initiated on this request.
-     *
-     * @param timeout the timeout (in milliseconds) for any async operations 
-     * initiated on this request
+     * started on this request.
      */
     public void setAsyncTimeout(long timeout) {
         asyncTimeout = timeout;
+        isSetAsyncTimeoutCalled = true;
     }
 
 
@@ -3857,6 +3858,18 @@ public class Request
      */
     public long getAsyncTimeout() {
         return asyncTimeout;
+    }
+
+
+    /**
+     * Checks if setAsyncTimeout was called on this request. 
+     *
+     * This is used to determine if the request should inherit the 
+     * async timeout of the servlet or filter that called startAsync
+     * (if setAsyncTimeout was not called, it will).
+     */
+    public boolean isSetAsyncTimeoutCalled() {
+        return isSetAsyncTimeoutCalled;
     }
 
 

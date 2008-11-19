@@ -346,6 +346,7 @@ public class DummyRequest implements HttpRequest, HttpServletRequest {
     public void addAsyncListener(AsyncListener listener,
                                  ServletRequest servletRequest,
                                  ServletResponse servletResponse) {}
+    public boolean isSetAsyncTimeoutCalled() { return false; }
     public void disableAsyncSupport() {}
 
 
