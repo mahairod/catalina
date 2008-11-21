@@ -100,7 +100,6 @@ import org.apache.catalina.Wrapper;
 
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.core.ApplicationFilterFactory;
-import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.session.StandardSession;
@@ -527,6 +526,8 @@ public class Request
     // Has setAsyncTimeout been called on this request?
     private boolean isSetAsyncTimeoutCalled;
 
+    private boolean isOkToReinitializeAsync = false;
+
 
     /**
      * Associated context.
@@ -617,6 +618,11 @@ public class Request
                 reader = null;
             }
         }
+
+        if (asyncContext != null) {
+            asyncContext.recycle();
+        }
+        isAsyncSupported = false;
 
     }
 
@@ -3749,8 +3755,19 @@ public class Request
                                             "request");
         }
 
-        asyncContext = new AsyncContextImpl(this, request, response);
-        isAsyncStarted = true;
+        if (asyncContext != null) {
+            if (!isOkToReinitializeAsync) {
+                throw new IllegalStateException("startAsync already called");
+            } 
+            // Recycle and reinitialize existing AsyncContext
+            asyncContext.recycle();
+            asyncContext.setServletRequest(request);
+            asyncContext.setServletResponse(response);
+        } else {
+            asyncContext = new AsyncContextImpl(this, request, response);
+            isAsyncStarted = true;
+            isOkToReinitializeAsync = false;
+        }
 
         // TBD
 
@@ -3775,6 +3792,11 @@ public class Request
      */
     public void disableAsyncSupport() {
         isAsyncSupported = false;
+    }
+
+
+    void setOkToReinitializeAsync() {
+        isOkToReinitializeAsync = true;
     }
 
 
@@ -3876,7 +3898,7 @@ public class Request
     /*
      * Invokes all AsyncListeners at their onComplete method
      */
-    public void asyncComplete() {
+    void asyncComplete() {
 
         if (!isAsyncStarted()) {
             throw new IllegalStateException("Request not in async mode");
