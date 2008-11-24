@@ -210,7 +210,7 @@ final class ApplicationFilterChain implements FilterChain {
                 if (!filterConfig.isAsyncSupported()) {
                     origRequest.disableAsyncSupport();
                 } else if (!origRequest.isSetAsyncTimeoutCalled()) {
-                    origRequest.setAsyncTimeout(filterConfig.getAsyncTimeout());
+                    origRequest.setAsyncTimeout(filterConfig.getAsyncTimeout(), false);
                 }
             }
             Filter filter = null;
@@ -405,7 +405,7 @@ final class ApplicationFilterChain implements FilterChain {
                 if (!wrapper.isAsyncSupported()) {
                     origRequest.disableAsyncSupport();
                 } else if (!origRequest.isSetAsyncTimeoutCalled()) {
-                    origRequest.setAsyncTimeout(wrapper.getAsyncTimeout());
+                    origRequest.setAsyncTimeout(wrapper.getAsyncTimeout(), false);
                 }
             } 
             if ((request instanceof HttpServletRequest) &&
