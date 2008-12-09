@@ -619,7 +619,7 @@ public class Request
         if (asyncContext != null) {
             asyncContext.recycle();
         }
-        isAsyncSupported = false;
+        isAsyncSupported = true;
         stopAsyncTimer();
     }
 
