@@ -21,11 +21,12 @@ public class ServletRegistrationImpl extends ServletRegistration {
     ServletRegistrationImpl(StandardContext ctx, String servletName,
                             String className) {
         this.ctx = ctx;
-        wrapper = ctx.createWrapper();
-        ctx.addChild(wrapper);
 
+        wrapper = ctx.createWrapper();
         wrapper.setName(servletName);
         wrapper.setServletClass(className);
+
+        ctx.addChild(wrapper);
     }
 
 
@@ -66,6 +67,5 @@ public class ServletRegistrationImpl extends ServletRegistration {
         super.setAsyncSupported(isAsyncSupported);
         wrapper.setIsAsyncSupported(isAsyncSupported);
     }
-
 }
 
