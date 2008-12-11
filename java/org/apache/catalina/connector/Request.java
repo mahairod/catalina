@@ -617,7 +617,7 @@ public class Request
         }
 
         /*
-         * Clear and reinitialize any async related artifacts
+         * Clear and reinitialize all async related instance vars
          */
         if (asyncContext != null) {
             asyncContext.recycle();
