@@ -59,6 +59,7 @@ import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
+import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -267,7 +268,7 @@ public class Request
     /**
      * The current dispatcher type.
      */
-    protected Object dispatcherType = null;
+    protected Object dispatcherTypeAttr = null;
 
 
     /**
@@ -532,7 +533,9 @@ public class Request
     protected Context context = null;
     protected ServletContext servletContext = null;
 
-    
+    private DispatcherType dispatcherType = DispatcherType.REQUEST;
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -545,7 +548,8 @@ public class Request
         servletContext = null;
         wrapper = null;
 
-        dispatcherType = null;
+        dispatcherType = DispatcherType.REQUEST;
+        dispatcherTypeAttr = null;
         requestDispatcherPath = null;
 
         authType = null;
@@ -1168,9 +1172,9 @@ public class Request
     public Object getAttribute(String name) {
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            return (dispatcherType == null) 
+            return (dispatcherTypeAttr == null) 
                 ? ApplicationFilterFactory.REQUEST_INTEGER
-                : dispatcherType;
+                : dispatcherTypeAttr;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             return (requestDispatcherPath == null) 
                 ? getRequestPathMB().toString()
@@ -1764,7 +1768,7 @@ public class Request
         }
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            dispatcherType = value;
+            dispatcherTypeAttr = value;
             return;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             requestDispatcherPath = value;
@@ -3744,6 +3748,16 @@ public class Request
 
     }
     // END CR 6309511
+
+
+    public void setDispatcherType(DispatcherType type) {
+        dispatcherType = type;
+    }
+
+
+    public DispatcherType getDispatcherType() {
+        return dispatcherType;
+    }
 
 
     /**

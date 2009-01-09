@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
 import org.apache.catalina.Globals;
@@ -85,12 +86,14 @@ public class ApplicationRequest extends ServletRequestWrapper {
      * Construct a new wrapped request around the specified servlet request.
      *
      * @param request The servlet request being wrapped
+     * @param isFowardDispatch true if this wrapper is being created for a 
+     * RD.forward, false otherwise
      */
-    public ApplicationRequest(ServletRequest request) {
-
+    public ApplicationRequest(ServletRequest request,
+                              boolean isFowardDispatch) {
         super(request);
         setRequest(request);
-
+        this.isForwardDispatch = isForwardDispatch;
     }
 
 
@@ -109,6 +112,13 @@ public class ApplicationRequest extends ServletRequestWrapper {
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
+
+
+    /*
+     * true if this is a wrapper for RD.forward, false if otherwise (i.e.,
+     * this is a wrapper for RD.include)
+     */
+    private boolean isForwardDispatch = false;
 
 
     // ------------------------------------------------- ServletRequest Methods
@@ -199,6 +209,15 @@ public class ApplicationRequest extends ServletRequestWrapper {
             }
         }
 
+    }
+
+
+    public DispatcherType getDispatcherType() {
+        if (isForwardDispatch) {
+            return DispatcherType.FORWARD;
+        } else {
+            return DispatcherType.INCLUDE;
+        }
     }
 
 
