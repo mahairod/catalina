@@ -29,15 +29,7 @@ import java.util.logging.*;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
-import javax.servlet.ServletResponse;
-import javax.servlet.ServletResponseWrapper;
-import javax.servlet.UnavailableException;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -500,16 +492,16 @@ final class ApplicationDispatcher
         throws IOException, ServletException {
                 
         if (request != null) {
-            Integer disInt = (Integer) request.getAttribute
-                (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
-            if (disInt != null) {
-                if (disInt.intValue() != ApplicationFilterFactory.ERROR) {
+            DispatcherType dispatcherType = (DispatcherType)
+                request.getAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
+            if (dispatcherType != null) {
+                if (dispatcherType != DispatcherType.ERROR) {
                     state.outerRequest.setAttribute
                         (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                         getCombinedPath());
                     state.outerRequest.setAttribute
                         (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                        Integer.valueOf(ApplicationFilterFactory.FORWARD));
+                        DispatcherType.FORWARD);
                     invoke(state.outerRequest, response, state);
                 } else {
                     invoke(state.outerRequest, response, state);
@@ -613,7 +605,7 @@ final class ApplicationDispatcher
                 wrequest.setServletPath(servletPath);
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                Integer.valueOf(ApplicationFilterFactory.INCLUDE));
+                DispatcherType.INCLUDE);
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                 getCombinedPath());
@@ -644,7 +636,7 @@ final class ApplicationDispatcher
             
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                Integer.valueOf(ApplicationFilterFactory.INCLUDE));
+                DispatcherType.INCLUDE);
             wrequest.setAttribute(
                 ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                 getCombinedPath());

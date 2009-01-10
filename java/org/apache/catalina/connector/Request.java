@@ -533,8 +533,6 @@ public class Request
     protected Context context = null;
     protected ServletContext servletContext = null;
 
-    private DispatcherType dispatcherType = DispatcherType.REQUEST;
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -548,7 +546,6 @@ public class Request
         servletContext = null;
         wrapper = null;
 
-        dispatcherType = DispatcherType.REQUEST;
         dispatcherTypeAttr = null;
         requestDispatcherPath = null;
 
@@ -1173,7 +1170,7 @@ public class Request
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
             return (dispatcherTypeAttr == null) 
-                ? ApplicationFilterFactory.REQUEST_INTEGER
+                ? DispatcherType.REQUEST
                 : dispatcherTypeAttr;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             return (requestDispatcherPath == null) 
@@ -3750,13 +3747,14 @@ public class Request
     // END CR 6309511
 
 
-    public void setDispatcherType(DispatcherType type) {
-        dispatcherType = type;
-    }
-
-
     public DispatcherType getDispatcherType() {
-        return dispatcherType;
+        DispatcherType dispatcher = (DispatcherType) getAttribute(
+            ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
+System.out.println("XXX DISP=" + dispatcher);
+        if (dispatcher == null) {
+            dispatcher = DispatcherType.REQUEST;
+        }
+        return dispatcher;
     }
 
 
