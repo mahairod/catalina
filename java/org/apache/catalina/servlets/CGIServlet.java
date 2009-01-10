@@ -353,9 +353,9 @@ public final class CGIServlet extends HttpServlet {
         // Document the properties from ServletRequest
         out.println("<h1>ServletRequest Properties</h1>");
         out.println("<ul>");
-        Enumeration attrs = req.getAttributeNames();
+        Enumeration<String> attrs = req.getAttributeNames();
         while (attrs.hasMoreElements()) {
-            String attr = (String) attrs.nextElement();
+            String attr = attrs.nextElement();
             out.println("<li><b>attribute</b> " + attr + " = " +
                            req.getAttribute(attr));
         }
@@ -365,14 +365,14 @@ public final class CGIServlet extends HttpServlet {
                        req.getContentLength());
         out.println("<li><b>contentType</b> = " +
                        req.getContentType());
-        Enumeration locales = req.getLocales();
+        Enumeration<Locale> locales = req.getLocales();
         while (locales.hasMoreElements()) {
-            Locale locale = (Locale) locales.nextElement();
+            Locale locale = locales.nextElement();
             out.println("<li><b>locale</b> = " + locale);
         }
-        Enumeration params = req.getParameterNames();
+        Enumeration<String> params = req.getParameterNames();
         while (params.hasMoreElements()) {
-            String param = (String) params.nextElement();
+            String param = params.nextElement();
             String values[] = req.getParameterValues(param);
             for (int i = 0; i < values.length; i++)
                 out.println("<li><b>parameter</b> " + param + " = " +
@@ -399,9 +399,9 @@ public final class CGIServlet extends HttpServlet {
             for (int i = 0; i < cookies.length; i++)
                 out.println("<li><b>cookie</b> " + cookies[i].getName() +" = " +cookies[i].getValue());
         }
-        Enumeration headers = req.getHeaderNames();
+        Enumeration<String> headers = req.getHeaderNames();
         while (headers.hasMoreElements()) {
-            String header = (String) headers.nextElement();
+            String header = headers.nextElement();
             out.println("<li><b>header</b> " + header + " = " +
                            req.getHeader(header));
         }
@@ -436,7 +436,7 @@ public final class CGIServlet extends HttpServlet {
         out.println("<ul>");
         attrs = req.getAttributeNames();
         while (attrs.hasMoreElements()) {
-            String attr = (String) attrs.nextElement();
+            String attr = attrs.nextElement();
             out.println("<li><b>" + attr + "</b> = " +
                            req.getAttribute(attr));
         }
@@ -466,7 +466,7 @@ public final class CGIServlet extends HttpServlet {
             out.println("<ul>");
             attrs = session.getAttributeNames();
             while (attrs.hasMoreElements()) {
-                String attr = (String) attrs.nextElement();
+                String attr = attrs.nextElement();
                 out.println("<li><b>" + attr + "</b> = " +
                                session.getAttribute(attr));
             }
@@ -488,7 +488,7 @@ public final class CGIServlet extends HttpServlet {
         out.println("<ul>");
         params = getServletConfig().getInitParameterNames();
         while (params.hasMoreElements()) {
-            String param = (String) params.nextElement();
+            String param = params.nextElement();
             String value = getServletConfig().getInitParameter(param);
             out.println("<li><b>" + param + "</b> = " + value);
         }
@@ -514,7 +514,7 @@ public final class CGIServlet extends HttpServlet {
         out.println("<ul>");
         params = getServletContext().getInitParameterNames();
         while (params.hasMoreElements()) {
-            String param = (String) params.nextElement();
+            String param = params.nextElement();
             String value = getServletContext().getInitParameter(param);
             out.println("<li><b>" + param + "</b> = " + value);
         }
@@ -526,7 +526,7 @@ public final class CGIServlet extends HttpServlet {
         out.println("<ul>");
         attrs = getServletContext().getAttributeNames();
         while (attrs.hasMoreElements()) {
-            String attr = (String) attrs.nextElement();
+            String attr = attrs.nextElement();
             out.println("<li><b>" + attr + "</b> = " +
                            getServletContext().getAttribute(attr));
         }
@@ -677,7 +677,7 @@ public final class CGIServlet extends HttpServlet {
         private File tmpDir = null;
 
         /** derived cgi environment */
-        private Hashtable env = null;
+        private Hashtable<String, String> env = null;
 
         /** cgi command to be invoked */
         private String command = null;
@@ -945,7 +945,6 @@ public final class CGIServlet extends HttpServlet {
 
             // Add the CGI environment variables
             String sPathInfoOrig = null;
-            String sPathTranslatedOrig = null;
             String sPathInfoCGI = null;
             String sPathTranslatedCGI = null;
             String sCGIFullPath = null;
@@ -957,10 +956,6 @@ public final class CGIServlet extends HttpServlet {
 
             sPathInfoOrig = this.pathInfo;
             sPathInfoOrig = sPathInfoOrig == null ? "" : sPathInfoOrig;
-
-            sPathTranslatedOrig = req.getPathTranslated();
-            sPathTranslatedOrig =
-                sPathTranslatedOrig == null ? "" : sPathTranslatedOrig;
 
             if (webAppRootDir == null ) {
                 // The app has not been deployed in exploded form
@@ -1046,8 +1041,6 @@ public final class CGIServlet extends HttpServlet {
              */
             if (sPathInfoCGI != null && !("".equals(sPathInfoCGI))) {
                 sPathTranslatedCGI = context.getRealPath(sPathInfoCGI);
-            } else {
-                sPathTranslatedCGI = null;
             }
             if (sPathTranslatedCGI == null || "".equals(sPathTranslatedCGI)) {
                 //NOOP
@@ -1083,11 +1076,11 @@ public final class CGIServlet extends HttpServlet {
             envp.put("CONTENT_LENGTH", sContentLength);
 
 
-            Enumeration headers = req.getHeaderNames();
+            Enumeration<String> headers = req.getHeaderNames();
             String header = null;
             while (headers.hasMoreElements()) {
                 header = null;
-                header = ((String) headers.nextElement()).toUpperCase();
+                header = (headers.nextElement()).toUpperCase();
                 //REMIND: rewrite multiple headers as if received as single
                 //REMIND: change character set
                 //REMIND: I forgot what the previous REMIND means
@@ -1178,10 +1171,14 @@ public final class CGIServlet extends HttpServlet {
             } 
 
             // create directories
-            String dirPath = new String (destPath.toString().substring(
-                    0,destPath.toString().lastIndexOf("/")));
+            String dirPath = destPath.toString().substring(
+                    0,destPath.toString().lastIndexOf("/"));
             File dir = new File(dirPath);
-            dir.mkdirs();
+            if (!dir.mkdirs() && debug >= 2) {
+                log("expandCGIScript: failed to create directories for '" +
+                        dir.getAbsolutePath() + "'");
+                return;
+            }
 
             try {
                 synchronized (expandFileLock) {
@@ -1207,7 +1204,10 @@ public final class CGIServlet extends HttpServlet {
             } catch (IOException ioe) {
                 // delete in case file is corrupted 
                 if (f.exists()) {
-                    f.delete();
+                    if (!f.delete() && debug >= 2) {
+                        log("expandCGIScript: failed to delete '" +
+                                f.getAbsolutePath() + "'");
+                    }
                 }
             }
         }
@@ -1238,13 +1238,13 @@ public final class CGIServlet extends HttpServlet {
             sb.append("</td></tr>");
 
             if (isValid()) {
-                Enumeration envk = env.keys();
+                Enumeration<String> envk = env.keys();
                 while (envk.hasMoreElements()) {
-                    String s = (String) envk.nextElement();
+                    String s = envk.nextElement();
                     sb.append("<tr><td>");
                     sb.append(s);
                     sb.append("</td><td>");
-                    sb.append(blanksToString((String) env.get(s),
+                    sb.append(blanksToString(env.get(s),
                                              "[will be set to blank]"));
                     sb.append("</td></tr>");
                 }
@@ -1264,7 +1264,7 @@ public final class CGIServlet extends HttpServlet {
 
             sb.append("<tr><td>Command Line Params</td><td>");
             for (int i=0; i < cmdLineParameters.size(); i++) {
-                String param = (String) cmdLineParameters.get(i);
+                String param = cmdLineParameters.get(i);
                 sb.append("<p>");
                 sb.append(param);
                 sb.append("</p>");
@@ -1308,7 +1308,7 @@ public final class CGIServlet extends HttpServlet {
          * @return   CGI environment
          *
          */
-        protected Hashtable getEnvironment() {
+        protected Hashtable<String, String> getEnvironment() {
             return env;
         }
 
@@ -1320,7 +1320,7 @@ public final class CGIServlet extends HttpServlet {
          * @return   CGI query parameters
          *
          */
-        protected ArrayList getParameters() {
+        protected ArrayList<String> getParameters() {
             return cmdLineParameters;
         }
 
@@ -1422,13 +1422,13 @@ public final class CGIServlet extends HttpServlet {
         private String command = null;
 
         /** environment used when invoking the cgi script */
-        private Hashtable env = null;
+        private Hashtable<String, String> env = null;
 
         /** working directory used when invoking the cgi script */
         private File wd = null;
 
         /** command line parameters to be passed to the invoked script */
-        private ArrayList params = null;
+        private ArrayList<String> params = null;
 
         /** stdin to be passed to cgi script */
         private InputStream stdin = null;
@@ -1456,8 +1456,8 @@ public final class CGIServlet extends HttpServlet {
          * @param  params   ArrayList with the script's query command line
          *                  paramters as strings
          */
-        protected CGIRunner(String command, Hashtable env, File wd,
-                            ArrayList params) {
+        protected CGIRunner(String command, Hashtable<String, String> env,
+                            File wd, ArrayList<String> params) {
             this.command = command;
             this.env = env;
             this.wd = wd;
@@ -1535,12 +1535,12 @@ public final class CGIServlet extends HttpServlet {
          * @exception  NullPointerException   if a hash key has a null value
          *
          */
-        protected String[] hashToStringArray(Hashtable h)
+        protected String[] hashToStringArray(Hashtable<String, ?> h)
             throws NullPointerException {
             Vector<String> v = new Vector<String>();
-            Enumeration e = h.keys();
+            Enumeration<String> e = h.keys();
             while (e.hasMoreElements()) {
-                String k = e.nextElement().toString();
+                String k = e.nextElement();
                 v.add(k + "=" + h.get(k));
             }
             String[] strArr = new String[v.size()];
@@ -1629,6 +1629,7 @@ public final class CGIServlet extends HttpServlet {
              * with major modifications by Martin Dengler
              */
             Runtime rt = null;
+            BufferedReader cgiHeaderReader = null;
             InputStream cgiOutput = null;
             BufferedReader commandsStdErr = null;
             BufferedOutputStream commandsStdIn = null;
@@ -1648,7 +1649,7 @@ public final class CGIServlet extends HttpServlet {
 
             for (int i=0; i < params.size(); i++) {
                 cmdAndArgs.append(" ");
-                String param = (String) params.get(i);
+                String param = params.get(i);
                 if (param.indexOf(" ") < 0) {
                     cmdAndArgs.append(param);
                 } else {
@@ -1668,7 +1669,7 @@ public final class CGIServlet extends HttpServlet {
                 rt = Runtime.getRuntime();
                 proc = rt.exec(cmdAndArgs.toString(), hashToStringArray(env), wd);
     
-                String sContentLength = (String) env.get("CONTENT_LENGTH");
+                String sContentLength = env.get("CONTENT_LENGTH");
 
                 if(!"".equals(sContentLength)) {
                     commandsStdIn = new BufferedOutputStream(proc.getOutputStream());
@@ -1691,12 +1692,12 @@ public final class CGIServlet extends HttpServlet {
                 new Thread() {
                     public void run () {
                         sendToLog(stdErrRdr) ;
-                    } ;
+                    }
                 }.start() ;
 
                 InputStream cgiHeaderStream =
                     new HTTPHeaderInputStream(proc.getInputStream());
-                BufferedReader cgiHeaderReader =
+                cgiHeaderReader =
                     new BufferedReader(new InputStreamReader(cgiHeaderStream));
             
                 while (isRunning) {
@@ -1744,7 +1745,9 @@ public final class CGIServlet extends HttpServlet {
                             // such as a socket disconnect on the servlet side; otherwise, the
                             // external process could hang
                             if (bufRead != -1) {
-                                while ((bufRead = cgiOutput.read(bBuf)) != -1) {}
+                                while ((bufRead = cgiOutput.read(bBuf)) != -1) {
+                                    // NOOP - just read the data
+                                }
                             }
                         }
         
@@ -1756,6 +1759,7 @@ public final class CGIServlet extends HttpServlet {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException ignored) {
+                            // Ignore
                         }
                     }
                 } //replacement for Process.waitFor()
@@ -1766,6 +1770,14 @@ public final class CGIServlet extends HttpServlet {
                 throw e;
             }
             finally{
+                // Close the header reader
+                if (cgiHeaderReader != null) {
+                    try {
+                        cgiHeaderReader.close();
+                    } catch (IOException ioe) {
+                        log ("Exception closing header reader " + ioe);
+                    }
+                }
                 // Close the output stream used if used
                 if (cgiOutput != null) {
                     try {
@@ -1858,11 +1870,11 @@ public final class CGIServlet extends HttpServlet {
                     rdr.close() ;
                 } catch (IOException ce) {
                     log("sendToLog error", ce) ;
-                } ;
-            } ;
+                }
+            }
             if ( lineCount > 0 && debug > 2) {
                 log("runCGI: " + lineCount + " lines received on stderr") ;
-            } ;
+            }
         }
     } //class CGIRunner
 
@@ -1871,7 +1883,7 @@ public final class CGIServlet extends HttpServlet {
      * upto and including the two blank lines terminating the headers. It
      * allows the content to be read using bytes or characters as appropriate.
      */
-    protected class HTTPHeaderInputStream extends InputStream {
+    protected static class HTTPHeaderInputStream extends InputStream {
         private static final int STATE_CHARACTER = 0;
         private static final int STATE_FIRST_CR = 1;
         private static final int STATE_FIRST_LF = 2;
