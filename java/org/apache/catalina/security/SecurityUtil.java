@@ -68,7 +68,8 @@ public final class SecurityUtil{
     /**
      * Cache every object for which we are creating method on it.
      */
-    private static HashMap objectCache = new HashMap();
+    private static HashMap<Object, Method[]> objectCache =
+        new HashMap<Object, Method[]>();
         
     private static Logger log = Logger.getLogger(SecurityUtil.class.getName());
     
@@ -93,7 +94,7 @@ public final class SecurityUtil{
    
     
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject. 
      *
      * @param methodName the method to apply the security restriction
@@ -107,7 +108,7 @@ public final class SecurityUtil{
 
     
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject. 
      *
      * @param methodName the method to apply the security restriction
@@ -120,7 +121,7 @@ public final class SecurityUtil{
      */
     public static void doAsPrivilege(final String methodName, 
                                      final Servlet targetObject, 
-                                     final Class[] targetType,
+                                     final Class<?>[] targetType,
                                      final Object[] targetArguments) 
         throws java.lang.Exception{    
 
@@ -133,7 +134,7 @@ public final class SecurityUtil{
     
     
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject. 
      *
      * @param methodName the method to apply the security restriction
@@ -148,7 +149,7 @@ public final class SecurityUtil{
      */    
     public static void doAsPrivilege(final String methodName, 
                                      final Servlet targetObject, 
-                                     final Class[] targetType,
+                                     final Class<?>[] targetType,
                                      final Object[] targetArguments,
                                      Principal principal) 
         throws java.lang.Exception{
@@ -156,7 +157,7 @@ public final class SecurityUtil{
         Method method = null;
         Method[] methodsCache = null;
         if(objectCache.containsKey(targetObject)){
-            methodsCache = (Method[])objectCache.get(targetObject);
+            methodsCache = objectCache.get(targetObject);
             method = findMethod(methodsCache, methodName);
             if (method == null){
                 method = createMethodAndCacheIt(methodsCache,
@@ -176,7 +177,7 @@ public final class SecurityUtil{
  
     
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject. 
      *
      * @param methodName the method to apply the security restriction
@@ -192,7 +193,7 @@ public final class SecurityUtil{
  
     
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject. 
      *
      * @param methodName the method to apply the security restriction
@@ -205,14 +206,40 @@ public final class SecurityUtil{
      */    
     public static void doAsPrivilege(final String methodName, 
                                      final Filter targetObject, 
-                                     final Class[] targetType,
+                                     final Class<?>[] targetType,
                                      final Object[] targetArguments) 
         throws java.lang.Exception{
+
+        doAsPrivilege(
+                methodName, targetObject, targetType, targetArguments, null);
+    }
+    
+    /**
+     * Perform work as a particular <code>Subject</code>. Here the work
+     * will be granted to a <code>null</code> subject. 
+     *
+     * @param methodName the method to apply the security restriction
+     * @param targetObject the <code>Filter</code> on which the method will 
+     * be called.
+     * @param targetType <code>Class</code> array used to instanciate a
+     * <code>Method</code> object.
+     * @param targetArguments <code>Object</code> array contains the 
+     * runtime parameters instance.
+     * @param principal the <code>Principal</code> to which the security 
+     * privilege apply
+     */    
+    public static void doAsPrivilege(final String methodName, 
+                                     final Filter targetObject, 
+                                     final Class[] targetType,
+                                     final Object[] targetArguments,
+                                     Principal principal) 
+        throws java.lang.Exception{
+
         Method method = null;
 
         Method[] methodsCache = null;
         if(objectCache.containsKey(targetObject)){
-            methodsCache = (Method[])objectCache.get(targetObject);
+            methodsCache = objectCache.get(targetObject);
             method = findMethod(methodsCache, methodName);
             if (method == null){
                 method = createMethodAndCacheIt(methodsCache,
@@ -227,12 +254,12 @@ public final class SecurityUtil{
                                             targetType);                     
         }
 
-        execute(method, targetObject, targetArguments, null);
+        execute(method, targetObject, targetArguments, principal);
     }
     
     
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject. 
      *
      * @param methodName the method to apply the security restriction
@@ -289,9 +316,14 @@ public final class SecurityUtil{
             }
 
             Subject.doAsPrivileged(subject, pea, null);       
-       } catch( PrivilegedActionException pe) {
-            Throwable e = ((InvocationTargetException)pe.getException())
+        } catch( PrivilegedActionException pe) {
+            Throwable e;
+            if (pe.getException() instanceof InvocationTargetException) {
+                e = ((InvocationTargetException)pe.getException())
                                 .getTargetException();
+            } else {
+                e = pe;
+            }
             
             if (log.isLoggable(Level.FINE)){
                 log.log(Level.FINE, sm.getString("SecurityUtil.doAsPrivilege"), e);
@@ -349,7 +381,7 @@ public final class SecurityUtil{
     private static Method createMethodAndCacheIt(Method[] methodsCache,
                                                  String methodName,
                                                  Object targetObject,
-                                                 Class[] targetType) 
+                                                 Class<?>[] targetType) 
             throws Exception{
         
         if ( methodsCache == null){
