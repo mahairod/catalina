@@ -61,9 +61,9 @@ public class ObjectCreateRule extends Rule {
      * @param clazz Java class name of the object to be created
      *
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #ObjectCreateRule(Class clazz)} instead.
+     * Use {@link #ObjectCreateRule(Class&lt;?&gt; clazz)} instead.
      */
-    public ObjectCreateRule(Digester digester, Class clazz) {
+    public ObjectCreateRule(Digester digester, Class<?> clazz) {
 
         this(clazz);
 
@@ -100,11 +100,11 @@ public class ObjectCreateRule extends Rule {
      *  override of the class name to create
      *
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #ObjectCreateRule(String attributeName, Class clazz)} instead.
+     * Use {@link #ObjectCreateRule(String attributeName, Class&lt;?&gt; clazz)} instead.
      */
     public ObjectCreateRule(Digester digester,
                             String attributeName,
-                            Class clazz) {
+                            Class<?> clazz) {
 
         this(attributeName, clazz);
 
@@ -127,7 +127,7 @@ public class ObjectCreateRule extends Rule {
      *
      * @param clazz Java class name of the object to be created
      */
-    public ObjectCreateRule(Class clazz) {
+    public ObjectCreateRule(Class<?> clazz) {
 
         this(clazz.getName(), (String) null);
 
@@ -160,7 +160,7 @@ public class ObjectCreateRule extends Rule {
      *  override of the class name to create
      */
     public ObjectCreateRule(String attributeName,
-                            Class clazz) {
+                            Class<?> clazz) {
 
         this(clazz.getName(), attributeName);
 
@@ -205,7 +205,7 @@ public class ObjectCreateRule extends Rule {
         }
 
         // Instantiate the new object and push it on the context stack
-        Class clazz = digester.getClassLoader().loadClass(realClassName);
+        Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
         Object instance = clazz.newInstance();
         digester.push(instance);
 

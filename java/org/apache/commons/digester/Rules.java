@@ -100,7 +100,7 @@ public interface Rules {
      *
      * @deprecated Call match(namespaceURI,pattern) instead.
      */
-    public List match(String pattern);
+    public List<Rule> match(String pattern);
 
 
     /**
@@ -114,7 +114,7 @@ public interface Rules {
      *  or <code>null</code> to match regardless of namespace URI
      * @param pattern Nesting pattern to be matched
      */
-    public List match(String namespaceURI, String pattern);
+    public List<Rule> match(String namespaceURI, String pattern);
 
 
     /**
@@ -124,7 +124,7 @@ public interface Rules {
      * in the order originally registered through the <code>add()</code>
      * method.
      */
-    public List rules();
+    public List<Rule> rules();
 
 
 }
