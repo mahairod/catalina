@@ -966,7 +966,7 @@ public class ApplicationContext
      * with the given servlet name to this servlet context.
      */
     public void addServletMapping(String servletName,
-                                  String[] urlPatterns) {
+                                  String... urlPatterns) {
         context.addServletMapping(servletName, urlPatterns);
     }
 
