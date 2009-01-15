@@ -105,7 +105,14 @@ final class StandardEngineValve
             return END_PIPELINE;
         }
 
-        host.invoke(request, response);
+        if (host.getPipeline().hasNonBasicValves() ||
+                host.hasCustomPipeline()) {
+            // Invoke pipeline
+            host.getPipeline().invoke(request, response);
+        } else {
+            // Invoke basic valve only
+            host.getPipeline().getBasic().invoke(request, response);
+        }
 
         return END_PIPELINE;
     }
@@ -124,7 +131,14 @@ final class StandardEngineValve
             return;
         }
 
-        host.invoke(request, response);
+        if (host.getPipeline().hasNonBasicValves() ||
+                host.hasCustomPipeline()) {
+            // Invoke pipeline
+            host.getPipeline().invoke(request, response);
+        } else {
+            // Invoke basic valve only
+            host.getPipeline().getBasic().invoke(request, response);
+        }
     }
 
 

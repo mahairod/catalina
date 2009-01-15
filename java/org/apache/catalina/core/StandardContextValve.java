@@ -147,10 +147,15 @@ final class StandardContextValve
         wrapper.getPipeline().invoke(request, response);
         */
         // START GlassFish 1343
-        GlassFishValve basic = wrapper.getPipeline().getBasic();
-        if (basic != null) {
-            basic.invoke(request, response);
-            basic.postInvoke(request, response);
+        if (wrapper.getPipeline().hasNonBasicValves() ||
+                wrapper.hasCustomPipeline()) {
+            wrapper.getPipeline().invoke(request, response);
+        } else {
+            GlassFishValve basic = wrapper.getPipeline().getBasic();
+            if (basic != null) {
+                basic.invoke(request, response);
+                basic.postInvoke(request, response);
+            }
         }
         // END GlassFish 1343
 
@@ -175,10 +180,15 @@ final class StandardContextValve
         wrapper.getPipeline().invoke(request, response);
         */
         // START GlassFish 1343
-        GlassFishValve basic = wrapper.getPipeline().getBasic();
-        if (basic != null) {
-            basic.invoke(request, response);
-            basic.postInvoke(request, response);
+        if (wrapper.getPipeline().hasNonBasicValves() ||
+                wrapper.hasCustomPipeline()) {
+            wrapper.getPipeline().invoke(request, response);
+        } else {
+            GlassFishValve basic = wrapper.getPipeline().getBasic();
+            if (basic != null) {
+                basic.invoke(request, response);
+                basic.postInvoke(request, response);
+            }
         }
         // END GlassFish 1343
 

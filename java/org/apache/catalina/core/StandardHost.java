@@ -219,6 +219,7 @@ public class StandardHost
     public void setPipeline(Pipeline pl) {
         pl.setBasic(new StandardHostValve());
         pipeline = pl;
+        hasCustomPipeline = true;
     }    
     // END SJSAS 6331392
 
