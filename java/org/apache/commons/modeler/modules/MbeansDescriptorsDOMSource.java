@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.*;
+import javax.management.ObjectName;
 
 import org.apache.commons.modeler.AttributeInfo;
 import org.apache.commons.modeler.ConstructorInfo;
@@ -47,7 +48,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
     String location;
     String type;
     Object source;
-    List mbeans=new ArrayList();
+    List<ObjectName> mbeans=new ArrayList<ObjectName>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -69,7 +70,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
         this.source=source;
     }
 
-    public List loadDescriptors( Registry registry, String location,
+    public List<ObjectName> loadDescriptors( Registry registry, String location,
                                  String type, Object source)
             throws Exception
     {
@@ -292,8 +293,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                 }
 
                 // Add the completed managed bean info to the registry
-                //registry.addManagedBean(managed);
-                mbeans.add( managed );
+                registry.addManagedBean(managed);
 
             }
 

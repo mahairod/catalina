@@ -89,7 +89,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     
     /** Will be used to isolate different apps and enhance security
      */
-    private static HashMap perLoaderRegistries=null;
+    private static HashMap<Object,Registry> perLoaderRegistries=null;
 
     /**
      * The registry instance created by our factory method the first time
@@ -109,21 +109,24 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * The set of ManagedBean instances for the beans this registry
      * knows about, keyed by name.
      */
-    private HashMap descriptors = new HashMap();
+    private HashMap<String,ManagedBean> descriptors = 
+            new HashMap<String,ManagedBean>();
 
     /** List of managed byeans, keyed by class name
      */
-    private HashMap descriptorsByClass = new HashMap();
+    private HashMap<String,ManagedBean> descriptorsByClass = 
+            new HashMap<String,ManagedBean>();
 
     // map to avoid duplicated searching or loading descriptors 
-    private HashMap searchedPaths=new HashMap();
+    private HashMap<String,URL> searchedPaths=new HashMap<String,URL>();
     
     private Object key;
     private Object guard;
 
     // Id - small ints to use array access. No reset on stop()
-    private Hashtable idDomains=new Hashtable();
-    private Hashtable ids=new Hashtable();
+    private Hashtable<String,Hashtable<String,Integer>> idDomains =
+            new Hashtable<String,Hashtable<String,Integer>>();
+    private Hashtable<String,int[]> ids = new Hashtable<String,int[]>();
 
     
     // ----------------------------------------------------------- Constructors
@@ -160,7 +163,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             if( key==null ) 
                 key=Thread.currentThread().getContextClassLoader();
             if( key != null ) {
-                localRegistry=(Registry)perLoaderRegistries.get(key);
+                localRegistry=perLoaderRegistries.get(key);
                 if( localRegistry == null ) {
                     localRegistry=new Registry();
                     localRegistry.key=key;
@@ -196,7 +199,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public static void setUseContextClassLoader( boolean enable ) {
         if( enable ) {
-            perLoaderRegistries=new HashMap();
+            perLoaderRegistries=new HashMap<Object,Registry>();
         }
     }
     
@@ -221,9 +224,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @since 1.1
      */ 
     public void stop() {
-        descriptorsByClass = new HashMap();
-        descriptors = new HashMap();
-        searchedPaths=new HashMap();
+        descriptorsByClass = new HashMap<String,ManagedBean>();
+        descriptors = new HashMap<String,ManagedBean>();
+        searchedPaths=new HashMap<String,URL>();
     }
     
     /** 
@@ -241,7 +244,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * 
      * @since 1.1
      */ 
-    public List loadMBeans( Object source, ClassLoader cl )
+    public List<ObjectName> loadMBeans( Object source, ClassLoader cl )
             throws Exception
     {
         return load("MbeansSource", source, null );
@@ -331,30 +334,23 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @throws Exception
      * @since 1.1
      */
-    public void invoke( List mbeans, String operation, boolean failFirst )
+    public void invoke( List<ObjectName> mbeans, String operation, boolean failFirst )
             throws Exception
     {
         if( mbeans==null ) {
             return;
         }
-        Iterator itr=mbeans.iterator();
+        Iterator<ObjectName> itr=mbeans.iterator();
         while(itr.hasNext()) {
-            Object current=itr.next();
-            ObjectName oN=null;
+            ObjectName current=itr.next();
             try {
-                if( current instanceof ObjectName) {
-                    oN=(ObjectName)current;
-                }
-                if( current instanceof String ) {
-                    oN=new ObjectName( (String)current );
-                }
-                if( oN==null ) {
+                if (current == null) {
                     continue;
                 }
-                if( getMethodInfo(oN, operation) == null) {
+                if( getMethodInfo(current, operation) == null) {
                     continue;
                 }
-                getMBeanServer().invoke(oN, operation,
+                getMBeanServer().invoke(current, operation,
                         new Object[] {}, new String[] {});
 
             } catch( Exception t ) {
@@ -378,21 +374,21 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         if( domain==null) {
             domain="";
         }
-        Hashtable domainTable=(Hashtable)idDomains.get( domain );
+        Hashtable<String,Integer> domainTable=idDomains.get( domain );
         if( domainTable == null ) {
-            domainTable=new Hashtable();
+            domainTable = new Hashtable<String,Integer>();
             idDomains.put( domain, domainTable); 
         }
         if( name==null ) {
             name="";
         }
-        Integer i=(Integer)domainTable.get(name);
+        Integer i = domainTable.get(name);
         
         if( i!= null ) {
             return i.intValue();
         }
 
-        int id[]=(int [])ids.get( domain );
+        int id[] = ids.get(domain);
         if( id == null ) {
             id=new int[1];
             ids.put( domain, id); 
@@ -431,9 +427,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public ManagedBean findManagedBean(String name) {
         // XXX Group ?? Use Group + Type
-        ManagedBean mb=((ManagedBean) descriptors.get(name));
+        ManagedBean mb =  descriptors.get(name);
         if( mb==null )
-            mb=(ManagedBean)descriptorsByClass.get(name);
+            mb = descriptorsByClass.get(name);
         return mb;
     }
     
@@ -444,7 +440,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @since 1.0
      */
     public String[] findManagedBeans() {
-        return ((String[]) descriptors.keySet().toArray(new String[0]));
+        return descriptors.keySet().toArray(new String[0]);
     }
 
 
@@ -458,10 +454,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public String[] findManagedBeans(String group) {
 
-        ArrayList results = new ArrayList();
-        Iterator items = descriptors.values().iterator();
+        ArrayList<String> results = new ArrayList<String>();
+        Iterator<ManagedBean> items = descriptors.values().iterator();
         while (items.hasNext()) {
-            ManagedBean item = (ManagedBean) items.next();
+            ManagedBean item = items.next();
             if ((group == null) && (item.getGroup() == null)) {
                 results.add(item.getName());
             } else if (group.equals(item.getGroup())) {
@@ -469,7 +465,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             }
         }
         String values[] = new String[results.size()];
-        return ((String[]) results.toArray(values));
+        return results.toArray(values);
 
     }
 
@@ -633,7 +629,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
 
     /** Find or load metadata. 
      */ 
-    public ManagedBean findManagedBean(Object bean, Class beanClass, String type)
+    public ManagedBean findManagedBean(Object bean, Class<?> beanClass, String type)
         throws Exception
     {
         if( bean!=null && beanClass==null ) {
@@ -732,7 +728,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @throws Exception
      * @deprecated bad interface, mixing of metadata and mbeans
      */
-    public List load( String sourceType, Object source, String param)
+    public List<ObjectName> load( String sourceType, Object source, String param)
         throws Exception
     {
         if (log.isLoggable(Level.FINEST)) {
@@ -764,7 +760,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             type=param;
             inputsource=source;
         } else if( source instanceof Class ) {
-            location=((Class)source).getName();
+            location=((Class<?>)source).getName();
             type=param;
             inputsource=source;
             if( sourceType== null ) {
@@ -776,7 +772,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             sourceType="MbeansDescriptorsDOMSource";
         }
         ModelerSource ds=getModelerSource(sourceType);
-        List mbeans=ds.loadDescriptors(this, location, type, inputsource);
+        List<ObjectName> mbeans=ds.loadDescriptors(this, location, type, inputsource);
 
         return mbeans;
     }
@@ -886,18 +882,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @deprecated
      */
     public void loadDescriptors( String sourceType, Object source, String param)
-        throws Exception
-    {
-        List mbeans=load( sourceType, source, param );
-        if( mbeans == null) return;
+        throws Exception {
+        load(sourceType, source, param);
 
-        Iterator itr=mbeans.iterator();
-        while( itr.hasNext() ) {
-            Object mb=itr.next();
-            if( mb instanceof ManagedBean) {
-                addManagedBean((ManagedBean)mb);
-            }
-        }
     }
 
     /** Discover all META-INF/modeler.xml files in classpath and register
@@ -926,7 +913,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @param beanClass
      * @param type
      */
-    private void findDescriptor( Class beanClass, String type ) {
+    private void findDescriptor( Class<?> beanClass, String type ) {
         if( type==null ) {
             type=beanClass.getName();
         }
@@ -963,7 +950,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             type="org.apache.commons.modeler.modules." + type;
         }
 
-        Class c=Class.forName( type );
+        Class<?> c=Class.forName( type );
         ModelerSource ds=(ModelerSource)c.newInstance();
         return ds;
     }
@@ -1002,7 +989,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         perLoaderRegistries.remove(loader);
     }
 
-    public ManagedBean findManagedBean(Class beanClass, String type)
+    public ManagedBean findManagedBean(Class<?> beanClass, String type)
         throws Exception
     {
         return findManagedBean(null, beanClass, type);        
@@ -1063,7 +1050,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         }
     }
     
-    public List loadMBeans( Object source )
+    public List<ObjectName> loadMBeans( Object source )
             throws Exception
     {
         return loadMBeans( source, null );

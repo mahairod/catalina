@@ -118,7 +118,7 @@ public class StandardEngine
     
     /** Mbeans loaded by the engine.  
      */ 
-    private List mbeans;
+    private List<ObjectName> mbeans;
     
     /**
      * DefaultContext config
@@ -462,7 +462,7 @@ public class StandardEngine
         if( mbeans != null ) {
             try {
                 for( int i=0; i<mbeans.size() ; i++ ) {
-                    Registry.getRegistry().unregisterComponent((ObjectName)mbeans.get(i));
+                    Registry.getRegistry().unregisterComponent(mbeans.get(i));
                 }
             } catch (Exception e) {
                 log.log(Level.SEVERE,
