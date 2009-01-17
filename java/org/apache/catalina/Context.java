@@ -667,7 +667,7 @@ public interface Context extends Container {
      * context and initializes it.
      *
      * @param servletName the servlet name
-     * @param servlet the servlet instance
+     * @param instance the servlet instance
      *
      * @throws ServletException if the servlet fails to be initialized
      */
