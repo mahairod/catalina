@@ -26,8 +26,8 @@ package org.apache.catalina.startup;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleListener;
-import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.Rule;
+import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.digester.Rule;
 import org.xml.sax.Attributes;
 
 

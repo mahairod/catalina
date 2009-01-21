@@ -55,8 +55,8 @@ import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.modeler.ManagedBean;
-import org.apache.commons.modeler.Registry;
+import org.apache.tomcat.util.modeler.ManagedBean;
+import org.apache.tomcat.util.modeler.Registry;
 
 import org.glassfish.web.valve.GlassFishValve;
 
@@ -1389,7 +1389,7 @@ public class MBeanUtils {
     public synchronized static Registry createRegistry() {
 
         if (registry == null) {
-            registry = Registry.getRegistry();
+            registry = Registry.getRegistry(null, null);
             ClassLoader cl = serverLifecycleListenerClassLoader;
 
             registry.loadDescriptors("org.apache.catalina.mbeans",  cl);
@@ -1421,7 +1421,7 @@ public class MBeanUtils {
             URL url = ServerLifecycleListener.class.getResource(resource);
             if (url != null) {
                 InputStream stream = url.openStream();
-                Registry.loadRegistry(stream);
+                Registry.getRegistry(null, null).loadMetadata(stream);
                 stream.close();
             } else {
                 // XXX: i18n
@@ -1445,7 +1445,7 @@ public class MBeanUtils {
             try {
                 //Trace.parseTraceProperties();
                 //mserver = MBeanServerFactory.createMBeanServer();
-                mserver = Registry.getServer();
+                mserver = Registry.getRegistry(null, null).getMBeanServer();
             } catch (Throwable t) {
                 t.printStackTrace(System.out);
                 System.exit(1);

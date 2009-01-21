@@ -41,7 +41,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.ServerFactory;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.modeler.Registry;
+import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
@@ -559,7 +559,7 @@ public class StandardService
             // we registered ourself on init().
             // That should be the typical case - this object is just for
             // backward compat, nobody should bother to load it explicitely
-            Registry.getRegistry().unregisterComponent(oname);
+            Registry.getRegistry(null, null).unregisterComponent(oname);
         }        
         */
 
@@ -590,7 +590,7 @@ public class StandardService
                 domain=engine.getName();
                 oname=new ObjectName(domain + ":type=Service,serviceName="+name);
                 this.controller=oname;
-                Registry.getRegistry().registerComponent(this, oname, null);
+                Registry.getRegistry(null, null).registerComponent(this, oname, null);
             } catch (Exception e) {
                 log.log(Level.SEVERE,
                         sm.getString("standardService.register.failed",
@@ -625,7 +625,7 @@ public class StandardService
                 // we registered ourself on init().
                 // That should be the typical case - this object is just for
                 // backward compat, nobody should bother to load it explicitely
-                Registry.getRegistry().unregisterComponent(oname);
+                Registry.getRegistry(null, null).unregisterComponent(oname);
             }
             initialized = false;
         }

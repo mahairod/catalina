@@ -24,7 +24,7 @@
 package org.apache.catalina.util;
 
 
-import org.apache.commons.digester.Digester;
+import org.apache.tomcat.util.digester.Digester;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;

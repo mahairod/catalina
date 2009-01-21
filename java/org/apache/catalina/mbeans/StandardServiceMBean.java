@@ -29,7 +29,7 @@ import javax.management.ObjectName;
 import javax.management.RuntimeOperationsException;
 import org.apache.catalina.Connector;
 import org.apache.catalina.Service;
-import org.apache.commons.modeler.BaseModelMBean;
+import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 
 /**
