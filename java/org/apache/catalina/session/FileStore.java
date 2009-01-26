@@ -45,7 +45,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
-import org.apache.catalina.Store;
 import org.apache.catalina.Container;
 import org.apache.catalina.core.StandardContext;
 
@@ -58,8 +57,7 @@ import org.apache.catalina.core.StandardContext;
  * @version $Revision: 1.4 $ $Date: 2007/01/04 01:31:57 $
  */
 
-public final class FileStore
-    extends StoreBase implements Store {
+public final class FileStore extends StoreBase {
 
 
     // ----------------------------------------------------- Constants
@@ -226,14 +224,14 @@ public final class FileStore
         String files[] = file.list();
 
         // Build and return the list of session identifiers
-        ArrayList list = new ArrayList();
+        ArrayList<String> list = new ArrayList<String>();
         int n = FILE_EXT.length();
         for (int i = 0; i < files.length; i++) {
             if (files[i].endsWith(FILE_EXT)) {
                 list.add(files[i].substring(0, files[i].length() - n));
             }
         }
-        return ((String[]) list.toArray(new String[list.size()]));
+        return list.toArray(new String[list.size()]);
 
     }
 
@@ -295,7 +293,7 @@ public final class FileStore
                 try {
                     ois.close();
                 } catch (IOException f) {
-                    ;
+                    // Ignore
                 }
                 ois = null;
             }
@@ -317,7 +315,7 @@ public final class FileStore
                 try {
                     ois.close();
                 } catch (IOException f) {
-                    ;
+                    // Ignore
                 }
             }
         }
@@ -386,7 +384,7 @@ public final class FileStore
                 try {
                     oos.close();
                 } catch (IOException f) {
-                    ;
+                    // Ignore
                 }
             }
             throw e;

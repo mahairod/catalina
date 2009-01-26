@@ -65,20 +65,21 @@ public abstract class PersistentManagerBase
         PersistentManagerBase.class.getName());
 
     // ---------------------------------------------------- Security Classes
-     private class PrivilegedStoreClear
-        implements PrivilegedExceptionAction {
+    private class PrivilegedStoreClear
+        implements PrivilegedExceptionAction<Void> {
 
         PrivilegedStoreClear() {            
+            // NOOP
         }
 
-        public Object run() throws Exception{
+        public Void run() throws Exception{
            store.clear();
            return null;
         }                       
     }   
      
      private class PrivilegedStoreRemove
-        implements PrivilegedExceptionAction {
+        implements PrivilegedExceptionAction<Void> {
 
         private String id;    
             
@@ -86,14 +87,14 @@ public abstract class PersistentManagerBase
             this.id = id;
         }
 
-        public Object run() throws Exception{
+        public Void run() throws Exception{
            store.remove(id);
            return null;
         }                       
     }   
      
     private class PrivilegedStoreLoad
-        implements PrivilegedExceptionAction {
+        implements PrivilegedExceptionAction<Session> {
 
         private String id;    
             
@@ -101,13 +102,13 @@ public abstract class PersistentManagerBase
             this.id = id;
         }
 
-        public Object run() throws Exception{
+        public Session run() throws Exception{
            return store.load(id);
         }                       
     }   
           
     private class PrivilegedStoreSave
-        implements PrivilegedExceptionAction {
+        implements PrivilegedExceptionAction<Void> {
 
         private Session session;    
             
@@ -115,19 +116,20 @@ public abstract class PersistentManagerBase
             this.session = session;
         }
 
-        public Object run() throws Exception{
+        public Void run() throws Exception{
            store.save(session);
            return null;
         }                       
     }   
      
     private class PrivilegedStoreKeys
-        implements PrivilegedExceptionAction {
+        implements PrivilegedExceptionAction<String[]> {
 
         PrivilegedStoreKeys() {     
+            // NOOP
         }
 
-        public Object run() throws Exception{
+        public String[] run() throws Exception{
            return store.keys();
         }                       
     }   
@@ -784,7 +786,8 @@ public abstract class PersistentManagerBase
         try {
             if (SecurityUtil.isPackageProtectionEnabled()){
                 try{
-                    ids = (String[])AccessController.doPrivileged(new PrivilegedStoreKeys());
+                    ids = AccessController.doPrivileged(
+                            new PrivilegedStoreKeys());
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
                     log.log(Level.SEVERE,
@@ -928,7 +931,7 @@ public abstract class PersistentManagerBase
             try {
                 swapOut(sessions[i]);
             } catch (IOException e) {
-                ;   // This is logged in writeSession()
+                // This is logged in writeSession()
             }
 
     }
@@ -1000,7 +1003,8 @@ public abstract class PersistentManagerBase
         try {
             if (SecurityUtil.isPackageProtectionEnabled()){
                 try{
-                    session = (Session) AccessController.doPrivileged(new PrivilegedStoreLoad(id));
+                    session = AccessController.doPrivileged(
+                            new PrivilegedStoreLoad(id));
                 }catch(PrivilegedActionException ex){
                     Exception exception = ex.getException();
                     log.log(Level.SEVERE,
@@ -1179,7 +1183,7 @@ public abstract class PersistentManagerBase
         // Force initialization of the random number generator
         if (log.isLoggable(Level.FINEST))
             log.finest("Force random number initialization starting");
-        String dummy = generateSessionId();
+        generateSessionId();
         if (log.isLoggable(Level.FINEST))
             log.finest("Force random number initialization completed");
 
@@ -1251,7 +1255,6 @@ public abstract class PersistentManagerBase
         // Validate the source of this event
         if (!(event.getSource() instanceof Context))
             return;
-        Context context = (Context) event.getSource();
 
         // Process a relevant property change
         if (event.getPropertyName().equals("sessionTimeout")) {
@@ -1300,7 +1303,7 @@ public abstract class PersistentManagerBase
                     try {
                         swapOut(session);
                     } catch (IOException e) {
-                        ;   // This is logged in writeSession()
+                        // This is logged in writeSession()
                     }
                 }
             }
@@ -1347,11 +1350,11 @@ public abstract class PersistentManagerBase
                     try {
                         swapOut(sessions[i]);
                     } catch (java.util.ConcurrentModificationException e1) {
-                        ;   // This is logged in writeSession()                           
+                        // This is logged in writeSession()                           
                     } catch (IOException e) {
-                        ;   // This is logged in writeSession()
+                        // This is logged in writeSession()
                     } catch (Exception e) {
-                        ;   // This is logged in writeSession()                        
+                        // This is logged in writeSession()                        
                     } finally {
                         session.unlockBackground();
                     }
@@ -1394,11 +1397,11 @@ public abstract class PersistentManagerBase
                         try {
                             writeSession(session);
                         } catch (java.util.ConcurrentModificationException e1) {
-                            ;   // This is logged in writeSession()                            
+                            // This is logged in writeSession()                            
                         } catch (IOException e) {
-                            ;   // This is logged in writeSession()
+                            // This is logged in writeSession()
                         } catch (Exception e) {
-                            ;   // This is logged in writeSession()                                
+                            // This is logged in writeSession()                                
                         } finally {
                             session.unlockBackground();
                         }
