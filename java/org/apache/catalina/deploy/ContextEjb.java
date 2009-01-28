@@ -35,7 +35,7 @@ import java.io.Serializable;
  * @version $Revision: 1.2 $ $Date: 2005/12/08 01:27:39 $
  */
 
-public class ContextEjb implements Serializable {
+public class ContextEjb extends ResourceBase implements Serializable {
 
 
     // ------------------------------------------------------------- Properties

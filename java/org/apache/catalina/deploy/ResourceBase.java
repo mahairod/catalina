@@ -18,46 +18,28 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.HashMap;
 
 
 /**
- * Representation of a resource reference for a web application, as
- * represented in a <code>&lt;resource-ref&gt;</code> element in the
- * deployment descriptor.
+ * Representation of an Context element
  *
- * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2005/12/08 01:27:40 $
+ * @author Peter Rossbach (pero@apache.org)
+ * @version $Revision$ $Date$
  */
 
-public class ContextResource extends ResourceBase implements Serializable {
+public class ResourceBase implements Serializable {
 
 
     // ------------------------------------------------------------- Properties
 
 
     /**
-     * The authorization requirement for this resource
-     * (<code>Application</code> or <code>Container</code>).
-     */
-    private String auth = null;
-
-    public String getAuth() {
-        return (this.auth);
-    }
-
-    public void setAuth(String auth) {
-        this.auth = auth;
-    }
-
-
-    /**
-     * The description of this resource.
+     * The description of this Context Element.
      */
     private String description = null;
 
@@ -70,8 +52,9 @@ public class ContextResource extends ResourceBase implements Serializable {
     }
 
 
+
     /**
-     * The name of this resource.
+     * The name of this context Element.
      */
     private String name = null;
 
@@ -85,22 +68,7 @@ public class ContextResource extends ResourceBase implements Serializable {
 
 
     /**
-     * The sharing scope of this resource factory (<code>Shareable</code>
-     * or <code>Unshareable</code>).
-     */
-    private String scope = "Shareable";
-
-    public String getScope() {
-        return (this.scope);
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-
-    /**
-     * The type of this resource.
+     * The name of the EJB bean implementation class.
      */
     private String type = null;
 
@@ -113,39 +81,40 @@ public class ContextResource extends ResourceBase implements Serializable {
     }
 
 
-    // --------------------------------------------------------- Public Methods
-
+    /**
+     * Holder for our configured properties.
+     */
+    private HashMap properties = new HashMap();
 
     /**
-     * Return a String representation of this object.
+     * Return a configured property.
      */
-    public String toString() {
-
-        StringBuffer sb = new StringBuffer("ContextResource[");
-        sb.append("name=");
-        sb.append(name);
-        if (description != null) {
-            sb.append(", description=");
-            sb.append(description);
-        }
-        if (type != null) {
-            sb.append(", type=");
-            sb.append(type);
-        }
-        if (auth != null) {
-            sb.append(", auth=");
-            sb.append(auth);
-        }
-        if (scope != null) {
-            sb.append(", scope=");
-            sb.append(scope);
-        }
-        sb.append("]");
-        return (sb.toString());
-
+    public Object getProperty(String name) {
+        return properties.get(name);
     }
 
+    /**
+     * Set a configured property.
+     */
+    public void setProperty(String name, Object value) {
+        properties.put(name, value);
+    }
 
+    /** 
+     * remove a configured property.
+     */
+    public void removeProperty(String name) {
+        properties.remove(name);
+    }
+
+    /**
+     * List properties.
+     */
+    public Iterator listProperties() {
+        return properties.keySet().iterator();
+    }
+    
+    
     // -------------------------------------------------------- Package Methods
 
 
