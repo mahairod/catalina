@@ -1523,7 +1523,7 @@ public class Response
             String file = url.getFile();
             if ((file == null) || !file.startsWith(contextPath))
                 return (false);
-            if( file.indexOf(";jsessionid=" + session.getIdInternal()) >= 0 )
+            if( file.indexOf(";" + Globals.SESSION_PARAMETER_NAME + "=" + session.getIdInternal()) >= 0 )
                 return (false);
         }
 
@@ -1671,7 +1671,7 @@ public class Response
 
         StringBuffer sb = new StringBuffer(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
-            sb.append(";jsessionid=");
+            sb.append(";" + Globals.SESSION_PARAMETER_NAME + "=");
             sb.append(sessionId);
             StandardContext ctx = (StandardContext) getContext();
             if (ctx != null && ctx.getJvmRoute() != null) {
