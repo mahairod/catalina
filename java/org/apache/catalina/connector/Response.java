@@ -52,7 +52,6 @@ import org.apache.catalina.HttpResponse;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.CharsetMapper;
-import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.security.SecurityUtil;
@@ -84,6 +83,8 @@ public class Response
      */
     private static boolean enforceScope = false;
 
+    public static final String HTTP_RESPONSE_DATE_HEADER =
+        "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     // ----------------------------------------------------------- Constructors
 
@@ -1091,7 +1092,7 @@ public class Response
         }
 
         if (format == null) {
-            format = new SimpleDateFormat(DateTool.HTTP_RESPONSE_DATE_HEADER,
+            format = new SimpleDateFormat(HTTP_RESPONSE_DATE_HEADER,
                                           Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("GMT"));
         }
@@ -1403,7 +1404,7 @@ public class Response
         }
 
         if (format == null) {
-            format = new SimpleDateFormat(DateTool.HTTP_RESPONSE_DATE_HEADER,
+            format = new SimpleDateFormat(HTTP_RESPONSE_DATE_HEADER,
                                           Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("GMT"));
         }
