@@ -71,7 +71,7 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
 
-    public void forward() {
+    public void dispatch() {
         origRequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                                  DispatcherType.ASYNC);
         origRequest.stopAsyncTimer();
@@ -91,7 +91,7 @@ public class AsyncContextImpl implements AsyncContext {
     } 
 
 
-    public void forward(String path) {
+    public void dispatch(String path) {
         if (path == null) {
             throw new IllegalArgumentException("Null path");
         }
@@ -108,7 +108,7 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
 
-    public void forward(ServletContext context, String path) {
+    public void dispatch(ServletContext context, String path) {
         if (path == null || context == null) {
             throw new IllegalArgumentException("Null context or path");
         }

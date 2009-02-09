@@ -694,10 +694,13 @@ public interface Context extends Container {
      * @param initParams Map containing the initialization parameters for 
      * the servlet
      *
+     * @return the ServletRegistration through which the servlet may be
+     * further configured
+     *
      * @throws ServletException if the servlet fails to be initialized
      */
-    public void addServlet(String servletName, Servlet instance,
-                           Map<String, String> initParams)
+    public ServletRegistration addServlet(String servletName,
+            Servlet instance, Map<String, String> initParams)
         throws ServletException;
 
 
@@ -711,12 +714,15 @@ public interface Context extends Container {
      * the servlet
      * @param urlPatterns the URL patterns that will be mapped to the servlet
      *
+     * @return the ServletRegistration through which the servlet may be
+     * further configured
+     *
      * @throws ServletException if the servlet fails to be initialized
      */
-    public void addServlet(String servletName, Servlet instance,
-                           Map<String, String> initParams,
-                           String... urlPatterns)
-            throws ServletException;
+    public ServletRegistration addServlet(String servletName,
+            Servlet instance, Map<String, String> initParams,
+            String... urlPatterns)
+        throws ServletException;
 
 
     /**
