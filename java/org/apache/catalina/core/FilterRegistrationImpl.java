@@ -105,13 +105,7 @@ public class FilterRegistrationImpl extends FilterRegistration {
             fmap.setFilterName(filterDef.getFilterName());
             fmap.setServletName(servletName);
             for (DispatcherType dispatcherType : dispatcherTypes) {
-                switch (dispatcherType) {
-                    case REQUEST : fmap.setDispatcher("REQUEST"); break;
-                    case FORWARD : fmap.setDispatcher("FORWARD"); break;
-                    case INCLUDE : fmap.setDispatcher("INCLUDE"); break;
-                    case ASYNC : fmap.setDispatcher("ASYNC"); break;
-                    case ERROR : fmap.setDispatcher("ERROR"); break;
-                }
+                fmap.setDispatcher(dispatcherType);
             }
             ctx.addFilterMap(fmap, isMatchAfter);
         }
@@ -141,13 +135,7 @@ public class FilterRegistrationImpl extends FilterRegistration {
             fmap.setFilterName(filterDef.getFilterName());
             fmap.setURLPattern(urlPattern);
             for (DispatcherType dispatcherType : dispatcherTypes) {
-                switch (dispatcherType) {
-                    case REQUEST : fmap.setDispatcher("REQUEST"); break;
-                    case FORWARD : fmap.setDispatcher("FORWARD"); break;
-                    case INCLUDE : fmap.setDispatcher("INCLUDE"); break;
-                    case ASYNC : fmap.setDispatcher("ASYNC"); break;
-                    case ERROR : fmap.setDispatcher("ERROR"); break;
-                }
+                fmap.setDispatcher(dispatcherType);
             }
             ctx.addFilterMap(fmap, isMatchAfter);
         }

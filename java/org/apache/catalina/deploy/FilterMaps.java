@@ -18,10 +18,9 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.deploy;
+
+import javax.servlet.DispatcherType;
 
 /**
  * Representation of a filter mapping for a web application, as represented
@@ -70,8 +69,8 @@ public class FilterMaps {
         return urlPatterns;
     }
     
-    public void setDispatcher(String dispatcherString) {
-        fmap.setDispatcher(dispatcherString);
+    public void setDispatcher(DispatcherType dispatcher) {
+        fmap.setDispatcher(dispatcher);
     }
 
     public int getDispatcherMapping() {
