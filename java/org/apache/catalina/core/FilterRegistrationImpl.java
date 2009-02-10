@@ -11,9 +11,9 @@ import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.util.StringManager;
 
-public class FilterRegistrationImpl extends FilterRegistration {
+public class FilterRegistrationImpl implements FilterRegistration {
 
-    protected static final StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
     private FilterDef filterDef;
@@ -47,7 +47,6 @@ public class FilterRegistrationImpl extends FilterRegistration {
                              ctx.getName()));
         }
 
-        super.setDescription(description);
         filterDef.setDescription(description);
     }
 
@@ -68,6 +67,16 @@ public class FilterRegistrationImpl extends FilterRegistration {
     }
 
 
+    public void setInitParameters(Map<String, String> initParameters) {
+        if (null == initParameters) {
+            throw new IllegalArgumentException("Null init parameters");
+        }
+        for (Map.Entry<String, String> e : initParameters.entrySet()) {
+            setInitParameter(e.getKey(), e.getValue());
+        }
+    }
+
+
     public void setAsyncSupported(boolean isAsyncSupported) {
         if (ctx.isContextInitializedCalled()) {
             throw new IllegalStateException(
@@ -76,7 +85,6 @@ public class FilterRegistrationImpl extends FilterRegistration {
                              ctx.getName()));
         }
 
-        super.setAsyncSupported(isAsyncSupported);
         filterDef.setIsAsyncSupported(isAsyncSupported);
     }
 
