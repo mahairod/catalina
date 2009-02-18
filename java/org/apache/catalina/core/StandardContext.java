@@ -2570,7 +2570,7 @@ public class StandardContext
      *  is malformed
      */
     public void addFilterMap(FilterMap filterMap) {
-        addFilterMap(filterMap, false);
+        addFilterMap(filterMap, true);
     }
 
 
