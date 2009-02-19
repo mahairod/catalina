@@ -102,7 +102,6 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 
 import org.apache.catalina.authenticator.SingleSignOn;
-import org.apache.catalina.core.ApplicationFilterFactory;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.session.StandardSession;
@@ -3756,7 +3755,7 @@ public class Request
 
     public DispatcherType getDispatcherType() {
         DispatcherType dispatcher = (DispatcherType) getAttribute(
-            ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
+            Globals.DISPATCHER_TYPE_ATTR);
         if (dispatcher == null) {
             dispatcher = DispatcherType.REQUEST;
         }

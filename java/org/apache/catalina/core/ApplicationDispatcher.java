@@ -127,14 +127,14 @@ final class ApplicationDispatcher
         // Response wrapper we have created and installed (if any).
         ServletResponse wrapResponse = null;
         
-        // Are we performing an include() instead of a forward()?
-        boolean including = false;
+        // The type of dispatch we are performing
+        DispatcherType dispatcherType;
 
         State(ServletRequest request, ServletResponse response,
-                boolean including) {
+              DispatcherType dispatcherType) {
             this.outerRequest = request;
             this.outerResponse = response;
-            this.including = including;
+            this.dispatcherType = dispatcherType;
         }
     }
 
@@ -348,7 +348,12 @@ final class ApplicationDispatcher
         }
 
         // Set up to handle the specified request and response
-        State state = new State(request, response, false);
+        DispatcherType dispatcherType = (DispatcherType) request.getAttribute(
+            Globals.DISPATCHER_TYPE_ATTR);
+        if (!DispatcherType.ERROR.equals(dispatcherType)) {
+            dispatcherType = DispatcherType.FORWARD;
+        }
+        State state = new State(request, response, dispatcherType);
 
         // Identify the HTTP-specific request and response objects (if any)
         HttpServletRequest hrequest = null;
@@ -437,20 +442,13 @@ final class ApplicationDispatcher
         throws IOException, ServletException {
                 
         if (request != null) {
-            DispatcherType dispatcherType = (DispatcherType)
-                request.getAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
-            if (dispatcherType != null) {
-                if (dispatcherType != DispatcherType.ERROR) {
-                    state.outerRequest.setAttribute
-                        (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                        getCombinedPath());
-                    state.outerRequest.setAttribute
-                        (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                        DispatcherType.FORWARD);
-                    invoke(state.outerRequest, response, state);
-                } else {
-                    invoke(state.outerRequest, response, state);
-                }
+            if (state.dispatcherType != DispatcherType.ERROR) {
+                state.outerRequest.setAttribute(
+                    Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                    getCombinedPath());
+                invoke(state.outerRequest, response, state);
+            } else {
+                invoke(state.outerRequest, response, state);
             }
         }
     }
@@ -510,7 +508,7 @@ final class ApplicationDispatcher
     {
 
         // Set up to handle the specified request and response
-        State state = new State(request, response, true);
+        State state = new State(request, response, DispatcherType.INCLUDE);
 
         // Create a wrapped response to use for this request
         wrapResponse(state);
@@ -546,12 +544,8 @@ final class ApplicationDispatcher
             wrequest.setAttribute(Globals.NAMED_DISPATCHER_ATTR, name);
             if (servletPath != null)
                 wrequest.setServletPath(servletPath);
-            wrequest.setAttribute(
-                ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                DispatcherType.INCLUDE);
-            wrequest.setAttribute(
-                ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                getCombinedPath());
+            wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                                  getCombinedPath());
             try{
                 invoke(state.outerRequest, state.outerResponse, state);
             } finally {
@@ -572,13 +566,8 @@ final class ApplicationDispatcher
                                            pathInfo,
                                            queryString);
             wrequest.setQueryParams(queryString);
-            
-            wrequest.setAttribute(
-                ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                DispatcherType.INCLUDE);
-            wrequest.setAttribute(
-                ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                getCombinedPath());
+            wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                                  getCombinedPath());
             try{
                 invoke(state.outerRequest, state.outerResponse, state);
             } finally {
@@ -613,7 +602,7 @@ final class ApplicationDispatcher
             throws IOException, ServletException {
         //START OF 6364900 original invoke has been renamed to doInvoke
         boolean crossContext = false;
-        if(crossContextFlag != null && crossContextFlag.booleanValue()) {
+        if (crossContextFlag != null && crossContextFlag.booleanValue()) {
             crossContext = true;
         }
         if (crossContext) {
@@ -749,8 +738,9 @@ final class ApplicationDispatcher
             if (jspFile != null) {
                 request.setAttribute(Globals.JSP_FILE_ATTR, jspFile);
             } 
-            support.fireInstanceEvent(InstanceEvent.EventType.BEFORE_DISPATCH_EVENT,
-                                      servlet, request, response);
+            support.fireInstanceEvent(
+                InstanceEvent.EventType.BEFORE_DISPATCH_EVENT,
+                servlet, request, response);
             // for includes/forwards
             /* IASRI 4665318
             if ((servlet != null) && (filterChain != null)) {
@@ -1017,7 +1007,7 @@ final class ApplicationDispatcher
             crossContextFlag = Boolean.valueOf(crossContext);
             //END OF 6364900
             wrapper = new ApplicationHttpRequest(hcurrent, context,
-                                                 crossContext);
+                crossContext, state.dispatcherType);
         } else {
             wrapper = new ApplicationRequest(current);
         }
@@ -1061,9 +1051,10 @@ final class ApplicationDispatcher
             (current instanceof HttpServletResponse))
             wrapper =
                 new ApplicationHttpResponse((HttpServletResponse) current,
-                                            state.including);
+                    DispatcherType.INCLUDE.equals(state.dispatcherType));
         else
-            wrapper = new ApplicationResponse(current, state.including);
+            wrapper = new ApplicationResponse(current,
+                DispatcherType.INCLUDE.equals(state.dispatcherType));
         if (previous == null)
             state.outerResponse = wrapper;
         else

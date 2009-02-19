@@ -153,7 +153,7 @@ class ApplicationDispatcherForward {
 
             // Prevent infinite loop
             String requestPath = (String) request.getAttribute(
-                ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR);
+                Globals.DISPATCHER_REQUEST_PATH_ATTR);
             if (requestPath == null
                     || !requestPath.equals(errorPage.getLocation())) {
                 String message = RequestUtil.filter(responseFacade.getMessage());
@@ -226,13 +226,11 @@ class ApplicationDispatcherForward {
                                                   String errorPageLocation,
                                                   int errorCode,
                                                   String errorMessage) {
-        request.setAttribute(
-            ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-            DispatcherType.ERROR);
+        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
+                             DispatcherType.ERROR);
 
-        request.setAttribute(
-            Globals.EXCEPTION_PAGE_ATTR,
-            request.getRequestURI());
+        request.setAttribute(Globals.EXCEPTION_PAGE_ATTR,
+                             request.getRequestURI());
 
         if (errorServlet != null) {
             // Save the logical name of the servlet in which the error occurred
@@ -240,9 +238,8 @@ class ApplicationDispatcherForward {
                                  errorServlet.getName());
         }
 
-        request.setAttribute(
-            ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-            errorPageLocation);
+        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                             errorPageLocation);
 
         request.setAttribute(Globals.STATUS_CODE_ATTR,
                              Integer.valueOf(errorCode));
