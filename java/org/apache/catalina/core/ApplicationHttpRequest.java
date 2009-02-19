@@ -134,7 +134,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * The current dispatcher type.
+     * The dispatcher type.
      */
     protected DispatcherType dispatcherType;
 
