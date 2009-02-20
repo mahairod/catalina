@@ -22,10 +22,6 @@ public class AsyncContextImpl implements AsyncContext {
     private static final ExecutorService pool =
         Executors.newCachedThreadPool();
 
-    // Thread pool for scheduling and delivering async timeout events
-    private static final ScheduledThreadPoolExecutor asyncTimeoutScheduler =
-        new ScheduledThreadPoolExecutor(1);
-
     // The original (unwrapped) request
     private Request origRequest;
 
@@ -61,15 +57,6 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
 
-    /**
-     * @return the ThreadPoolExecutor that is used for scheduling and
-     * delivering async timeout events
-     */
-    static ScheduledThreadPoolExecutor getAsyncTimeoutScheduler() {
-        return asyncTimeoutScheduler;
-    }
-
-
     public ServletRequest getRequest() {
         return servletRequest;
     }
@@ -88,7 +75,6 @@ public class AsyncContextImpl implements AsyncContext {
     public void dispatch() {
         origRequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
                                  DispatcherType.ASYNC);
-        origRequest.cancelAsyncTimeoutTask();
         if (servletRequest instanceof HttpServletRequest) {
             String uri = ((HttpServletRequest)servletRequest).getRequestURI();
             ApplicationDispatcher dispatcher = (ApplicationDispatcher)
@@ -113,7 +99,6 @@ public class AsyncContextImpl implements AsyncContext {
         }
         origRequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
                                  DispatcherType.ASYNC);
-        origRequest.cancelAsyncTimeoutTask();
         ApplicationDispatcher dispatcher = (ApplicationDispatcher)
             servletRequest.getRequestDispatcher(path);
         if (dispatcher != null) {
@@ -132,7 +117,6 @@ public class AsyncContextImpl implements AsyncContext {
         }
         origRequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
                                  DispatcherType.ASYNC);
-        origRequest.cancelAsyncTimeoutTask();
         ApplicationDispatcher dispatcher = (ApplicationDispatcher)
             context.getRequestDispatcher(path);
         if (dispatcher != null) {
