@@ -560,7 +560,9 @@ public class CoyoteAdapter
             }
             // END CR 6590921
 
-            response.sendRedirect(redirectPath);
+            // Issue a permanent redirect
+            response.sendRedirect(redirectPath, false);
+
             return false;
         }
 
