@@ -113,9 +113,8 @@ public class FilterRegistrationImpl implements FilterRegistration {
             FilterMap fmap = new FilterMap();
             fmap.setFilterName(filterDef.getFilterName());
             fmap.setServletName(servletName);
-            for (DispatcherType dispatcherType : dispatcherTypes) {
-                fmap.setDispatcher(dispatcherType);
-            }
+            fmap.setDispatcherTypes(dispatcherTypes);
+
             ctx.addFilterMap(fmap, isMatchAfter);
         }
 
@@ -145,9 +144,8 @@ public class FilterRegistrationImpl implements FilterRegistration {
             FilterMap fmap = new FilterMap();
             fmap.setFilterName(filterDef.getFilterName());
             fmap.setURLPattern(urlPattern);
-            for (DispatcherType dispatcherType : dispatcherTypes) {
-                fmap.setDispatcher(dispatcherType);
-            }
+            fmap.setDispatcherTypes(dispatcherTypes);
+
             ctx.addFilterMap(fmap, isMatchAfter);
         }
 

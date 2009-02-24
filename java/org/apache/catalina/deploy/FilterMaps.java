@@ -20,6 +20,7 @@
 
 package org.apache.catalina.deploy;
 
+import java.util.Set;
 import javax.servlet.DispatcherType;
 
 /**
@@ -35,7 +36,7 @@ public class FilterMaps {
     private String[] urlPatterns = new String[0];
     private String[] servletNames = new String[0];
     private String filterName = null;
-    private FilterMap fmap = new FilterMap();
+    private Set<DispatcherType> dispatcherTypes;
 
     // ------------------------------------------------------------ Properties
     
@@ -69,11 +70,11 @@ public class FilterMaps {
         return urlPatterns;
     }
     
-    public void setDispatcher(DispatcherType dispatcher) {
-        fmap.setDispatcher(dispatcher);
+    public void setDispatcherTypes(Set<DispatcherType> dispatcherTypes) {
+        this.dispatcherTypes = dispatcherTypes;
     }
 
-    public int getDispatcherMapping() {
-        return fmap.getDispatcherMapping();
+    public Set<DispatcherType> getDispatcherTypes() {
+        return dispatcherTypes;
     }
 }
