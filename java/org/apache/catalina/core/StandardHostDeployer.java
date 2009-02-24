@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.logging.*;
+import javax.servlet.*;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Deployer;
@@ -615,7 +616,7 @@ public class StandardHostDeployer implements Deployer {
             // Get the work directory for the Context
             File workDir = 
                 (File) context.getServletContext().getAttribute
-                (Globals.WORK_DIR_ATTR);
+                (ServletContext.TEMPDIR);
             String configFile = context.getConfigFile();
             host.removeChild(context);
 

@@ -28,10 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.*;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.naming.NamingException;
@@ -230,7 +227,7 @@ final class StandardContextValve
                         instances[i].getClass().getName()),
                         t);
                     ServletRequest sreq = request.getRequest();
-                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    sreq.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                 // START SJSAS 6329662
                 } finally {
                     container.fireContainerEvent(
@@ -403,7 +400,7 @@ final class StandardContextValve
                         instances[i].getClass().getName()),
                         t);
                     ServletRequest sreq = request.getRequest();
-                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    sreq.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                     return null;
                 // START SJSAS 6329662
                 } finally {
