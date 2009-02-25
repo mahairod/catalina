@@ -313,7 +313,7 @@ public final class InvokerServlet
             if (wrapper == null)
                 wrapper = (Wrapper) context.findChild(name);
             if (wrapper != null) {
-                String actualServletClass = wrapper.getServletClass();
+                String actualServletClass = wrapper.getServletClassName();
                 if ((actualServletClass != null)
                     && (actualServletClass.startsWith
                         ("org.apache.catalina"))) {
@@ -344,7 +344,7 @@ public final class InvokerServlet
                     wrapper = context.createWrapper();
                     wrapper.setName(name);
                     wrapper.setLoadOnStartup(1);
-                    wrapper.setServletClass(servletClass);
+                    wrapper.setServletClassName(servletClass);
                     context.addChild(wrapper);
                     context.addServletMapping(pattern, name);
                 } catch (Throwable t) {
