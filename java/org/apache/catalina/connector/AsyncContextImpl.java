@@ -16,7 +16,8 @@ import org.apache.catalina.core.*;
 
 public class AsyncContextImpl implements AsyncContext {
 
-    private static final Logger log = Logger.getLogger(AsyncContextImpl.class.getName());
+    private static final Logger log =
+        Logger.getLogger(AsyncContextImpl.class.getName());
 
     // Thread pool for async dispatches
     private static final ExecutorService pool =
@@ -143,7 +144,7 @@ public class AsyncContextImpl implements AsyncContext {
 
 
     public void start(Runnable run) {
-        // XXX
+        pool.execute(run);
     }
 
 
@@ -160,11 +161,6 @@ public class AsyncContextImpl implements AsyncContext {
      */
     void setServletResponse(ServletResponse servletResponse) {
         this.servletResponse = servletResponse;
-    }
-
-
-    void recycle() {
-        // XXX
     }
 
 
@@ -185,7 +181,7 @@ public class AsyncContextImpl implements AsyncContext {
             try {
                 dispatcher.dispatch(request, response, DispatcherType.ASYNC);
             } catch (Exception e) {
-                // Log warning
+                log.log(Level.WARNING, "Error during ASYNC dispatch", e);
             }
         }
     }
