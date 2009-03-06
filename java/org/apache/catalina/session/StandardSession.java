@@ -41,15 +41,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.security.auth.login.LoginException;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionActivationListener;
-import javax.servlet.http.HttpSessionAttributeListener;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
-import javax.servlet.http.HttpSessionContext;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import javax.servlet.http.*;
 
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.Context;
@@ -1132,7 +1126,6 @@ public class StandardSession
      *  Java Servlet API.
      */
     public HttpSessionContext getSessionContext() {
-
         if (sessionContext == null)
             sessionContext = new StandardSessionContext();
         return (sessionContext);
@@ -1416,6 +1409,15 @@ public class StandardSession
 
     }
 
+
+    public void logout() throws LoginException {
+        if (!isValid()) {
+            throw new IllegalStateException
+                (sm.getString("standardSession.isNew.ise"));
+        }
+
+        // TBD
+    }
 
 
     /**

@@ -44,7 +44,9 @@ import java.util.logging.*;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
+
 import javax.security.auth.Subject;
+import javax.security.auth.login.LoginException;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -1895,6 +1897,24 @@ public class Request
 
 
     // ---------------------------------------------------- HttpRequest Methods
+
+
+    public boolean login(HttpServletResponse response)
+            throws IOException, LoginException {
+        // TBD
+        return false;
+    }
+
+
+    public void login(String username, String password)
+            throws LoginException {
+        // TBD
+    }
+
+
+    public void logout() throws LoginException {
+        // TBD
+    }
 
 
     /**
