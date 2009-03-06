@@ -266,6 +266,9 @@ final class StandardHostValve
         if (errorPage != null) {
             dispatchToErrorPage(request, response, errorPage, throwable,
                                 realError, 0);
+        } else if (context.getDefaultErrorPage() != null) {
+            dispatchToErrorPage(request, response,
+                context.getDefaultErrorPage(), throwable, realError, 0);  
         } else {
             // A custom error-page has not been defined for the exception
             // that was thrown during request processing. Check if an
@@ -326,6 +329,10 @@ final class StandardHostValve
         if (errorPage != null) {
             dispatchToErrorPage(request, response, errorPage, null, null,
                                 statusCode);
+        } else if (statusCode >= 400 && statusCode < 600 &&
+                context.getDefaultErrorPage() != null) {
+            dispatchToErrorPage(request, response,
+                context.getDefaultErrorPage(), null, null, statusCode);
         }
         // START SJSAS 6324911
         else {
@@ -335,7 +342,7 @@ final class StandardHostValve
                 try {
                     handleHostErrorPage(response, errorPage, statusCode);
                 } catch (Exception e) {
-                    log("Exception Processing " + errorPage, e);
+                    log("Exception processing " + errorPage, e);
                 }
             }
         }
@@ -632,7 +639,7 @@ final class StandardHostValve
             try {
                 sresp.flushBuffer();
             } catch (IOException e) {
-                log("Exception Processing " + errorPage, e);
+                log("Exception processing " + errorPage, e);
             }
         }
     }
