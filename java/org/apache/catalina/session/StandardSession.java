@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.security.auth.login.LoginException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.*;
 
@@ -1407,16 +1406,6 @@ public class StandardSession
 
         return (this.isNew);
 
-    }
-
-
-    public void logout() throws LoginException {
-        if (!isValid()) {
-            throw new IllegalStateException
-                (sm.getString("standardSession.isNew.ise"));
-        }
-
-        // TBD
     }
 
 
