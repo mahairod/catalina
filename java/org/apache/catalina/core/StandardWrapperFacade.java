@@ -18,11 +18,7 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.core;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -37,20 +33,17 @@ import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * Facade for the <b>StandardWrapper</b> object.
  *
  * @author Remy Maucharat
  * @version $Revision: 1.3 $ $Date: 2006/11/13 19:26:30 $
  */
-
 public final class StandardWrapperFacade
     implements ServletConfig {
 
 
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Create a new facede around a StandardWrapper.
@@ -100,6 +93,11 @@ public final class StandardWrapperFacade
 
     public String getInitParameter(String name) {
         return config.getInitParameter(name);
+    }
+
+
+    public Object getInitParameterObject(String name) {
+        return config.getInitParameterObject(name);
     }
 
 
