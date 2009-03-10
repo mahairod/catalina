@@ -20,11 +20,11 @@
 
 package org.apache.catalina.deploy;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.io.Serializable;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
+import org.apache.catalina.util.Enumerator;
 
 /**
  * Representation of a filter definition for a web application, as represented
@@ -76,7 +76,13 @@ public class FilterDef implements Serializable {
      * The set of initialization parameters for this filter, keyed by
      * parameter name.
      */
-    private Map<String, Object> parameters = new HashMap();
+    private Map<String, String> parameters = new HashMap<String, String>();
+
+    /**
+     * The set of initialization attributes for this filter, keyed by
+     * attribute name.
+     */
+    private Map<String, Object> attributes = new HashMap<String, Object>();
 
     /**
      * True if this filter supports async operations, false otherwise
@@ -186,11 +192,6 @@ public class FilterDef implements Serializable {
     }
 
 
-    public Map getParameterMap() {
-        return (this.parameters);
-    }
-
-
     public String getSmallIcon() {
         return (this.smallIcon);
     }
@@ -268,7 +269,7 @@ public class FilterDef implements Serializable {
      * @return true if the init parameter with the given name and value
      * was set, false otherwise
      */
-    public boolean setInitParameter(String name, Object value, 
+    public boolean setInitParameter(String name, String value, 
                                     boolean override) {
         if (null == name || null == value) {
             throw new IllegalArgumentException(
@@ -319,6 +320,20 @@ public class FilterDef implements Serializable {
     }
 
 
+    public String getInitParameter(String name) {
+        synchronized (parameters) {
+            return parameters.get(name);
+        }
+    }        
+
+
+    public Enumeration getInitParameterNames() {
+        synchronized (parameters) {
+            return new Enumerator(parameters.keySet());
+        }
+    }
+
+
     /**
      * Removes the initialization parameter with the given name.
      *
@@ -327,6 +342,62 @@ public class FilterDef implements Serializable {
     public void removeInitParameter(String name) {
         synchronized (parameters) {
             parameters.remove(name);
+        }
+    }
+
+
+    public boolean setInitAttribute(String name, Object value) {
+        if (null == name || null == value) {
+            throw new IllegalArgumentException(
+                "Null filter init attribute name or value");
+        }
+
+        synchronized (attributes) {
+            if (!attributes.containsKey(name)) {
+                attributes.put(name, value);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+
+    public boolean setInitAttributes(Map<String, Object> initAttributes) {
+        if (null == initAttributes) {
+            throw new IllegalArgumentException("Null init attributes");
+        }
+
+        synchronized (attributes) {
+            for (Map.Entry<String, Object> e : initAttributes.entrySet()) {
+                if (e.getKey() == null || e.getValue() == null) {
+                    throw new IllegalArgumentException(
+                        "Null attribute name or value");
+                }
+                if (attributes.containsKey(e.getKey())) {
+                    return false;
+                }
+            }
+
+            for (Map.Entry<String, Object> e : initAttributes.entrySet()) {
+                setInitAttribute(e.getKey(), e.getValue());
+            }
+   
+            return true;
+        }
+    }
+
+
+    public Object getInitAttribute(String name) {
+        synchronized (attributes) {
+            return attributes.get(name);
+        }
+    }        
+
+
+    public Enumeration getInitAttributeNames() {
+        synchronized (attributes) {
+            return new Enumerator(attributes.keySet());
         }
     }
 
