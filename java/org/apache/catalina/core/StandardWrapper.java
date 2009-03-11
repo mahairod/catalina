@@ -1706,9 +1706,9 @@ public class StandardWrapper
     }
 
 
-    public Enumeration<String> getInitAttributeNames() {
+    public Iterator<String> getInitAttributeNames() {
         synchronized (attributes) {
-            return (new Enumerator(attributes.keySet()));
+            return attributes.keySet().iterator();
         }
     }
 
