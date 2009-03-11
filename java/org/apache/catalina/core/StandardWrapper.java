@@ -741,9 +741,10 @@ public class StandardWrapper
      */
     public String[] getServletMethods() throws ServletException {
 	
-        Class servletClazz = loadServlet().getClass();
+        loadServletClass();
+
         if (!javax.servlet.http.HttpServlet.class.isAssignableFrom(
-                                                        servletClazz)) {
+                                                        servletClass)) {
             return DEFAULT_SERVLET_METHODS;
         }
 
@@ -751,7 +752,7 @@ public class StandardWrapper
         allow.add("TRACE");
         allow.add("OPTIONS");
 	
-        Method[] methods = getAllDeclaredMethods(servletClazz);
+        Method[] methods = getAllDeclaredMethods(servletClass);
         for (int i=0; methods != null && i<methods.length; i++) {
             Method m = methods[i];
 	    
@@ -1210,9 +1211,7 @@ public class StandardWrapper
 
         long t1 = System.currentTimeMillis();
 
-        if (servletClass == null) {
-            servletClass = loadServletClass();
-        }
+        loadServletClass();
 
         // Instantiate and initialize an instance of the servlet class itself
         Servlet servlet = null;
@@ -1339,12 +1338,12 @@ public class StandardWrapper
     }
 
 
-    private Class loadServletClass() throws ServletException {
+    private synchronized void loadServletClass() throws ServletException {
+        if (servletClass != null) {
+            return;
+        }
+
         // If this "servlet" is really a JSP file, get the right class.
-        // HOLD YOUR NOSE - this is a kludge that avoids having to do special
-        // case Catalina-specific code in Jasper - it also requires that the
-        // servlet path be replaced by the <jsp-file> element content in
-        // order to be completely effective
         String actualClass = servletClassName;
         if ((actualClass == null) && (jspFile != null)) {
             Wrapper jspWrapper = (Wrapper)
@@ -1437,7 +1436,7 @@ public class StandardWrapper
                 (sm.getString("standardWrapper.missingClass", actualClass));
         }
 
-        return clazz;
+        servletClass = clazz;
     }
 
 
