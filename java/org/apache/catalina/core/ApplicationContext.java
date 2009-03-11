@@ -971,6 +971,16 @@ public class ApplicationContext
 
 
     /*
+     * Registers the given servlet instance with this ServletContext
+     * under the given <tt>servletName</tt>.
+     */
+    public ServletRegistration addServlet(String servletName,
+                                          Servlet servlet) {
+        return context.addServlet(servletName, servlet);
+    }
+
+
+    /*
      * Adds the servlet with the given name and class type to this
      * servlet context.
      */
@@ -997,6 +1007,15 @@ public class ApplicationContext
         return context.addFilter(filterName, className);
     }
     
+
+    /*
+     * Registers the given filter instance with this ServletContext
+     * under the given <tt>filterName</tt>.
+     */
+    public FilterRegistration addFilter(String filterName, Filter filter) {
+        return context.addFilter(filterName, filter);
+    }
+
 
     /**
      * Adds the filter with the given name and class type to this servlet
