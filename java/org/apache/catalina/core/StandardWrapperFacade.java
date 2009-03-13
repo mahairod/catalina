@@ -90,7 +90,7 @@ public final class StandardWrapperFacade
     }
 
 
-    public Enumeration getInitParameterNames() {
+    public Enumeration<String> getInitParameterNames() {
         return config.getInitParameterNames();
     }
 

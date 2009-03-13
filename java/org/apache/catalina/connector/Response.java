@@ -983,7 +983,7 @@ public class Response
      */
     public String[] getHeaderValues(String name) {
 
-        Enumeration e = coyoteResponse.getMimeHeaders().values(name);
+        Enumeration<String> e = coyoteResponse.getMimeHeaders().values(name);
         Vector result = new Vector();
         while (e.hasMoreElements()) {
             result.addElement(e.nextElement());
@@ -991,7 +991,6 @@ public class Response
         String[] resultArray = new String[result.size()];
         result.copyInto(resultArray);
         return resultArray;
-
     }
 
 

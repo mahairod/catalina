@@ -60,7 +60,7 @@ public class ApplicationRequest extends ServletRequestWrapper {
     /**
      * The set of attribute names that are special for request dispatchers.
      */
-    private static final HashSet specials = new HashSet(10);
+    private static final HashSet<String> specials = new HashSet(10);
 
 
     static {
@@ -106,7 +106,8 @@ public class ApplicationRequest extends ServletRequestWrapper {
      * The request attributes for this request.  This is initialized from the
      * wrapped request, but updates are allowed.
      */
-    protected HashMap attributes = new HashMap();
+    protected HashMap<String, Object> attributes =
+        new HashMap<String, Object>();
 
     /**
      * The dispatcher type.
@@ -129,11 +130,9 @@ public class ApplicationRequest extends ServletRequestWrapper {
      * @param name Name of the attribute to retrieve
      */
     public Object getAttribute(String name) {
-
         synchronized (attributes) {
             return (attributes.get(name));
         }
-
     }
 
 
@@ -141,12 +140,10 @@ public class ApplicationRequest extends ServletRequestWrapper {
      * Override the <code>getAttributeNames()</code> method of the wrapped
      * request.
      */
-    public Enumeration getAttributeNames() {
-
+    public Enumeration<String> getAttributeNames() {
         synchronized (attributes) {
-            return (new Enumerator(attributes.keySet()));
+            return (new Enumerator<String>(attributes.keySet()));
         }
-
     }
 
 
@@ -157,13 +154,11 @@ public class ApplicationRequest extends ServletRequestWrapper {
      * @param name Name of the attribute to remove
      */
     public void removeAttribute(String name) {
-
         synchronized (attributes) {
             attributes.remove(name);
             if (!isSpecial(name))
                 getRequest().removeAttribute(name);
         }
-
     }
 
 
@@ -200,14 +195,13 @@ public class ApplicationRequest extends ServletRequestWrapper {
         // Initialize the attributes for this request
         synchronized (attributes) {
             attributes.clear();
-            Enumeration names = request.getAttributeNames();
+            Enumeration<String> names = request.getAttributeNames();
             while (names.hasMoreElements()) {
-                String name = (String) names.nextElement();
+                String name = names.nextElement();
                 Object value = request.getAttribute(name);
                 attributes.put(name, value);
             }
         }
-
     }
 
 
@@ -226,7 +220,6 @@ public class ApplicationRequest extends ServletRequestWrapper {
      * @param name Attribute name to be tested
      */
     protected static boolean isSpecial(String name) {
-
         return specials.contains(name);
     }
 

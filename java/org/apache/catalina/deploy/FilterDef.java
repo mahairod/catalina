@@ -349,7 +349,7 @@ public class FilterDef implements Serializable {
     }        
 
 
-    public Enumeration getInitParameterNames() {
+    public Enumeration<String> getInitParameterNames() {
         synchronized (parameters) {
             return new Enumerator(parameters.keySet());
         }

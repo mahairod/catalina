@@ -1691,7 +1691,7 @@ public class StandardWrapper
      * Return the set of initialization parameter names defined for this
      * servlet.  If none are defined, an empty Enumeration is returned.
      */
-    public Enumeration getInitParameterNames() {
+    public Enumeration<String> getInitParameterNames() {
         synchronized (parameters) {
             return (new Enumerator(parameters.keySet()));
         }
