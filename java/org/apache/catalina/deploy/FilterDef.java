@@ -417,9 +417,9 @@ public class FilterDef implements Serializable {
     }        
 
 
-    public Enumeration getInitAttributeNames() {
+    public Iterable<String> getInitAttributeNames() {
         synchronized (attributes) {
-            return new Enumerator(attributes.keySet());
+            return attributes.keySet();
         }
     }
 

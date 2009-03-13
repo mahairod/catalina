@@ -100,7 +100,7 @@ public final class StandardWrapperFacade
     }
 
 
-    public Iterator<String> getInitAttributeNames() {
+    public Iterable<String> getInitAttributeNames() {
         return config.getInitAttributeNames();
     }
 
