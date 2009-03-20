@@ -94,14 +94,4 @@ public final class StandardWrapperFacade
         return config.getInitParameterNames();
     }
 
-
-    public Object getInitAttribute(String name) {
-        return config.getInitAttribute(name);
-    }
-
-
-    public Iterable<String> getInitAttributeNames() {
-        return config.getInitAttributeNames();
-    }
-
 }
