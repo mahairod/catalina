@@ -352,6 +352,10 @@ public class Request
     protected String requestedSessionId = null;
 
 
+    // The requested session cookie path, see IT 7426
+    protected String requestedSessionCookiePath;
+
+
     /**
      * The requested session version (if any) for this request.
      */
@@ -560,6 +564,7 @@ public class Request
         session = null;
         requestedSessionCookie = false;
         requestedSessionId = null;
+        requestedSessionCookiePath = null;
         requestedSessionVersion = null;
         requestedSessionURL = false;
 
@@ -2071,9 +2076,15 @@ public class Request
      * @param flag The new flag
      */
     public void setRequestedSessionCookie(boolean flag) {
-
         this.requestedSessionCookie = flag;
+    }
 
+
+    /**
+     * Sets the requested session cookie path, see IT 7426
+     */
+    public void setRequestedSessionCookiePath(String cookiePath) {
+        requestedSessionCookiePath = cookiePath;
     }
 
 
@@ -2978,6 +2989,9 @@ public class Request
             cookie.setMaxAge(sessionCookieConfig.getMaxAge());
         }
         
+        if (requestedSessionCookiePath != null) {
+            cookie.setPath(requestedSessionCookiePath);
+        }
     }
 
 
