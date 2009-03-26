@@ -1335,7 +1335,7 @@ public class StandardWrapper
         }
 
         try {
-            instanceSupport.fireInstanceEvent(BEFORE_INIT_EVENT,servlet);
+            instanceSupport.fireInstanceEvent(BEFORE_INIT_EVENT, servlet);
             // START SJS WS 7.0 6236329
             //if( System.getSecurityManager() != null) {
             if ( SecurityUtil.executeUnderSubjectDoAs() ){
