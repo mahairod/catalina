@@ -36,7 +36,6 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Locale;
 import java.net.Socket;
-import javax.security.auth.login.LoginException;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
@@ -1112,7 +1111,7 @@ public class RequestFacade
 
 
     public boolean login(HttpServletResponse response)
-            throws IOException, LoginException {
+            throws IOException, ServletException {
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
@@ -1122,7 +1121,7 @@ public class RequestFacade
 
 
     public void login(String username, String password)
-            throws LoginException {
+            throws ServletException {
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
@@ -1131,7 +1130,7 @@ public class RequestFacade
     }
 
 
-    public void logout() throws LoginException {
+    public void logout() throws ServletException {
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
