@@ -363,7 +363,9 @@ public class LoggerBase
         domain=name.getDomain();
         host=name.getKeyProperty("host");
         path=name.getKeyProperty("path");
-        log("preRegister with "+name);
+        if(log.isLoggable(Level.FINE)) {
+            log.fine("preRegister with "+name);
+        }
         if( container== null ) {
             // Register with the parent
             try {
@@ -378,7 +380,9 @@ public class LoggerBase
                     cname=new ObjectName(domain +":j2eeType=WebModule,name=//" +
                             host + "/" + path);
                 }
-                log.fine("Register with " + cname);
+                if(log.isLoggable(Level.FINE)) {
+                    log.fine("Register with " + cname);
+                }
                 mserver.invoke(cname, "setLogger", new Object[] {this},
                         new String[] {"org.apache.catalina.Logger"});
             } catch (Exception e) {
@@ -407,7 +411,9 @@ public class LoggerBase
     }
     
     public ObjectName createObjectName() {
-        log("createObjectName with "+container);
+        if(log.isLoggable(Level.FINE)) {
+            log("createObjectName with "+container);
+        }
         // register
         try {
             StandardEngine engine=null;            
