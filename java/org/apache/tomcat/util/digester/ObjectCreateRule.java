@@ -61,7 +61,7 @@ public class ObjectCreateRule extends Rule {
      * @param clazz Java class name of the object to be created
      *
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #ObjectCreateRule(Class&lt;?&gt; clazz)} instead.
+     * Use {@link #ObjectCreateRule(Class clazz)} instead.
      */
     public ObjectCreateRule(Digester digester, Class<?> clazz) {
 
@@ -100,7 +100,7 @@ public class ObjectCreateRule extends Rule {
      *  override of the class name to create
      *
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #ObjectCreateRule(String attributeName, Class&lt;?&gt; clazz)} instead.
+     * Use {@link #ObjectCreateRule(String attributeName, Class clazz)} instead.
      */
     public ObjectCreateRule(Digester digester,
                             String attributeName,
