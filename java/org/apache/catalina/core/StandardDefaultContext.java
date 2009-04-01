@@ -510,12 +510,11 @@ public class StandardDefaultContext
      * Get the resources DirContext object with which this Container is
      * associated.
      *
-     * @param resources The new associated DirContext
+     * @return the resources DirContext object with which this Container is
+     * associated
      */
     public DirContext getResources() {
-
         return this.dirContext;
-
     }
 
 
@@ -790,12 +789,10 @@ public class StandardDefaultContext
     /**
      * Add a resource link for this web application.
      *
-     * @param resource New resource link
+     * @param resourceLink New resource link
      */
     public void addResourceLink(ContextResourceLink resourceLink) {
-
         namingResources.addResourceLink(resourceLink);
-
     }
 
 
@@ -1213,7 +1210,7 @@ public class StandardDefaultContext
     /**
      * Remove any environment entry with the specified name.
      *
-     * @param name Name of the environment entry to remove
+     * @param envName Name of the environment entry to remove
      */
     public void removeEnvironment(String envName) {
 
@@ -1255,7 +1252,7 @@ public class StandardDefaultContext
     /**
      * Remove any resource link with the specified name.
      *
-     * @param resourceName Name of the resource reference to remove
+     * @param resourceLinkName Name of the resource reference to remove
      */
     public void removeResourceLink(String resourceLinkName) {
 

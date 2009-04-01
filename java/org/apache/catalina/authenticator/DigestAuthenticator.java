@@ -164,8 +164,8 @@ public class DigestAuthenticator
      *
      * @param request Request we are processing
      * @param response Response we are creating
-     * @param login Login configuration describing how authentication
-     *              should be performed
+     * @param config Login configuration describing how authentication
+     * should be performed
      *
      * @exception IOException if an input/output error occurs
      */
@@ -227,8 +227,6 @@ public class DigestAuthenticator
      *
      * @param request HTTP servlet request
      * @param authorization Authorization credentials from this request
-     * @param login Login configuration describing how authentication
-     *              should be performed
      * @param realm Realm used to authenticate Principals
      */
     protected static Principal findPrincipal(HttpServletRequest request,
@@ -412,9 +410,9 @@ public class DigestAuthenticator
      * </pre>
      *
      * @param request HTTP Servlet request
-     * @param resonse HTTP Servlet response
-     * @param login Login configuration describing how authentication
-     *              should be performed
+     * @param response HTTP Servlet response
+     * @param config Login configuration describing how authentication
+     * should be performed
      * @param nOnce nonce token
      */
     protected void setAuthenticateHeader(HttpServletRequest request,

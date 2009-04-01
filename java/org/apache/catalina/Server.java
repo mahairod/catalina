@@ -73,7 +73,7 @@ public interface Server {
     /**
      * Set the global naming resources.
      * 
-     * @param namingResources The new global naming resources
+     * @param globalNamingResources The new global naming resources
      */
     public void setGlobalNamingResources
         (NamingResources globalNamingResources);

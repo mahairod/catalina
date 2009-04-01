@@ -1806,7 +1806,7 @@ public class Request
      * reading input using <code>getReader()</code>. Otherwise, it has no
      * effect.
      * 
-     * @param env      <code>String</code> containing the name of
+     * @param enc      <code>String</code> containing the name of
      *                 the character encoding.
      * @throws         java.io.UnsupportedEncodingException if this
      *                 ServletRequest is still in a state where a
@@ -2604,7 +2604,7 @@ public class Request
     /**
      * set the session - this method is not for general use
      *
-     * @param the new session
+     * @param newSess the new session
      */
     public void setSession(Session newSess) {
         session = newSess;
