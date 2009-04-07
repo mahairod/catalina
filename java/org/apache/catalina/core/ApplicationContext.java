@@ -959,8 +959,8 @@ public class ApplicationContext
      * Adds the servlet with the given name and class name to this
      * servlet context.
      */
-    public ServletRegistration addServlet(String servletName,
-                                          String className) {
+    public ServletRegistration.Dynamic addServlet(
+            String servletName, String className) {
         return context.addServlet(servletName, className);
     }
 
@@ -969,8 +969,8 @@ public class ApplicationContext
      * Registers the given servlet instance with this ServletContext
      * under the given <tt>servletName</tt>.
      */
-    public ServletRegistration addServlet(String servletName,
-                                          Servlet servlet) {
+    public ServletRegistration.Dynamic addServlet(
+            String servletName, Servlet servlet) {
         return context.addServlet(servletName, servlet);
     }
 
@@ -979,7 +979,7 @@ public class ApplicationContext
      * Adds the servlet with the given name and class type to this
      * servlet context.
      */
-    public ServletRegistration addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Class <? extends Servlet> servletClass) {
         return context.addServlet(servletName, servletClass);
     }
@@ -1009,7 +1009,8 @@ public class ApplicationContext
      * Adds the filter with the given name and class name to this servlet
      * context.
      */
-    public FilterRegistration addFilter(String filterName, String className) {
+    public FilterRegistration.Dynamic addFilter(
+            String filterName, String className) {
         return context.addFilter(filterName, className);
     }
     
@@ -1018,7 +1019,8 @@ public class ApplicationContext
      * Registers the given filter instance with this ServletContext
      * under the given <tt>filterName</tt>.
      */
-    public FilterRegistration addFilter(String filterName, Filter filter) {
+    public FilterRegistration.Dynamic addFilter(
+            String filterName, Filter filter) {
         return context.addFilter(filterName, filter);
     }
 
@@ -1027,7 +1029,7 @@ public class ApplicationContext
      * Adds the filter with the given name and class type to this servlet
      * context.
      */
-    public FilterRegistration addFilter(String filterName,
+    public FilterRegistration.Dynamic addFilter(String filterName,
             Class <? extends Filter> filterClass) {
         return context.addFilter(filterName, filterClass);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  */
 
@@ -12,46 +12,18 @@ import org.apache.catalina.util.StringManager;
 
 public class ServletRegistrationImpl implements ServletRegistration {
 
-    private static final StringManager sm =
+    protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private StandardWrapper wrapper;
-    private StandardContext ctx;
-
-    /*
-     * true if this ServletRegistration was obtained through programmatic
-     * registration (i.e., via a call to ServletContext#addServlet), and
-     * false if it represents a servlet declared in web.xml or a web.xml
-     * fragment
-     */
-    private boolean isProgrammatic;
-
+    protected StandardWrapper wrapper;
+    protected StandardContext ctx;
 
     /**
      * Constructor
      */
-    ServletRegistrationImpl(StandardWrapper wrapper, StandardContext ctx,
-                            boolean isProgrammatic) {
+    ServletRegistrationImpl(StandardWrapper wrapper, StandardContext ctx) {
         this.wrapper = wrapper;
         this.ctx = ctx;
-        this.isProgrammatic = isProgrammatic;
-    }
-
-
-    public boolean setDescription(String description) {
-        if (ctx.isContextInitializedCalled()) {
-            throw new IllegalStateException(
-                sm.getString("servletRegistration.alreadyInitialized",
-                             "description", wrapper.getName(),
-                             ctx.getName()));
-        }
-
-        if (!isProgrammatic) {
-            return false;
-        } else {
-            wrapper.setDescription(description);
-            return true;
-        }
     }
 
 
@@ -69,40 +41,6 @@ public class ServletRegistrationImpl implements ServletRegistration {
 
     public boolean setInitParameters(Map<String, String> initParameters) {
         return wrapper.setInitParameters(initParameters);
-    }
-
-
-    public boolean setLoadOnStartup(int loadOnStartup) {
-        if (ctx.isContextInitializedCalled()) {
-            throw new IllegalStateException(
-                sm.getString("servletRegistration.alreadyInitialized",
-                             "load-on-startup", wrapper.getName(),
-                             ctx.getName()));
-        }
-
-        if (!isProgrammatic) {
-            return false;
-        } else {
-            wrapper.setLoadOnStartup(loadOnStartup);
-            return true;
-        }
-    }
-
-
-    public boolean setAsyncSupported(boolean isAsyncSupported) {
-        if (ctx.isContextInitializedCalled()) {
-            throw new IllegalStateException(
-                sm.getString("servletRegistration.alreadyInitialized",
-                             "async-supported", wrapper.getName(),
-                             ctx.getName()));
-        }
-
-        if (!isProgrammatic) {
-            return false;
-        } else {
-            wrapper.setIsAsyncSupported(isAsyncSupported);
-            return true;
-        }
     }
 
 

@@ -721,7 +721,7 @@ public interface Context extends Container {
      *
      * @throws ServletException if the servlet fails to be initialized
      */
-    public ServletRegistration addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet instance, Map<String, String> initParams)
         throws ServletException;
 
@@ -741,7 +741,7 @@ public interface Context extends Container {
      *
      * @throws ServletException if the servlet fails to be initialized
      */
-    public ServletRegistration addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet instance, Map<String, String> initParams,
             String... urlPatterns)
         throws ServletException;

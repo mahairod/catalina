@@ -2235,8 +2235,15 @@ public class StandardContext
             }
         }
 
-        ServletRegistration regis = new ServletRegistrationImpl(
-            (StandardWrapper) wrapper, this, isProgrammatic);
+        ServletRegistration regis = null;
+        if (isProgrammatic) {
+            regis = new DynamicServletRegistrationImpl(
+                (StandardWrapper) wrapper, this);
+        } else {
+            regis = new ServletRegistrationImpl(
+                (StandardWrapper) wrapper, this);
+        }
+      
         wrapper.setServletRegistration(regis);
     }
 
@@ -2386,8 +2393,13 @@ public class StandardContext
 
 
     public void addFilterDef(FilterDef filterDef, boolean isProgrammatic) {
-        FilterRegistration regis = new FilterRegistrationImpl(
-            filterDef, this, isProgrammatic);
+        FilterRegistration regis = null;
+        if (isProgrammatic) {
+            regis = new DynamicFilterRegistrationImpl(filterDef, this);
+        } else {
+            regis = new FilterRegistrationImpl(filterDef, this);
+        }
+
         filterDef.setFilterRegistration(regis);
   
         synchronized (filterDefs) {
@@ -2503,7 +2515,8 @@ public class StandardContext
      * Adds the filter with the given name and class name to this servlet
      * context.
      */
-    public FilterRegistration addFilter(String filterName, String className) {
+    public FilterRegistration.Dynamic addFilter(
+            String filterName, String className) {
         synchronized (filterDefs) {
             // Make sure filter name is unique for this context
             if (findFilterDef(filterName) != null) {
@@ -2514,7 +2527,8 @@ public class StandardContext
             filterDef.setFilterClassName(className);
             addFilterDef(filterDef, true);
 
-            return filterDef.getFilterRegistration();
+            return (FilterRegistration.Dynamic)
+                filterDef.getFilterRegistration();
         }
     }
 
@@ -2523,7 +2537,8 @@ public class StandardContext
      * Registers the given filter instance with this ServletContext
      * under the given <tt>filterName</tt>.
      */
-    public FilterRegistration addFilter(String filterName, Filter filter) {
+    public FilterRegistration.Dynamic addFilter(
+            String filterName, Filter filter) {
         if (filterName == null || filter == null) {
             throw new NullPointerException("Null filter instance or name");
         }
@@ -2541,7 +2556,8 @@ public class StandardContext
             filterDef.setFilter(filter);
             addFilterDef(filterDef, true);
 
-            return filterDef.getFilterRegistration();
+            return (FilterRegistration.Dynamic)
+                filterDef.getFilterRegistration();
         }
     }
 
@@ -2550,7 +2566,7 @@ public class StandardContext
      * Adds the filter with the given name and class type to this servlet
      * context.
      */
-    public FilterRegistration addFilter(String filterName,
+    public FilterRegistration.Dynamic addFilter(String filterName,
             Class <? extends Filter> filterClass) {
         synchronized (filterDefs) {
             if (findFilterDef(filterName) != null) {
@@ -2562,7 +2578,8 @@ public class StandardContext
             filterDef.setFilterClass(filterClass);
             addFilterDef(filterDef, true);
 
-            return filterDef.getFilterRegistration();
+            return (FilterRegistration.Dynamic)
+                filterDef.getFilterRegistration();
         }
     }
 
@@ -3051,14 +3068,15 @@ public class StandardContext
      * Adds the servlet with the given name and class name to this servlet
      * context.
      */
-    public ServletRegistration addServlet(String servletName,
-                                          String className) {
+    public ServletRegistration.Dynamic addServlet(
+            String servletName, String className) {
         if (findChild(servletName) == null) {
             Wrapper wrapper = createWrapper();
             wrapper.setName(servletName);
             wrapper.setServletClassName(className);
             addChild(wrapper, true);
-            return wrapper.getServletRegistration();
+            return (ServletRegistration.Dynamic)
+                wrapper.getServletRegistration();
         } else {
             return null;
         }
@@ -3069,8 +3087,8 @@ public class StandardContext
      * Registers the given servlet instance with this ServletContext
      * under the given <tt>servletName</tt>.
      */
-    public ServletRegistration addServlet(String servletName,
-                                          Servlet servlet) {
+    public ServletRegistration.Dynamic addServlet(
+            String servletName, Servlet servlet) {
         return addServlet(servletName, servlet, null, null);
     }
 
@@ -3079,7 +3097,7 @@ public class StandardContext
      * Adds the servlet with the given name and class type to this servlet
      * context.
      */
-    public ServletRegistration addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Class <? extends Servlet> servletClass) {
         // Make sure servlet name is unique for this context
         if (findChild(servletName) == null) {
@@ -3087,7 +3105,8 @@ public class StandardContext
             wrapper.setName(servletName);
             wrapper.setServletClass(servletClass);
             addChild(wrapper, true);
-            return wrapper.getServletRegistration();
+            return (ServletRegistration.Dynamic)
+                wrapper.getServletRegistration();
         } else {
             return null;
         }
@@ -3110,7 +3129,7 @@ public class StandardContext
      *
      * @throws ServletException if the servlet fails to be initialized
      */
-    public ServletRegistration addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet instance, Map<String, String> initParams) {
         return addServlet(servletName, instance, initParams, null);
     }
@@ -3129,7 +3148,7 @@ public class StandardContext
      * @return the ServletRegistration through which the servlet may be
      * further configured
      */
-    public ServletRegistration addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet, Map<String, String> initParams,
             String... urlPatterns) {
         if (servletName == null || servlet == null) {
@@ -3169,7 +3188,8 @@ public class StandardContext
 
             addChild(wrapper, true);
 
-            return wrapper.getServletRegistration();
+            return (ServletRegistration.Dynamic)
+                wrapper.getServletRegistration();
         }
     }
 
