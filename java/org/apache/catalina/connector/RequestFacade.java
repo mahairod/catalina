@@ -1099,7 +1099,7 @@ public class RequestFacade
 
     /**
      * Sets the timeout (in milliseconds) for any asynchronous operations
-     * started on this request.
+     * initiated on this request.
      */
     public void setAsyncTimeout(long timeout) {
         if (request == null) {
@@ -1107,6 +1107,19 @@ public class RequestFacade
                             sm.getString("requestFacade.nullRequest"));
         }
         request.setAsyncTimeout(timeout);
+    }
+
+
+    /**
+     * Gets the timeout (in milliseconds) for any asynchronous operations
+     * initiated on this request.
+     */
+    public long getAsyncTimeout() {
+        if (request == null) {
+            throw new IllegalStateException(
+                            sm.getString("requestFacade.nullRequest"));
+        }
+        return request.getAsyncTimeout();
     }
 
 
