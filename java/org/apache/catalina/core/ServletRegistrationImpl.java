@@ -39,7 +39,7 @@ public class ServletRegistrationImpl implements ServletRegistration {
     }
 
 
-    public boolean setInitParameters(Map<String, String> initParameters) {
+    public Set<String> setInitParameters(Map<String, String> initParameters) {
         return wrapper.setInitParameters(initParameters);
     }
 

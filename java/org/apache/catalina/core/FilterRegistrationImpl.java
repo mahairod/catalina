@@ -40,7 +40,7 @@ public class FilterRegistrationImpl implements FilterRegistration {
     }
 
 
-    public boolean setInitParameters(Map<String, String> initParameters) {
+    public Set<String> setInitParameters(Map<String, String> initParameters) {
         return filterDef.setInitParameters(initParameters);
     }
 
