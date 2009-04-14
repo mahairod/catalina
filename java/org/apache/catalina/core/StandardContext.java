@@ -41,17 +41,11 @@ import org.apache.catalina.*;
 import org.apache.catalina.deploy.*;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.mbeans.MBeanUtils;
-import org.apache.catalina.session.ManagerBase;
-import org.apache.catalina.session.PersistentManagerBase;
-import org.apache.catalina.session.StandardManager;
+import org.apache.catalina.session.*;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.startup.Constants;
-import org.apache.catalina.util.CharsetMapper;
-import org.apache.catalina.util.CustomObjectInputStream;
-import org.apache.catalina.util.ExtensionValidator;
-import org.apache.catalina.util.RequestUtil;
-import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.util.*;
 import org.apache.naming.ContextBindings;
 import org.apache.naming.resources.BaseDirContext;
 import org.apache.naming.resources.FileDirContext;
@@ -61,6 +55,7 @@ import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 import org.glassfish.web.loader.WebappClassLoader;
 import org.glassfish.web.loader.ServletContainerInitializerUtil;
+import org.glassfish.web.valve.GlassFishValve;
 import com.sun.grizzly.util.http.mapper.Mapper;
 
 /**
@@ -3143,7 +3138,7 @@ public class StandardContext
      * @return true if a Servlet mapping for the given URL pattern already
      * exists in this Context, false otherwise
      */
-    public boolean hasServletMapping(String pattern) {
+    private boolean hasServletMapping(String pattern) {
         return servletMappings.get(pattern) != null;
     }
 
@@ -4169,6 +4164,24 @@ public class StandardContext
 
         return (wrapperListeners);
 
+    }
+
+
+    /**
+     * Gets the Authenticator of this Context.
+     *
+     * @return the Authenticator of this Context
+     */
+    public Authenticator getAuthenticator() {
+        Pipeline p = getPipeline();
+        if (p != null) {
+            for (GlassFishValve valve : p.getValves()) {
+                if (valve instanceof Authenticator) {
+                    return (Authenticator) valve;
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -6287,9 +6300,7 @@ public class StandardContext
      * Are we processing a version 2.2 deployment descriptor?
      */
     protected boolean isServlet22() {
-
         return publicId != null && publicId.equals(Constants.WebDtdPublicId_22);
-
     }
 
 

@@ -1442,4 +1442,13 @@ public interface Context extends Container {
      * otherwise
      */
     void setSecurePagesWithPragma(boolean securePagesWithPragma);
+
+
+    /**
+     * Gets the Authenticator of this Context.
+     *
+     * @return the Authenticator of this Context
+     */
+    Authenticator getAuthenticator();
+
 }
