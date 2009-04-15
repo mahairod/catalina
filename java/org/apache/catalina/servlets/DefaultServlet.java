@@ -22,24 +22,10 @@
 package org.apache.catalina.servlets;
 
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -63,12 +49,11 @@ import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
-
 // START SJSAS 6231069
 import org.apache.catalina.core.ApplicationHttpResponse;
 // END SJSAS 6231069
-
 import org.apache.catalina.core.AlternateDocBase;
+import org.glassfish.web.loader.*;
 
 /**
  * The default resource-serving servlet for most web applications,
@@ -674,6 +659,28 @@ public class DefaultServlet
             } else {
                 // None of the url patterns for alternate docbases matched
                 cacheEntry = resources.lookupCache(path);
+            }
+        }
+
+        if (!cacheEntry.exists) {
+            // Try looking up resource in
+            // WEB-INF/lib/[*.jar]/META-INF/resources
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            URL resourceUrl = cl.getResource(Globals.META_INF_RESOURCES + path);
+            if (resourceUrl != null) {
+                if (cl instanceof WebappClassLoader) {
+                    // XXX Remove dependency on WebappClassLoader
+                    ConcurrentHashMap<String, ResourceEntry> resourceEntries =
+                        ((WebappClassLoader)cl).getResourceEntries();
+                    ResourceEntry resourceEntry = resourceEntries.get(
+                        Globals.META_INF_RESOURCES + path);
+                    if (resourceEntry != null) {
+                        response.setHeader("content-length",
+                            "" + resourceEntry.binaryContent.length);
+                        copy(response, resourceUrl);
+                        return;
+                    }
+                }
             }
         }
 
@@ -1761,7 +1768,7 @@ public class DefaultServlet
      * @exception IOException if an input/output error occurs
      */
     protected void copy(CacheEntry cacheEntry, InputStream is,
-                      ServletOutputStream ostream)
+                        ServletOutputStream ostream)
         throws IOException {
 
         IOException exception = null;
@@ -1806,7 +1813,8 @@ public class DefaultServlet
      *
      * @exception IOException if an input/output error occurs
      */
-    protected void copy(CacheEntry cacheEntry, InputStream is, PrintWriter writer)
+    protected void copy(CacheEntry cacheEntry, InputStream is,
+                        PrintWriter writer)
         throws IOException {
 
         IOException exception = null;
@@ -1850,7 +1858,7 @@ public class DefaultServlet
      * @exception IOException if an input/output error occurs
      */
     protected void copy(CacheEntry cacheEntry, ServletOutputStream ostream,
-                      Range range)
+                        Range range)
         throws IOException {
 
         IOException exception = null;
@@ -1881,7 +1889,7 @@ public class DefaultServlet
      * @exception IOException if an input/output error occurs
      */
     protected void copy(CacheEntry cacheEntry, PrintWriter writer,
-                      Range range)
+                        Range range)
         throws IOException {
 
         IOException exception = null;
@@ -1920,7 +1928,7 @@ public class DefaultServlet
      * @exception IOException if an input/output error occurs
      */
     protected void copy(CacheEntry cacheEntry, ServletOutputStream ostream,
-                      Iterator<Range> ranges, String contentType)
+                        Iterator<Range> ranges, String contentType)
         throws IOException {
 
         IOException exception = null;
@@ -1973,7 +1981,7 @@ public class DefaultServlet
      * @exception IOException if an input/output error occurs
      */
     protected void copy(CacheEntry cacheEntry, PrintWriter writer,
-                      Iterator<Range> ranges, String contentType)
+                        Iterator<Range> ranges, String contentType)
         throws IOException {
 
         IOException exception = null;
@@ -2029,8 +2037,7 @@ public class DefaultServlet
      * @return Exception which occurred during processing
      */
     protected IOException copyRange(InputStream istream,
-                                  ServletOutputStream ostream) {
-
+                                    ServletOutputStream ostream) {
         // Copy the input stream to the output stream
         IOException exception = null;
         byte buffer[] = new byte[input];
@@ -2062,7 +2069,6 @@ public class DefaultServlet
      * @return Exception which occurred during processing
      */
     protected IOException copyRange(Reader reader, PrintWriter writer) {
-
         // Copy the input stream to the output stream
         IOException exception = null;
         char buffer[] = new char[input];
@@ -2096,9 +2102,8 @@ public class DefaultServlet
      * @return Exception which occurred during processing
      */
     protected IOException copyRange(InputStream istream,
-                                  ServletOutputStream ostream,
-                                  long start, long end) {
-
+                                    ServletOutputStream ostream,
+                                    long start, long end) {
         if (debug > 10)
             log("Serving bytes:" + start + "-" + end);
 
@@ -2148,7 +2153,7 @@ public class DefaultServlet
      * @return Exception which occurred during processing
      */
     protected IOException copyRange(Reader reader, PrintWriter writer,
-                                  long start, long end) {
+                                    long start, long end) {
 
         try {
             reader.skip(start);
@@ -2183,6 +2188,47 @@ public class DefaultServlet
 
     }
 
+
+    /**
+     * Copies the contents of the given resource URL to the given response.
+     */
+    private void copy(HttpServletResponse response, URL resourceUrl)
+            throws IOException {
+
+        IOException ioe = null;
+
+        try {
+            ServletOutputStream outStream = response.getOutputStream();
+            InputStream inStream = resourceUrl.openStream();
+            try {
+                ioe = copyRange(inStream, outStream); 
+            } finally {
+                if (inStream != null) {
+                    inStream.close();
+                }
+            }
+        } catch (IllegalStateException e) {
+            // Try to get a Writer instead if we're serving a text file
+            if (resourceUrl.getPath().endsWith("text") ||
+                    resourceUrl.getPath().endsWith("xml")) {
+                Reader reader = new BufferedReader(new InputStreamReader(
+                        resourceUrl.openStream()));
+                try {
+                    ioe = copyRange(reader, response.getWriter());
+                } finally {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                }
+            } else {
+                throw e;
+            }
+        }
+
+        if (ioe != null) {
+            throw ioe;
+        }
+    }
 
 
     // ------------------------------------------------------ Range Inner Class
