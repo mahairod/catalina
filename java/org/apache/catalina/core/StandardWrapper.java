@@ -24,26 +24,21 @@
 package org.apache.catalina.core;
 
 import java.lang.reflect.Method;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 import java.util.logging.*;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
+import java.security.*;
 import javax.servlet.*;
+import javax.servlet.http.*;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
-import org.apache.catalina.Container;
-import org.apache.catalina.ContainerServlet;
-import org.apache.catalina.Context;
-import org.apache.catalina.InstanceListener;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Loader;
-import org.apache.catalina.Wrapper;
+import org.apache.catalina.*;
 import static org.apache.catalina.InstanceEvent.EventType.BEFORE_INIT_EVENT;
 import static org.apache.catalina.InstanceEvent.EventType.AFTER_INIT_EVENT;
+import static org.apache.catalina.InstanceEvent.EventType.BEFORE_SERVICE_EVENT;
+import static org.apache.catalina.InstanceEvent.EventType.AFTER_SERVICE_EVENT;
 import static org.apache.catalina.InstanceEvent.EventType.AFTER_DESTROY_EVENT;
 import static org.apache.catalina.InstanceEvent.EventType.BEFORE_DESTROY_EVENT;
 import org.apache.catalina.security.SecurityUtil;
@@ -69,8 +64,9 @@ public class StandardWrapper
         extends ContainerBase
         implements ServletConfig, Wrapper {
 
-    private static Logger log = Logger.getLogger(
-        StandardWrapper.class.getName());
+    private static java.util.logging.Logger log =
+        java.util.logging.Logger.getLogger(
+            StandardWrapper.class.getName());
 
     private static final String[] DEFAULT_SERVLET_METHODS = new String[] {
                                                     "GET", "HEAD", "POST" };
@@ -1393,6 +1389,72 @@ public class StandardWrapper
     }
 
 
+    // START IASRI 4665318
+    void service(ServletRequest request, ServletResponse response,
+                 Servlet serv, Request origRequest)
+             throws IOException, ServletException {
+
+        InstanceSupport supp = getInstanceSupport();
+
+        try {
+            supp.fireInstanceEvent(BEFORE_SERVICE_EVENT,
+                                   serv, request, response);
+            if (origRequest != null) {
+                if (!isAsyncSupported()) {
+                    origRequest.disableAsyncSupport();
+                }
+            } 
+            if ((request instanceof HttpServletRequest) &&
+                (response instanceof HttpServletResponse)) {
+                    
+                if ( SecurityUtil.executeUnderSubjectDoAs() ){
+                    final ServletRequest req = request;
+                    final ServletResponse res = response;
+                    Principal principal = 
+                        ((HttpServletRequest) req).getUserPrincipal();
+
+                    Object[] serviceType = new Object[2];
+                    serviceType[0] = req;
+                    serviceType[1] = res;
+                    
+                    SecurityUtil.doAsPrivilege("service",
+                                               serv,
+                                               classTypeUsedInService, 
+                                               serviceType,
+                                               principal);                                                   
+                    serviceType = null;
+                } else {  
+                    serv.service((HttpServletRequest) request,
+                                 (HttpServletResponse) response);
+                }
+            } else {
+                serv.service(request, response);
+            }
+            supp.fireInstanceEvent(AFTER_SERVICE_EVENT,
+                                   serv, request, response);
+        } catch (IOException e) {
+            supp.fireInstanceEvent(AFTER_SERVICE_EVENT,
+                                   serv, request, response, e);
+            throw e;
+        } catch (ServletException e) {
+            supp.fireInstanceEvent(AFTER_SERVICE_EVENT,
+                                   serv, request, response, e);
+            throw e;
+        } catch (RuntimeException e) {
+            supp.fireInstanceEvent(AFTER_SERVICE_EVENT,
+                                   serv, request, response, e);
+            throw e;
+        } catch (Throwable e) {
+            supp.fireInstanceEvent(AFTER_SERVICE_EVENT,
+                                   serv, request, response, e);
+            throw new ServletException
+              (sm.getString("filterChain.servlet"), e);
+        }
+
+    }
+    // END IASRI 4665318
+
+
     /**
      * Remove the specified initialization parameter from this servlet.
      *
@@ -1641,7 +1703,6 @@ public class StandardWrapper
         synchronized (parameters) {
             return (new Enumerator(parameters.keySet()));
         }
-
     }
 
 
@@ -1662,10 +1723,9 @@ public class StandardWrapper
      * Return the name of this servlet.
      */
     public String getServletName() {
-
         return (getName());
-
     }
+
 
     public long getProcessingTimeMillis() {
         return swValve.getProcessingTimeMillis();
