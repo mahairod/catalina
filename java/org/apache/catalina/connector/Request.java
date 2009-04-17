@@ -3968,6 +3968,16 @@ public class Request
         return startAsync(servletRequest, servletResponse, false);
     }
 
+    public Iterable<Part> getParts() {
+        //TODO: Stub out the implementation
+        return null; 
+    }
+
+    public Part getPart(String name) {
+        //TODO: Stub out the implementation
+        return null;
+    }
+
 
     /**
      * Starts async processing on this request.
