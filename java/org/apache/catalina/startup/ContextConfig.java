@@ -1229,10 +1229,7 @@ public class ContextConfig
         */
 
         // Removing sercurity role
-        String[] securityRoles = context.findSecurityRoles();
-        for (i = 0; i < securityRoles.length; i++) {
-            context.removeSecurityRole(securityRoles[i]);
-        }
+        context.clearSecurityRoles();
 
         // Removing servlet mappings
         String[] servletMappings = context.findServletMappings();
@@ -1285,7 +1282,7 @@ public class ContextConfig
             String roles[] = constraints[i].findAuthRoles();
             for (int j = 0; j < roles.length; j++) {
                 if (!"*".equals(roles[j]) &&
-                    !context.findSecurityRole(roles[j])) {
+                    !context.hasSecurityRole(roles[j])) {
                     log.info ( sm.getString ("contextConfig.role.auth", 
                                              roles[j],
                                              context.getName()) );
@@ -1299,7 +1296,7 @@ public class ContextConfig
         for (int i = 0; i < wrappers.length; i++) {
             Wrapper wrapper = (Wrapper) wrappers[i];
             String runAs = wrapper.getRunAs();
-            if ((runAs != null) && !context.findSecurityRole(runAs)) {
+            if ((runAs != null) && !context.hasSecurityRole(runAs)) {
                 log.info( sm.getString("contextConfig.role.runas", 
                                        runAs,
                                        context.getName()) );
@@ -1308,7 +1305,7 @@ public class ContextConfig
             String names[] = wrapper.findSecurityReferences();
             for (int j = 0; j < names.length; j++) {
                 String link = wrapper.findSecurityReference(names[j]);
-                if ((link != null) && !context.findSecurityRole(link)) {
+                if ((link != null) && !context.hasSecurityRole(link)) {
                     log.info( sm.getString("contextConfig.role.link", 
                                            link,
                                            context.getName()) );
