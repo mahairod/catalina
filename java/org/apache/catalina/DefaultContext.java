@@ -320,14 +320,15 @@ public interface DefaultContext {
 
 
     /**
-     * Return the list of application listener class names configured
-     * for this application.
+     * Gets the (possibly empty) list of application listener class names
+     * configured for this application.
      */
     public List<String> findApplicationListeners();
 
 
     /**
-     * Return the set of application parameters for this application.
+     * Gets the (possibly empty) list of application parameters for
+     * this application.
      */
     public List<ApplicationParameter> findApplicationParameters();
 
@@ -374,10 +375,10 @@ public interface DefaultContext {
 
 
     /**
-     * Return the set of InstanceListener classes that will be added to
-     * newly created Wrappers automatically.
+     * Gets the (possibly empty) list of InstanceListener classes that
+     * will be added to newly created Wrappers automatically.
      */
-    public String[] findInstanceListeners();
+    public List<String> findInstanceListeners();
 
 
     /**
@@ -447,15 +448,15 @@ public interface DefaultContext {
 
 
     /**
-     * Return the set of LifecycleListener classes that will be added to
-     * newly created Wrappers automatically.
+     * Gets the (possibly empty) list of LifecycleListener classes that
+     * will be added to newly created Wrappers automatically.
      */
-    public String[] findWrapperLifecycles();
+    public List<String> findWrapperLifecycles();
 
 
     /**
-     * Return the list of ContainerListener classes that will be added to
-     * newly created Wrappers automatically.
+     * Gets the (possibly empty) list of ContainerListener classes that
+     * will be added to newly created Wrappers automatically.
      */
     public List<String> findWrapperListeners();
 
@@ -542,12 +543,9 @@ public interface DefaultContext {
 
 
     /**
-     * Remove a class name from the set of LifecycleListener classes that
-     * will be added to newly created Wrappers.
-     *
-     * @param listener Class name of a LifecycleListener class to be removed
+     * Removes any Wrapper lifecycle listeners from this default Context
      */
-    public void removeWrapperLifecycle(String listener);
+    public void removeWrapperLifecycles();
 
 
     /**

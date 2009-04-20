@@ -125,10 +125,10 @@ public class StandardDefaultContext
 
 
     /**
-     * The set of classnames of InstanceListeners that will be added
+     * The list of classnames of InstanceListeners that will be added
      * to each newly created Wrapper by <code>createWrapper()</code>.
      */
-    private String instanceListeners[] = new String[0];
+    private ArrayList<String> instanceListeners = new ArrayList<String>();
 
 
     /**
@@ -158,10 +158,10 @@ public class StandardDefaultContext
 
 
     /**
-     * The set of classnames of LifecycleListeners that will be added
+     * The list of classnames of LifecycleListeners that will be added
      * to each newly created Wrapper by <code>createWrapper()</code>.
      */
-    private String wrapperLifecycles[] = new String[0];
+    private ArrayList<String> wrapperLifecycles = new ArrayList<String>();
 
 
     /**
@@ -695,15 +695,7 @@ public class StandardDefaultContext
      * @param listener Java class name of an InstanceListener class
      */
     public void addInstanceListener(String listener) {
-
-        synchronized (instanceListeners) {
-            String results[] =new String[instanceListeners.length + 1];
-            for (int i = 0; i < instanceListeners.length; i++)
-                results[i] = instanceListeners[i];
-            results[instanceListeners.length] = listener;
-            instanceListeners = results;
-        }
-
+        instanceListeners.add(listener);
     }
 
 
@@ -789,15 +781,7 @@ public class StandardDefaultContext
      * @param listener Java class name of a LifecycleListener class
      */
     public void addWrapperLifecycle(String listener) {
-
-        synchronized (wrapperLifecycles) {
-            String results[] =new String[wrapperLifecycles.length + 1];
-            for (int i = 0; i < wrapperLifecycles.length; i++)
-                results[i] = wrapperLifecycles[i];
-            results[wrapperLifecycles.length] = listener;
-            wrapperLifecycles = results;
-        }
-
+        wrapperLifecycles.add(listener);
     }
 
 
@@ -891,13 +875,11 @@ public class StandardDefaultContext
 
 
     /**
-     * Return the set of InstanceListener classes that will be added to
+     * Return the list of InstanceListener classes that will be added to
      * newly created Wrappers automatically.
      */
-    public String[] findInstanceListeners() {
-
-        return (instanceListeners);
-
+    public List<String> findInstanceListeners() {
+        return instanceListeners;
     }
 
 
@@ -1005,13 +987,11 @@ public class StandardDefaultContext
 
 
     /**
-     * Return the set of LifecycleListener classes that will be added to
+     * Return the list of LifecycleListener classes that will be added to
      * newly created Wrappers automatically.
      */
-    public String[] findWrapperLifecycles() {
-
-        return (wrapperLifecycles);
-
+    public List<String> findWrapperLifecycles() {
+        return wrapperLifecycles;
     }
 
 
@@ -1081,37 +1061,13 @@ public class StandardDefaultContext
 
 
     /**
-     * Remove a class name from the set of InstanceListener classes that
+     * Remove a class name from the list of InstanceListener classes that
      * will be added to newly created Wrappers.
      *
      * @param listener Class name of an InstanceListener class to be removed
      */
     public void removeInstanceListener(String listener) {
-
-        synchronized (instanceListeners) {
-
-            // Make sure this InstanceListener is currently present
-            int n = -1;
-            for (int i = 0; i < instanceListeners.length; i++) {
-                if (instanceListeners[i].equals(listener)) {
-                    n = i;
-                    break;
-                }
-            }
-            if (n < 0)
-                return;
-
-            // Remove the specified InstanceListener
-            int j = 0;
-            String results[] = new String[instanceListeners.length - 1];
-            for (int i = 0; i < instanceListeners.length; i++) {
-                if (i != n)
-                    results[j++] = instanceListeners[i];
-            }
-            instanceListeners = results;
-
-        }
-
+        instanceListeners.remove(listener);
     }
 
 
@@ -1210,47 +1166,17 @@ public class StandardDefaultContext
      * @param name Name of the resource environment reference to remove
      */
     public void removeResourceEnvRef(String name) {
-
         namingResources.removeResourceEnvRef(name);
-
-    }
-
-    /**
-     * Remove a class name from the set of LifecycleListener classes that
-     * will be added to newly created Wrappers.
-     *
-     * @param listener Class name of a LifecycleListener class to be removed
-     */
-    public void removeWrapperLifecycle(String listener) {
-
-
-        synchronized (wrapperLifecycles) {
-
-            // Make sure this LifecycleListener is currently present
-            int n = -1;
-            for (int i = 0; i < wrapperLifecycles.length; i++) {
-                if (wrapperLifecycles[i].equals(listener)) {
-                    n = i;
-                    break;
-                }
-            }
-            if (n < 0)
-                return;
-
-            // Remove the specified LifecycleListener
-            int j = 0;
-            String results[] = new String[wrapperLifecycles.length - 1];
-            for (int i = 0; i < wrapperLifecycles.length; i++) {
-                if (i != n)
-                    results[j++] = wrapperLifecycles[i];
-            }
-            wrapperLifecycles = results;
-
-        }
-
     }
 
 
+    @Override
+    public void removeWrapperLifecycles() {
+        wrapperLifecycles.clear();
+    }
+
+
+    @Override
     public void removeWrapperListeners() {
         wrapperListeners.clear();
     }
@@ -1435,17 +1361,17 @@ public class StandardDefaultContext
         while (iter.hasNext()) {
             context.addApplicationListener(iter.next());
         }
-        String[] listeners = findInstanceListeners();
-        for( int i = 0; i < listeners.length; i++ ) {
-            context.addInstanceListener(listeners[i]);
+        iter = findInstanceListeners().iterator();
+        while (iter.hasNext()) {
+            context.addInstanceListener(iter.next());
         }
         iter = findWrapperListeners().iterator(); 
         while (iter.hasNext()) {
             context.addWrapperListener(iter.next());
         }
-        String[] wrapper = findWrapperLifecycles();
-        for( int i = 0; i < wrapper.length; i++ ) {
-            context.addWrapperLifecycle(wrapper[i]);
+        iter = findWrapperLifecycles().iterator();
+        while (iter.hasNext()) {
+            context.addWrapperLifecycle(iter.next());
         }
         String[] parameters = findParameters();
         for( int i = 0; i < parameters.length; i++ ) {
