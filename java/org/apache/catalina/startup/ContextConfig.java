@@ -1117,7 +1117,7 @@ public class ContextConfig
         }
 */
         // Removing security constraints
-        context.clearConstraints();
+        context.removeConstraints();
 
         // Removing Ejbs
         /*
@@ -1148,10 +1148,7 @@ public class ContextConfig
         }
 
         // Removing filter maps
-        FilterMap[] filterMaps = context.findFilterMaps();
-        for (i = 0; i < filterMaps.length; i++) {
-            context.removeFilterMap(filterMaps[i]);
-        }
+        context.removeFilterMaps();
 
         // Removing local ejbs
         /*
@@ -1199,7 +1196,7 @@ public class ContextConfig
         */
 
         // Removing sercurity role
-        context.clearSecurityRoles();
+        context.removeSecurityRoles();
 
         // Removing servlet mappings
         String[] servletMappings = context.findServletMappings();
@@ -1228,10 +1225,7 @@ public class ContextConfig
         }
 
         // Removing wrapper listeners
-        String[] wrapperListeners = context.findWrapperListeners();
-        for (i = 0; i < wrapperListeners.length; i++) {
-            context.removeWrapperListener(wrapperListeners[i]);
-        }
+        context.removeWrapperListeners();
 
         ok = true;
 
@@ -1247,17 +1241,15 @@ public class ContextConfig
     protected void validateSecurityRoles() {
 
         // Check role names used in <security-constraint> elements
-        List<SecurityConstraint> constraints = context.getConstraints();
-        synchronized(constraints) {
-            Iterator<SecurityConstraint> i = constraints.iterator(); 
-            while (i.hasNext()) {
-                for (String role : i.next().findAuthRoles()) {
-                    if (!"*".equals(role) &&
-                            !context.hasSecurityRole(role)) {
-                        log.info(sm.getString("contextConfig.role.auth", 
-                                              role, context.getName()));
-                        context.addSecurityRole(role);
-                    }
+        Iterator<SecurityConstraint> iter =
+            context.getConstraints().iterator(); 
+        while (iter.hasNext()) {
+            for (String role : iter.next().findAuthRoles()) {
+                if (!"*".equals(role) &&
+                        !context.hasSecurityRole(role)) {
+                    log.info(sm.getString("contextConfig.role.auth", 
+                                          role, context.getName()));
+                    context.addSecurityRole(role);
                 }
             }
         }
