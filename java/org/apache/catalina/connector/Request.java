@@ -2186,7 +2186,7 @@ public class Request
      * @param method The request method
      */
     public void setMethod(String method) {
-        // Not used
+        coyoteRequest.method().setString(method);
     }
 
 
@@ -2197,7 +2197,7 @@ public class Request
      * @param query The query string
      */
     public void setQueryString(String query) {
-        // Not used
+        coyoteRequest.queryString().setString(query);
     }
 
 
@@ -2285,7 +2285,7 @@ public class Request
      * @param uri The request URI
      */
     public void setRequestURI(String uri) {
-        // Not used
+        coyoteRequest.requestURI().setString(uri);
     }
 
 
