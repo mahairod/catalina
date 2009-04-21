@@ -1951,7 +1951,7 @@ public class Request
     // ---------------------------------------------------- HttpRequest Methods
 
     @Override
-    public boolean login(HttpServletResponse response)
+    public boolean authenticate(HttpServletResponse response)
             throws IOException, ServletException {
         
         if (getUserPrincipal() != null) {
