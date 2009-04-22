@@ -2183,6 +2183,9 @@ public class Request
     /**
      * Set the HTTP request method used for this Request.
      *
+     * Used by FBL when restoring original request after successful 
+     * authentication.
+     *
      * @param method The request method
      */
     public void setMethod(String method) {
@@ -2193,6 +2196,9 @@ public class Request
     /**
      * Set the query string for this Request.  This will normally be called
      * by the HTTP Connector, when it parses the request headers.
+     *
+     * Used by FBL when restoring original request after successful 
+     * authentication.
      *
      * @param query The query string
      */
@@ -2281,6 +2287,9 @@ public class Request
     /**
      * Set the unparsed request URI for this Request.  This will normally be
      * called by the HTTP Connector, when it parses the request headers.
+     *
+     * Used by FBL when restoring original request after successful 
+     * authentication.
      *
      * @param uri The request URI
      */
