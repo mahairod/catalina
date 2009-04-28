@@ -23,6 +23,7 @@
 
 package org.apache.catalina;
 
+import java.util.*;
 
 /**
  * Common interface for component life cycle methods.  Catalina components
@@ -96,10 +97,10 @@ public interface Lifecycle {
 
 
     /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
-     * Lifecycle has no listeners registered, a zero-length array is returned.
+     * Gets the (possibly empty) list of lifecycle listeners associated
+     * with this Lifecycle instance.
      */
-    LifecycleListener[] findLifecycleListeners();
+    List<LifecycleListener> findLifecycleListeners();
 
 
     /**

@@ -1104,17 +1104,15 @@ public final class StandardServer
 
         // Store nested <Listener> elements
         if (connector instanceof Lifecycle) {
-            LifecycleListener listeners[] =
-                ((Lifecycle) connector).findLifecycleListeners();
-            if (listeners == null) {
-                listeners = new LifecycleListener[0];
-            }
-            for (int i = 0; i < listeners.length; i++) {
-                if (listeners[i].getClass().getName().equals
+            Iterator<LifecycleListener> iter =
+                ((Lifecycle) connector).findLifecycleListeners().iterator();
+            while (iter.hasNext()) {
+                LifecycleListener listener = iter.next();
+                if (listener.getClass().getName().equals
                     (SERVER_LISTENER_CLASS_NAME)) {
                     continue;
                 }
-                storeListener(writer, indent + 2, listeners[i]);
+                storeListener(writer, indent + 2, listener);
             }
         }
 
@@ -1189,14 +1187,15 @@ public final class StandardServer
 
         // Store nested <Listener> elements
         if (context instanceof Lifecycle) {
-            LifecycleListener listeners[] =
-                ((Lifecycle) context).findLifecycleListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                if (listeners[i].getClass().getName().equals
+            Iterator<LifecycleListener> lifecycleIter =
+                ((Lifecycle) context).findLifecycleListeners().iterator();
+            while (lifecycleIter.hasNext()) {
+                LifecycleListener listener = lifecycleIter.next();
+                if (listener.getClass().getName().equals
                     (SERVER_LISTENER_CLASS_NAME)) {
                     continue;
                 }
-                storeListener(writer, indent + 2, listeners[i]);
+                storeListener(writer, indent + 2, listener);
             }
         }
 
@@ -1336,26 +1335,28 @@ public final class StandardServer
         writer.println(">");
 
         // Store nested <InstanceListener> elements
-        Iterator<String> iter = dcontext.findInstanceListeners().iterator();
-        while (iter.hasNext()) {
+        Iterator<String> stringIter =
+            dcontext.findInstanceListeners().iterator();
+        while (stringIter.hasNext()) {
             for (int j = 0; j < indent; j++) {
                 writer.print(' ');
             }
             writer.print("<InstanceListener>");
-            writer.print(iter.next());
+            writer.print(stringIter.next());
             writer.println("</InstanceListener>");
         }
 
         // Store nested <Listener> elements
         if (dcontext instanceof Lifecycle) {
-            LifecycleListener listeners[] =
-                ((Lifecycle) dcontext).findLifecycleListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                if (listeners[i].getClass().getName().equals
+            Iterator<LifecycleListener> lifecycleIter =
+                ((Lifecycle) dcontext).findLifecycleListeners().iterator();
+            while (lifecycleIter.hasNext()) {
+                LifecycleListener listener = lifecycleIter.next();
+                if (listener.getClass().getName().equals
                     (SERVER_LISTENER_CLASS_NAME)) {
                     continue;
                 }
-                storeListener(writer, indent + 2, listeners[i]);
+                storeListener(writer, indent + 2, listener);
             }
         }
 
@@ -1426,24 +1427,24 @@ public final class StandardServer
         }
 
         // Store nested <WrapperLifecycle> elements
-        iter = dcontext.findWrapperLifecycles().iterator();
-        while (iter.hasNext()) {
+        stringIter = dcontext.findWrapperLifecycles().iterator();
+        while (stringIter.hasNext()) {
             for (int j = 0; j < indent; j++) {
                 writer.print(' ');
             }
             writer.print("<WrapperLifecycle>");
-            writer.print(iter.next());
+            writer.print(stringIter.next());
             writer.println("</WrapperLifecycle>");
         }
 
         // Store nested <WrapperListener> elements
-        iter = dcontext.findWrapperListeners().iterator();
-        while (iter.hasNext()) {
+        stringIter = dcontext.findWrapperListeners().iterator();
+        while (stringIter.hasNext()) {
             for (int j = 0; j < indent; j++) {
                 writer.print(' ');
             }
             writer.print("<WrapperListener>");
-            writer.print(iter.next());
+            writer.print(stringIter.next());
             writer.println("</WrapperListener>");
         }
 
@@ -1505,14 +1506,15 @@ public final class StandardServer
 
         // Store nested <Listener> elements
         if (engine instanceof Lifecycle) {
-            LifecycleListener listeners[] =
-                ((Lifecycle) engine).findLifecycleListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                if (listeners[i].getClass().getName().equals
+            Iterator<LifecycleListener> iter =
+                ((Lifecycle) engine).findLifecycleListeners().iterator();
+            while (iter.hasNext()) {
+                LifecycleListener listener = iter.next();
+                if (listener.getClass().getName().equals
                     (SERVER_LISTENER_CLASS_NAME)) {
                     continue;
                 }
-                storeListener(writer, indent + 2, listeners[i]);
+                storeListener(writer, indent + 2, listener);
             }
         }
 
@@ -1641,14 +1643,15 @@ public final class StandardServer
 
         // Store nested <Listener> elements
         if (host instanceof Lifecycle) {
-            LifecycleListener listeners[] =
-                ((Lifecycle) host).findLifecycleListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                if (listeners[i].getClass().getName().equals
+            Iterator<LifecycleListener> lifecycleIter =
+                ((Lifecycle) host).findLifecycleListeners().iterator();
+            while (lifecycleIter.hasNext()) {
+                LifecycleListener listener = lifecycleIter.next();
+                if (listener.getClass().getName().equals
                     (SERVER_LISTENER_CLASS_NAME)) {
                     continue;
                 }
-                storeListener(writer, indent + 2, listeners[i]);
+                storeListener(writer, indent + 2, listener);
             }
         }
 
@@ -2028,10 +2031,10 @@ public final class StandardServer
 
         // Store nested <Listener> elements
         if (server instanceof Lifecycle) {
-            LifecycleListener listeners[] =
-                ((Lifecycle) server).findLifecycleListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                storeListener(writer, indent + 2, listeners[i]);
+            Iterator<LifecycleListener> lifecycleIter =
+                ((Lifecycle) server).findLifecycleListeners().iterator();
+            while (lifecycleIter.hasNext()) {
+                storeListener(writer, indent + 2, lifecycleIter.next());
             }
         }
 
@@ -2105,14 +2108,15 @@ public final class StandardServer
 
         // Store nested <Listener> elements
         if (service instanceof Lifecycle) {
-            LifecycleListener listeners[] =
-                ((Lifecycle) service).findLifecycleListeners();
-            for (int i = 0; i < listeners.length; i++) {
-                if (listeners[i].getClass().getName().equals
+            Iterator<LifecycleListener> lifecycleIter =
+                ((Lifecycle) service).findLifecycleListeners().iterator();
+            while (lifecycleIter.hasNext()) {
+                LifecycleListener listener = lifecycleIter.next();
+                if (listener.getClass().getName().equals
                     (SERVER_LISTENER_CLASS_NAME)) {
                     continue;
                 }
-                storeListener(writer, indent + 2, listeners[i]);
+                storeListener(writer, indent + 2, listener);
             }
         }
 
@@ -2224,7 +2228,7 @@ public final class StandardServer
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
+    // ---------------------------------------------------- Lifecycle Methods
 
 
     /**
@@ -2233,20 +2237,16 @@ public final class StandardServer
      * @param listener The listener to add
      */
     public void addLifecycleListener(LifecycleListener listener) {
-
         lifecycle.addLifecycleListener(listener);
-
     }
 
 
     /**
-     * Get the lifecycle listeners associated with this lifecycle. If this
-     * Lifecycle has no listeners registered, a zero-length array is returned.
+     * Gets the (possibly empty) list of lifecycle listeners
+     * associated with this StandardServer.
      */
-    public LifecycleListener[] findLifecycleListeners() {
-
+    public List<LifecycleListener> findLifecycleListeners() {
         return lifecycle.findLifecycleListeners();
-
     }
 
 
@@ -2256,9 +2256,7 @@ public final class StandardServer
      * @param listener The listener to remove
      */
     public void removeLifecycleListener(LifecycleListener listener) {
-
         lifecycle.removeLifecycleListener(listener);
-
     }
 
 
