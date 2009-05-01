@@ -3018,8 +3018,8 @@ public class Request
         if (!create)
             return (null);
         if ((context != null) && (response != null) &&
-            context.getCookies() &&
-            response.getResponse().isCommitted()) {
+                context.getCookies() &&
+                response.getResponse().isCommitted()) {
             throw new IllegalStateException
               (sm.getString("coyoteRequest.sessionCreateCommitted"));
         }
@@ -4039,12 +4039,14 @@ public class Request
                 }
         };
 
-        org.apache.catalina.connector.Response res = (org.apache.catalina.connector.Response) coyoteRequest.getResponse()
-                .getNote(CoyoteAdapter.ADAPTER_NOTES);
+        org.apache.catalina.connector.Response res =
+            (org.apache.catalina.connector.Response)
+            coyoteRequest.getResponse().getNote(CoyoteAdapter.ADAPTER_NOTES);
         coyoteRequest.getResponse().suspend(asyncTimeoutMillis, 
                 this,requestCompletionHandler,
-                new RequestAttachment<org.apache.catalina.connector.Request>(asyncTimeoutMillis,
-                this, requestCompletionHandler , res));
+                new RequestAttachment<org.apache.catalina.connector.Request>(
+                    asyncTimeoutMillis, this, requestCompletionHandler,
+                    res));
 
         return asyncContext;
     }
@@ -4191,14 +4193,27 @@ public class Request
      * 
      * If none of the <tt>onTimeout</tt> handlers call complete or dispatch,
      * have the container complete the async operation.
+     *
+     * If there is no AsyncListener registered and an async timeout
+     * occurs, the container MUST do an ERROR dispatch to the original
+     * URI with a response code of 500.
      */
     void asyncTimeout() {
-        notifyAsyncListeners(AsyncEventType.TIMEOUT);
-        // Must not call asyncComplete if already completed or
-        // one of the listeners called AsyncContext#dispatch, in which
-        // case asyncStarted will have been set to false
-        if (!isAsyncComplete && isAsyncStarted()) {
+        if (asyncListenerHolders == null ||
+                asyncListenerHolders.isEmpty()) {
+            ((HttpServletResponse)response).setStatus(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             asyncComplete();
+        } else {
+            notifyAsyncListeners(AsyncEventType.TIMEOUT);
+            /*
+             * Must not call asyncComplete if already completed or
+             * one of the listeners called AsyncContext#dispatch, in which
+             * case asyncStarted will have been set to false
+             */
+            if (!isAsyncComplete && isAsyncStarted()) {
+                asyncComplete();
+            }
         }
     }
 
