@@ -181,7 +181,7 @@ public class MapperListener
 
 
             // Query contexts
-            onStr = domain + ":j2eeType=WebModule,*";
+            onStr = domain + ":j2eeType=WebModule,*,J2EEServer=" + myInstance;
             objectName = new ObjectName(onStr);
             set = mBeanServer.queryMBeans(objectName, null);
             iterator = set.iterator();
@@ -191,7 +191,7 @@ public class MapperListener
             }
 
             // Query wrappers
-            onStr = domain + ":j2eeType=Servlet,*";
+            onStr = domain + ":j2eeType=Servlet,*,J2EEServer=" + myInstance;
             objectName = new ObjectName(onStr);
             set = mBeanServer.queryMBeans(objectName, null);
             iterator = set.iterator();
