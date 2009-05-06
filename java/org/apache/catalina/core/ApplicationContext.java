@@ -44,7 +44,6 @@ import org.apache.catalina.Logger;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.util.Enumerator;
-import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
 import org.apache.naming.resources.DirContextURLStreamHandler;
@@ -720,7 +719,7 @@ public class ApplicationContext
      */
     private Set<String> getResourcePathsInternal(DirContext resources,
                                                  String path) {
-        ResourceSet set = new ResourceSet();
+        HashSet<String> set = new HashSet<String>();
         try {
             listCollectionPaths(set, resources, path);
         } catch (NamingException e) {
@@ -748,8 +747,7 @@ public class ApplicationContext
         } catch (Exception e) {
             // ignore
         }
-        set.setLocked(true);
-        return (set);
+        return Collections.unmodifiableSet(set);
     }
 
 
