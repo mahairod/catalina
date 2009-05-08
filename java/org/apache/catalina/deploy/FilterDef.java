@@ -23,7 +23,6 @@ package org.apache.catalina.deploy;
 import java.util.*;
 import java.io.Serializable;
 import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
 import org.apache.catalina.util.Enumerator;
 
 /**
@@ -88,35 +87,8 @@ public class FilterDef implements Serializable {
      */
     private boolean isAsyncSupported = false;
 
-    /**
-     * The FilterRegistration object through which this FilterDef may be
-     * further configured
-     */
-    private FilterRegistration filterRegistration = null;
-
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Sets the FilterRegistration through which this FilterDef may be
-     * further configured.
-     *
-     * @param regis the FilterRegistration
-     */
-    public void setFilterRegistration(FilterRegistration regis) {
-        filterRegistration = regis;
-    }
-
-
-    /**
-     * Gets the FilterRegistration through which this FilterDef may be
-     * further configured.
-     *
-     * @return the FilterRegistration
-     */
-    public FilterRegistration getFilterRegistration() {
-        return filterRegistration;
-    }
 
 
     public String getDescription() {
@@ -332,6 +304,13 @@ public class FilterDef implements Serializable {
             return parameters.get(name);
         }
     }        
+
+
+    public Map<String, String> getInitParameters() {
+        synchronized (parameters) {
+            return Collections.unmodifiableMap(parameters);
+        }
+    }
 
 
     public Enumeration<String> getInitParameterNames() {

@@ -27,6 +27,16 @@ public class ServletRegistrationImpl implements ServletRegistration {
     }
 
 
+    public String getName() {
+        return wrapper.getName();
+    }
+
+
+    public String getClassName() {
+        return wrapper.getServletClassName();
+    }
+
+
     public boolean setInitParameter(String name, String value) {
         if (ctx.isContextInitializedCalled()) {
             throw new IllegalStateException(
@@ -39,8 +49,18 @@ public class ServletRegistrationImpl implements ServletRegistration {
     }
 
 
+    public String getInitParameter(String name) {
+        return wrapper.getInitParameter(name);
+    }
+
+
     public Set<String> setInitParameters(Map<String, String> initParameters) {
         return wrapper.setInitParameters(initParameters);
+    }
+
+
+    public Map<String, String> getInitParameters() {
+        return wrapper.getInitParameters();
     }
 
 
@@ -58,9 +78,11 @@ public class ServletRegistrationImpl implements ServletRegistration {
                     wrapper.getName(), ctx.getName()));
         }
 
-
         return ctx.addServletMapping(wrapper.getName(), urlPatterns);
     }
 
+    public Iterable<String> getMappings() {
+        return wrapper.getMappings();
+    }
 }
 
