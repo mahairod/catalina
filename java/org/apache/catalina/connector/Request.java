@@ -4418,14 +4418,22 @@ public class Request
         @Override
         public void resume(){
             getCompletionHandler().resumed(getAttachment());
+            if (log.isLoggable(Level.FINE)){
+                log.log(Level.FINE, "RequestAttachement.resume: " + res);
+            }
+            completeProcessing();
+        }
+        
+        void completeProcessing(){
             try{
-                if (log.isLoggable(Level.FINE)){
-                    log.log(Level.FINE, "RequestAttachement.resume: " + res);
-                }
                 res.finishResponse();
             } catch (IOException ex){
-                log.log(Level.FINEST,"resume",ex);
+                if (log.isLoggable(Level.FINE)){
+                    log.log(Level.FINE, "res.finishResponse()" + res);
+                }
             }
+            res.recycle();
+            res.getRequest().recycle();
         }
 
         @Override
@@ -4437,16 +4445,8 @@ public class Request
                 }
                 getCompletionHandler().cancelled(getAttachment());
             } finally {
-                if (forceClose &&!res.isCommitted()){
-                    try{
-                        // This is the equivalent of invoking res.finishResponse();
-                        res.getStream().close();
-                    } catch (IOException ex){
-                        // Swallow?
-                    }
-                }
+                completeProcessing();
             }
         }
-
     }
 }
