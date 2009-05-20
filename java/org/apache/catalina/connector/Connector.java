@@ -362,6 +362,11 @@ public class Connector
     private String instanceName;
 
     /**
+     * The name of this Connector
+     */
+    private String name;
+
+    /**
      * Coyote adapter.
      */
     private Adapter adapter = null;
@@ -889,6 +894,22 @@ public class Connector
         this.port = port;
         setProperty("port", String.valueOf(port));
 
+    }
+
+
+    /**
+     * Sets the name of this Connector.
+     */
+    public void setName(String name){
+        this.name = name;
+    }
+    
+    
+    /**
+     * Gets the name of this Connector.
+     */
+    public String getName(){
+        return name;
     }
 
 
@@ -1722,7 +1743,12 @@ public class Connector
         }
 
         if( this.domain != null ) {
-            mapperListener.setDomain( domain );
+            if (!"admin-listener".equals(getName())) {
+                // See IT 8255
+                mapper.removeContext(defaultHost, "");
+                mapper.removeHost(defaultHost);
+            }
+            mapperListener.setDomain(domain);
             // BEGIN S1AS 5000999
             mapperListener.setPort(this.getPort());
             mapperListener.setDefaultHost(this.defaultHost);
