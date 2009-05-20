@@ -143,6 +143,10 @@ public class MapperListener
         this.port = port;
     }
 
+    public void setInstanceName(String instanceName) {
+        myInstance = instanceName;
+    }
+
     public String getDefaultHost() {
         return defaultHost;
     }
@@ -156,10 +160,6 @@ public class MapperListener
      * Initialize associated mapper.
      */
     public void init() {
-
-        // START SJSAS 6313044
-        myInstance = System.getProperty("com.sun.aas.instanceName");
-        // END SJSAS 6313044
 
         if (defaultHost != null) {
             mapper.setDefaultHostName(defaultHost);
@@ -178,7 +178,6 @@ public class MapperListener
                 ObjectInstance oi = (ObjectInstance) iterator.next();
                 registerHost(oi.getObjectName());
             }
-
 
             // Query contexts
             onStr = domain + ":j2eeType=WebModule,*,J2EEServer=" + myInstance;

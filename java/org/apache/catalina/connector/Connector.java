@@ -359,6 +359,7 @@ public class Connector
      */
     private ProtocolHandler protocolHandler = null;
 
+    private String instanceName;
 
     /**
      * Coyote adapter.
@@ -888,6 +889,16 @@ public class Connector
         this.port = port;
         setProperty("port", String.valueOf(port));
 
+    }
+
+
+    /**
+     * Sets the instance name for this Connector.
+     * 
+     * @param instanceName the instance name
+     */
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
     }
 
 
@@ -1717,6 +1728,7 @@ public class Connector
             mapperListener.setDefaultHost(this.defaultHost);
             // END S1AS 5000999
             //mapperListener.setEngine( service.getContainer().getName() );
+            mapperListener.setInstanceName(instanceName);
             mapperListener.init();
             try {
                 ObjectName mapperOname = createObjectName(this.domain, "Mapper");
