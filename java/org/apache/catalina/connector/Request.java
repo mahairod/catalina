@@ -4160,6 +4160,9 @@ public class Request
      */
     @Override
     public void setAsyncTimeout(long timeout) {
+        if (isAsyncStarted()) {
+            throw new IllegalStateException("Request already in async mode");
+        }
         asyncTimeoutMillis = timeout;
     }
 
