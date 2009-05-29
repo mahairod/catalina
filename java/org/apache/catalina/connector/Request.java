@@ -88,6 +88,7 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.util.StringParser;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.fileupload.Multipart;
 
 // START S1AS 6170450
 import com.sun.appserv.security.provider.ProxyHandler;
@@ -509,6 +510,12 @@ public class Request
     // Has AsyncContext.complete been called?
     private boolean isAsyncComplete;
     private boolean isOkToReinitializeAsync;
+
+
+    /**
+     * Multi-Part support
+     */
+    private Multipart multipart;
 
     /**
      * Associated context.
@@ -3978,17 +3985,25 @@ public class Request
     }
 
 
-    @Override
-    public Iterable<Part> getParts() throws ServletException {
-        //TODO: Stub out the implementation
-        return null; 
+    private Multipart getMultipart() {
+        if (multipart == null) {
+            multipart = new Multipart(this,
+                                      wrapper.getMultipartLocation(),
+                                      wrapper.getMultipartMaxFileSize(),
+                                      wrapper.getMultipartMaxRequestSize(),
+                                      wrapper.getMultipartFileSizeThreshold());
+        }
+        return multipart;
     }
 
+    @Override
+    public Iterable<Part> getParts() throws ServletException {
+        return getMultipart().getParts();
+    }
 
     @Override
     public Part getPart(String name) throws ServletException {
-        //TODO: Stub out the implementation
-        return null;
+        return getMultipart().getPart(name);
     }
 
 
