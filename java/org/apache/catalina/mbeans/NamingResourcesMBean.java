@@ -65,6 +65,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
             throws MBeanException, RuntimeOperationsException {
         super();
         registry = MBeanUtils.createRegistry();
+        managed = registry.findManagedBean("NamingResources");
     }
 
 
@@ -73,8 +74,8 @@ public class NamingResourcesMBean extends BaseModelMBean {
     /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected ManagedBean managed =
-        registry.findManagedBean("NamingResources");
+    protected ManagedBean managed;
+
 
     // ------------------------------------------------------------- Attributes
     
