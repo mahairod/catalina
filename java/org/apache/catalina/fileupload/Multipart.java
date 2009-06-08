@@ -80,7 +80,7 @@ public class Multipart {
         return false;
     }
 
-    private void initParts() throws ServletException {
+    private void initParts() throws IOException, ServletException {
         if (parts != null) {
             return;
         }
@@ -99,12 +99,12 @@ public class Multipart {
                              partItem.getOutputStream(), true);
                 parts.add((Part)partItem);
             }
-        } catch (IOException ex) {
-            throw new ServletException(ex);
+        } catch (SizeException ex) {
+            throw new IllegalStateException(ex);
         }
     }
 
-    public Iterable<Part> getParts() throws ServletException {
+    public Iterable<Part> getParts() throws IOException, ServletException {
         if (! isMultipart()) {
             throw new ServletException("The request content-type is not a multipart/form-data");
         }
@@ -113,7 +113,7 @@ public class Multipart {
         return parts;
     }
 
-    public Part getPart(String name) throws ServletException {
+    public Part getPart(String name) throws IOException, ServletException {
 
         if (! isMultipart()) {
             throw new ServletException("The request content-type is not a multipart/form-data");
