@@ -82,7 +82,7 @@ public class ContextConfig
     //START SJSAS 6202703
     //private static Properties authenticators = null;
     
-    protected static Properties authenticators = null;
+    protected static final Properties authenticators = new Properties();
     //END SJSAS 6202703
 
     /**
@@ -181,7 +181,6 @@ public class ContextConfig
      * Static initializer
      */
     static {
-        authenticators = new Properties();
         authenticators.setProperty(
             "BASIC", BasicAuthenticator.class.getName());
         authenticators.setProperty(
