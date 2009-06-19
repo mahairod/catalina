@@ -978,6 +978,7 @@ public class WebappLoader
             return;
 
         loaderRepositories=new ArrayList<String>();
+
         // Loading the work directory
         File workDir =
             (File) servletContext.getAttribute(ServletContext.TEMPDIR);
@@ -988,8 +989,6 @@ public class WebappLoader
         if (log.isLoggable(Level.FINEST) && workDir != null) 
             log.finest(sm.getString("webappLoader.deploy",
                                     workDir.getAbsolutePath()));
-
-        classLoader.setWorkDir(workDir);
 
         DirContext resources = container.getResources();
 
