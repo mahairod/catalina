@@ -209,17 +209,6 @@ public class StandardContext
     // END RIMOD 4894300
 
     /**
-     * Restricted ServletContext, some of whose methods (namely the
-     * configuration methods added by Servlet 3.0) throw an
-     * IllegalStateException if invoked by a ServletContextListener
-     * declared in a Tag Library Descriptor (TLD) resource of a web
-     * fragment JAR file excluded from absolute ordering.
-     *
-     * See IT 8565 for additional details.
-     */
-    protected transient ServletContext restrictedContext = null;
-
-    /**
      *  Is the context initialized. 
      */
     private boolean isContextInitializedCalled = false;
@@ -681,6 +670,24 @@ public class StandardContext
 
     private ConcurrentHashMap<String, FilterRegistration> filterRegisMap =
         new ConcurrentHashMap<String, FilterRegistration>();
+
+    private Map<String, String> jarName2WebFragNameMap;
+
+    private List absoluteOrderingList;
+
+    /**
+     * Restricted ServletContext, some of whose methods (namely the
+     * configuration methods added by Servlet 3.0) throw an
+     * IllegalStateException if invoked by a ServletContextListener
+     * declared in a Tag Library Descriptor (TLD) resource of a web
+     * fragment JAR file excluded from absolute ordering.
+     *
+     * See IT 8565 for additional details.
+     */
+    protected transient ServletContext restrictedContext = null;
+
+    private Set<String> restrictedApplicationListeners = 
+        new HashSet<String>();
 
 
     // ----------------------------------------------------- Context Properties
@@ -2088,12 +2095,34 @@ public class StandardContext
 
 
     /**
-     * Add a new Listener class name to the set of Listeners
+     * Adds the Listener with the given class name to the set of Listeners
      * configured for this application.
      *
-     * @param listener Java class name of a listener class
+     * @param listener the fully qualified class name of the Listener
      */
     public void addApplicationListener(String listener) {
+        addApplicationListener(listener, false);
+    }
+
+
+    /**
+     * Adds the Listener with the given class name to the set of Listeners
+     * configured for this application.
+     *
+     * @param listener the fully qualified class name of the Listener
+     * @param isRestricted true if the web application represented by
+     * this Context declares an absolute ordering of its web
+     * fragment JAR files without the use of <code>others</code>, and the
+     * given listener is declared in the Tag Library Descriptor
+     * (TLD) resource of a web fragment JAR file that is excluded from
+     * the absolute ordering
+     */
+    public void addApplicationListener(String listener,
+                                       boolean isRestricted) {
+        if (isRestricted) {
+            restrictedApplicationListeners.add(listener);
+        }
+
         if (applicationListeners.contains(listener)) {
             if (log.isLoggable(Level.INFO)) {
                 log.info(sm.getString("standardContext.duplicateListener",
@@ -3396,6 +3425,31 @@ public class StandardContext
      */
     public Map<String, ServletRegistration> getServletRegistrations() {
         return Collections.unmodifiableMap(servletRegisMap);
+    }
+
+
+    public void setJarNameToWebFragmentNameMap(
+                    Map<String, String> jarName2WebFragNameMap) {
+        this.jarName2WebFragNameMap = jarName2WebFragNameMap;
+    }
+
+
+    public void setAbsoluteOrdering(List absoluteOrderingList) {
+        this.absoluteOrderingList = absoluteOrderingList;
+    }
+
+
+    /**
+     * @return true if this Context declares an absolute ordering of its
+     * web fragments (without the use of any <others/> element), and the
+     * web fragment JAR file with the given name is excluded from it;
+     * false otherwise
+     */
+    public boolean isFragmentMissingFromAbsoluteOrdering(String jarName) {
+        return (jarName2WebFragNameMap != null &&
+            absoluteOrderingList != null &&
+            !absoluteOrderingList.contains(
+                jarName2WebFragNameMap.get(jarName)));
     }
 
 
@@ -4910,7 +4964,9 @@ public class StandardContext
         if (instances == null)
             return (ok);
         ServletContextEvent event =
-          new ServletContextEvent(getServletContext());
+            new ServletContextEvent(getServletContext());
+        ServletContextEvent restrictedEvent =
+            new ServletContextEvent(getRestrictedServletContext());
         for (Object instance : instances) {
             if (instance == null) {
                 continue;
@@ -4921,7 +4977,12 @@ public class StandardContext
             ServletContextListener listener = (ServletContextListener)instance;
             try {
                 fireContainerEvent(ContainerEvent.BEFORE_CONTEXT_INITIALIZED, listener);
-                listener.contextInitialized(event);
+                if (restrictedApplicationListeners.contains(
+                        listener.getClass().getName())) {
+                    listener.contextInitialized(restrictedEvent);
+                } else {
+                    listener.contextInitialized(event);
+                }
             } finally {
                 fireContainerEvent(ContainerEvent.AFTER_CONTEXT_INITIALIZED, listener);
             }
@@ -4976,6 +5037,8 @@ public class StandardContext
         }
         ServletContextEvent event =
             new ServletContextEvent(getServletContext());
+        ServletContextEvent restrictedEvent =
+            new ServletContextEvent(getRestrictedServletContext());
         for (int i = 0; i < listeners.length; i++) {
             // Invoke in reverse order of declaration 
             int j = (listeners.length - 1) - i;
@@ -4991,7 +5054,12 @@ public class StandardContext
             try {
                 fireContainerEvent(ContainerEvent.BEFORE_CONTEXT_DESTROYED,
                                    listener);
-                listener.contextDestroyed(event);
+                if (restrictedApplicationListeners.contains(
+                        listener.getClass().getName())) {
+                    listener.contextDestroyed(restrictedEvent);
+                } else {
+                    listener.contextDestroyed(event);
+                }
                 fireContainerEvent(ContainerEvent.AFTER_CONTEXT_DESTROYED,
                                    listener);
             } catch (Throwable t) {
@@ -5940,7 +6008,7 @@ public class StandardContext
      */
     @Override
     public void destroy() throws Exception {
-        if( oname != null ) {
+        if(oname != null) {
             // Send j2ee.object.deleted notification
             Notification notification =
                 new Notification("j2ee.object.deleted", this.getObjectName(),
