@@ -7301,7 +7301,8 @@ public class StandardContext
                 "getSessionCookieConfig",
                 "setSessionTrackingModes",
                 "getDefaultSessionTrackingModes",
-                "getEffectiveSessionTrackingModes");
+                "getEffectiveSessionTrackingModes",
+                "addListener");
 
         /*
          * The ServletContext to which to delegate the invocation of any
