@@ -539,7 +539,7 @@ public class Embedded  extends StandardService implements Lifecycle {
         context.setDebug(debug);
         context.setDocBase(docBase);
         context.setPath(path);
-
+        
         ContextConfig config = new ContextConfig();
         config.setCustomAuthenticators(authenticators);
         config.setDebug(debug);
