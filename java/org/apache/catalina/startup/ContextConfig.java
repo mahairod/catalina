@@ -851,20 +851,23 @@ public class ContextConfig
         
         Host host = (Host) context.getParent();
         String appBase = host.getAppBase();
-
+        
         boolean unpackWARs = true;
         if (host instanceof StandardHost) {
             unpackWARs = ((StandardHost) host).isUnpackWARs() 
                 && ((StandardContext) context).getUnpackWAR();
         }
 
-        File canonicalAppBase = new File(appBase);
-        if (canonicalAppBase.isAbsolute()) {
-            canonicalAppBase = canonicalAppBase.getCanonicalFile();
-        } else {
-            canonicalAppBase = 
-                new File(System.getProperty("catalina.base"), appBase)
-                .getCanonicalFile();
+        File canonicalAppBase = null;
+        if (appBase != null) {
+            canonicalAppBase = new File(appBase);
+            if (canonicalAppBase.isAbsolute()) {
+                canonicalAppBase = canonicalAppBase.getCanonicalFile();
+            } else {
+                canonicalAppBase = 
+                    new File(System.getProperty("catalina.base"), appBase)
+                    .getCanonicalFile();
+            }
         }
 
         String docBase = context.getDocBase();
@@ -886,7 +889,7 @@ public class ContextConfig
         }
 
         File file = new File(docBase);
-        if (!file.isAbsolute()) {
+        if (!file.isAbsolute() && canonicalAppBase != null) {
             docBase = (new File(canonicalAppBase, docBase)).getPath();
         } else {
             docBase = file.getCanonicalPath();
@@ -931,7 +934,8 @@ public class ContextConfig
             }
         }
 
-        if (docBase.startsWith(canonicalAppBase.getPath())) {
+        if (canonicalAppBase != null &&
+                docBase.startsWith(canonicalAppBase.getPath())) {
             docBase = docBase.substring(canonicalAppBase.getPath().length());
             docBase = docBase.replace(File.separatorChar, '/');
             if (docBase.startsWith("/")) {
