@@ -52,9 +52,6 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.util;
 
 
@@ -77,9 +74,16 @@ public class ServerInfo {
 
 
     /**
-     * The server information String with which we identify ourselves.
+     * The server information string used for logging
      */
     private static String serverInfo = null;
+
+    /**
+     * The public server information string that is exposed in
+     * container-generated error pages and as the value of the "Server"
+     * HTTP response header
+     */
+    private static String publicServerInfo = null;
 
     static {
 
@@ -115,10 +119,15 @@ public class ServerInfo {
      * Return the server identification for this version of Tomcat.
      */
     public static String getServerInfo() {
-
         return (serverInfo);
-
     }
 
+    public static void setPublicServerInfo(String info) {
+        publicServerInfo = info;
+    }
+
+    public static String getPublicServerInfo() {
+        return publicServerInfo;
+    }
 
 }
