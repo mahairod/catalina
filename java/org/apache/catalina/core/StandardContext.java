@@ -690,6 +690,9 @@ public class StandardContext
     private Set<String> restrictedApplicationListeners = 
         new HashSet<String>();
 
+    // <jsp-config> related info aggregated from web.xml and web-fragment.xml
+    private JspConfigDescriptor jspConfigDesc;
+
 
     // ----------------------------------------------------- Context Properties
 
@@ -2873,6 +2876,11 @@ public class StandardContext
     }
 
 
+    public void setJspConfigDescriptor(JspConfigDescriptor jspConfigDesc) {
+        this.jspConfigDesc = jspConfigDesc;
+    }
+
+
     /**
      * Gets the <code>&lt;jsp-config&gt;</code> related configuration
      * that was aggregated over the <code>web.xml</code> and
@@ -2880,7 +2888,7 @@ public class StandardContext
      * represented by this ServletContext.
      */
     public JspConfigDescriptor getJspConfigDescriptor() {
-        return null;  // TBD
+        return jspConfigDesc;
     }
 
 
