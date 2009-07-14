@@ -441,7 +441,8 @@ public class StandardContext
      * The status code error pages for this web application, keyed by
      * HTTP status code (as an Integer).
      */
-    private final Map<Integer, ErrorPage> statusPages = new HashMap<Integer, ErrorPage>();
+    private final Map<Integer, ErrorPage> statusPages =
+        new HashMap<Integer, ErrorPage>();
 
     /**
      * The JSP tag libraries for this web application, keyed by URI
@@ -3513,28 +3514,6 @@ public class StandardContext
     }
 
     /**
-     * Return the set of defined error pages for all specified error codes
-     * and exception types.
-     */
-    public ErrorPage[] findErrorPages() {
-        synchronized(exceptionPages) {
-            synchronized(statusPages) {
-                ErrorPage results1[] = new ErrorPage[exceptionPages.size()];
-                results1 = exceptionPages.values().toArray(results1);
-                ErrorPage results2[] = new ErrorPage[statusPages.size()];
-                results2 = statusPages.values().toArray(results2);
-                ErrorPage results[] = new ErrorPage[results1.length + results2.length];
-                for (int i = 0; i < results1.length; i++)
-                    results[i] = results1[i];
-                for (int i = results1.length; i < results.length; i++)
-                    results[i] = results2[i - results1.length];
-                return (results);
-            }
-        }
-
-    }
-
-    /**
      * Return the filter definition for the specified filter name, if any;
      * otherwise return <code>null</code>.
      *
@@ -4099,26 +4078,24 @@ public class StandardContext
     }
 
     /**
-     * Remove the error page for the specified error code or
-     * Java language exception, if it exists; otherwise, no action is taken.
-     *
-     * @param errorPage The error page definition to be removed
+     * Removes any error page declarations.
      */
-    public void removeErrorPage(ErrorPage errorPage) {
-
-        String exceptionType = errorPage.getExceptionType();
-        if (exceptionType != null) {
-            synchronized (exceptionPages) {
-                exceptionPages.remove(exceptionType);
+    public void removeErrorPages() {
+        synchronized (exceptionPages) {
+            if (notifyContainerListeners) {
+                for (ErrorPage errorPage : exceptionPages.values()) {
+                    fireContainerEvent("removeErrorPage", errorPage);
+                }
             }
-        } else {
-            synchronized (statusPages) {
-                statusPages.remove(errorPage.getErrorCode());
-            }
+            exceptionPages.clear();
         }
-
-        if (notifyContainerListeners) {
-            fireContainerEvent("removeErrorPage", errorPage);
+        synchronized (statusPages) {
+            if (notifyContainerListeners) {
+                for (ErrorPage statusPage : statusPages.values()) {
+                    fireContainerEvent("removeErrorPage", statusPage);
+                }
+            }
+            statusPages.clear();
         }
     }
 
@@ -5954,8 +5931,8 @@ public class StandardContext
     }
 
     /**
-     * Post a copy of our web application resources as a servlet context
-     * attribute.
+     * Stores the resources of this application as ServletContext
+     * attributes.
      */
     private void postResources() {
         getServletContext().setAttribute(
@@ -6265,58 +6242,6 @@ public class StandardContext
         return (oname.toString());
     }
 
-
-    /** JSR77 deploymentDescriptor attribute
-     *
-     * @return string deployment descriptor
-     */
-    public String getDeploymentDescriptor() {
-
-        InputStream stream = null;
-        ServletContext servletContext = getServletContext();
-        if (servletContext != null) {
-            stream = servletContext.getResourceAsStream(
-                org.apache.catalina.startup.Constants.ApplicationWebXml);
-        }
-        if (stream == null) {
-            return "";
-        }
-        BufferedReader br = new BufferedReader(
-                                new InputStreamReader(stream));
-        StringBuffer sb = new StringBuffer();
-        String strRead = "";
-        try {
-            while (strRead != null) {
-                sb.append(strRead);
-                strRead = br.readLine();
-            }
-        } catch (IOException e) {
-            return "";
-        }
-
-        return sb.toString();
-
-    }
-
-    /** JSR77 servlets attribute
-     *
-     * @return list of all servlets ( we know about )
-     */
-    public String[] getServletObjectNames() {
-
-        String[] result = null;
-
-        Container[] children = findChildren();
-        if (children != null) {
-            result = new String[children.length];
-            for( int i=0; i< children.length; i++ ) {
-                result[i] = ((StandardWrapper)children[i]).getObjectName();
-            }
-        }
-
-        return result;
-    }
-
     @Override
     public ObjectName createObjectName(String hostDomain, ObjectName parentName)
             throws MalformedObjectNameException
@@ -6545,13 +6470,6 @@ public class StandardContext
     }
 
     /**
-     * Support for "stateManageable" JSR77
-     */
-    public boolean isStateManageable() {
-        return true;
-    }
-
-    /**
      * Set the validation feature of the XML parser used when
      * parsing xml instances.
      * @param webXmlValidation true to enable xml instance validation
@@ -6712,7 +6630,6 @@ public class StandardContext
         return false;
     }
 
-
     /*
      * HTTP session related monitoring events
      */
@@ -6758,13 +6675,15 @@ public class StandardContext
 
     
     /**
-     * Restricted ServletContext, some of whose methods (namely the
-     * configuration methods added by Servlet 3.0) throw an
-     * IllegalStateException if invoked by a ServletContextListener
-     * declared in a Tag Library Descriptor (TLD) resource of a web
-     * fragment JAR file excluded from absolute ordering.
+     * Restricted ServletContext, some of whose methods (namely any
+     * methods that are new in Servlet 3.0) throw an IllegalStateException.
      *
-     * See IT 8565 for additional details.
+     * Instances of RestrictedServletContext will be passed to the
+     * contextInitialized and contextDestroyed callbacks of any
+     * restricted ServletContextListeners, that is, any
+     * ServletContextListeners not declared in <code>web.xml</code> or
+     * <code>web-fragment.xml</code>, or annotated with
+     * <code>javax.servlet.annotation.WebListener</code> (see IT 8565).
      */
     static class RestrictedServletContext implements InvocationHandler {
 
