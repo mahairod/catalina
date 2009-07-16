@@ -2615,7 +2615,7 @@ public class StandardContext
      */
     public void addListener(String className) {
         try {
-            addListener(loadListener(getLoader().getClassLoader(), className));
+            addListener(loadListener(getClassLoader(), className));
         } catch (Throwable t) {
             throw new IllegalArgumentException(
                 "Unable to load listener of type " + className, t); 
@@ -2723,6 +2723,10 @@ public class StandardContext
      */
     public JspConfigDescriptor getJspConfigDescriptor() {
         return jspConfigDesc;
+    }
+
+    public ClassLoader getClassLoader() {
+        return (getLoader() != null) ? getLoader().getClassLoader() : null;
     }
 
     /**
@@ -4528,8 +4532,7 @@ public class StandardContext
         int i = 0;
         for (String listener : listeners) {
             try {
-                results[i++] = loadListener(getLoader().getClassLoader(),
-                                            listener);
+                results[i++] = loadListener(getClassLoader(), listener);
             } catch (Throwable t) {
                 getServletContext().log
                     (sm.getString("standardContext.applicationListener",
@@ -4602,8 +4605,7 @@ public class StandardContext
 
 
     /**
-     * Loads and instantiates and returns the listener with the specified
-     * classname.
+     * Loads and instantiates the listener with the specified classname.
      *
      * @param loader the classloader to use
      * @param listenerClassName the fully qualified classname to instantiate
@@ -5357,7 +5359,8 @@ public class StandardContext
         // find any ServletContainerInitializers, so return immediately
         Map<Class<? extends ServletContainerInitializer>, HashSet<Class<?>>> initializerList =
                 ServletContainerInitializerUtil.getInitializerList(
-                        servletContainerInitializerInterestList, getLoader().getClassLoader());
+                        servletContainerInitializerInterestList,
+                        getClassLoader());
         if(initializerList == null)
             return true;
         // We have the list of initializers and the classes that satisfy
@@ -5685,7 +5688,7 @@ public class StandardContext
                     } finally {
                         if (getLoader() != null) {
                             Thread.currentThread().setContextClassLoader
-                                (getLoader().getClassLoader());
+                                (getClassLoader());
                         }
                     }
                 }
@@ -5760,8 +5763,7 @@ public class StandardContext
         ClassLoader oldContextClassLoader =
             Thread.currentThread().getContextClassLoader();
 
-        Thread.currentThread().setContextClassLoader
-            (getLoader().getClassLoader());
+        Thread.currentThread().setContextClassLoader(getClassLoader());
 
         if (isUseNaming()) {
             try {
