@@ -123,17 +123,6 @@ public class StandardContext
         mySecurityManager = new MySecurityManager();
     }
 
-    /**
-     * set a new pipeline (restricted to use by EE code)
-     * HERCULES:add
-     */
-    public void restrictedSetPipeline(Pipeline pl) {
-        pl.setBasic(new StandardContextValve());
-        pipeline = pl;
-        hasCustomPipeline = true;
-    }
-
-
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -188,8 +177,7 @@ public class StandardContext
     /**
      * The Java class name of the CharsetMapper class to be created.
      */
-    private String charsetMapperClass =
-      "org.apache.catalina.util.CharsetMapper";
+    private String charsetMapperClass = CharsetMapper.class.getName();
 
     /**
      * The path to a file to save this Context information.
@@ -1350,6 +1338,15 @@ public class StandardContext
      */
     public Mapper getMapper() {
         return mapper;
+    }
+
+    /**
+     * Sets a new pipeline
+     */
+    public void restrictedSetPipeline(Pipeline pl) {
+        pl.setBasic(new StandardContextValve());
+        pipeline = pl;
+        hasCustomPipeline = true;
     }
 
     /**
@@ -6844,6 +6841,9 @@ public class StandardContext
              *  org.apache.catalina.core.ApplicationContextFacade
              * classContext[5]:
              *  Caller whose classloader to check
+             *
+             * NOTE: INDEX MUST BE ADJUSTED WHENEVER EXECUTION STACK
+             * CHANGES, E.G., DUE TO CODE BEING REORGANIZED
              */
             ClassLoader ccl = classContext[5].getClassLoader();
             if (ccl != null && ccl != webappLoader && 
