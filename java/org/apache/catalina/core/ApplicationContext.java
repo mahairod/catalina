@@ -1064,7 +1064,7 @@ public class ApplicationContext
      * Gets a Map of the ServletRegistration objects corresponding to all
      * currently registered servlets.
      */
-    public Map<String, ServletRegistration> getServletRegistrations() {
+    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
         return context.getServletRegistrations();
     }
 
@@ -1123,7 +1123,7 @@ public class ApplicationContext
      * Gets a Map of the FilterRegistration objects corresponding to all
      * currently registered filters.
      */
-    public Map<String, FilterRegistration> getFilterRegistrations() {
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
         return context.getFilterRegistrations();
     }
 
