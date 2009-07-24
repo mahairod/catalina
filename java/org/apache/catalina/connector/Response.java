@@ -1586,7 +1586,8 @@ public class Response
                     return false;
                 }
                 String sessionParamName =
-                    (ctx.getSessionCookieName() != null) ?
+                    (ctx.isSessionCookieConfigInitialized() &&
+                            ctx.getSessionCookieName() != null) ?
                         ctx.getSessionCookieName() :
                         Globals.SESSION_PARAMETER_NAME;
                 if (file.indexOf(";" + sessionParamName + "=" +
@@ -1742,7 +1743,8 @@ public class Response
         if( sb.length() > 0 ) { // jsessionid can't be first.
             StandardContext ctx = (StandardContext) getContext();
             String sessionParamName =
-                (ctx != null && ctx.getSessionCookieName() != null) ?
+                (ctx != null && ctx.isSessionCookieConfigInitialized() &&
+                        ctx.getSessionCookieName() != null) ?
                     ctx.getSessionCookieName() :
                     Globals.SESSION_PARAMETER_NAME;
             sb.append(";" + sessionParamName + "=");
