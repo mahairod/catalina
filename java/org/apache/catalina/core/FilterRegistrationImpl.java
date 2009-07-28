@@ -95,7 +95,7 @@ public class FilterRegistrationImpl implements FilterRegistration {
     }
 
 
-    public Iterable<String> getServletNameMappings() {
+    public Collection<String> getServletNameMappings() {
         return ctx.getServletNameFilterMappings(getName());
     }
 
@@ -129,7 +129,7 @@ public class FilterRegistrationImpl implements FilterRegistration {
     }
 
 
-    public Iterable<String> getUrlPatternMappings() {
+    public Collection<String> getUrlPatternMappings() {
         return ctx.getUrlPatternFilterMappings(getName());
     }
 }

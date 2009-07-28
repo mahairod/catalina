@@ -23,17 +23,9 @@
 
 package org.apache.catalina.connector;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
-import java.security.PrivilegedActionException;
-import java.security.AccessControlException;
-import java.security.Permission;
-import java.security.SecurityPermission;
-import java.util.Locale;
+import java.io.*;
+import java.security.*;
+import java.util.*;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -729,7 +721,7 @@ public class ResponseFacade
     }
 
 
-    public Iterable<String> getHeaders(String name) {
+    public Collection<String> getHeaders(String name) {
         if (response == null) {
             throw new IllegalStateException(
                             sm.getString("responseFacade.nullResponse"));
@@ -738,7 +730,7 @@ public class ResponseFacade
     }
     
 
-    public Iterable<String> getHeaderNames() {
+    public Collection<String> getHeaderNames() {
         if (response == null) {
             throw new IllegalStateException(
                             sm.getString("responseFacade.nullResponse"));

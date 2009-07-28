@@ -940,9 +940,9 @@ public class StandardWrapper
     }
 
 
-    public Iterable<String> getMappings() {
+    public Collection<String> getMappings() {
         synchronized (mappings) {
-            return (Iterable<String>) mappings.clone();
+            return Collections.unmodifiableList(mappings);
         }
     }
 

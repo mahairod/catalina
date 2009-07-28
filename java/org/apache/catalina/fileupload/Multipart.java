@@ -11,9 +11,8 @@
 
 package org.apache.catalina.fileupload;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import javax.servlet.ServletException;
@@ -104,7 +103,7 @@ public class Multipart {
         }
     }
 
-    public Iterable<Part> getParts() throws IOException, ServletException {
+    public Collection<Part> getParts() throws IOException, ServletException {
         if (! isMultipart()) {
             throw new ServletException("The request content-type is not a multipart/form-data");
         }

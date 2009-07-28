@@ -2341,10 +2341,10 @@ public class StandardContext
     }
 
     /**
-     * Gets an Iterable over the current servlet name mappings of the Filter
-     * with the given name.
+     * Gets the current servlet name mappings of the Filter with
+     * the given name.
      */
-    public Iterable<String> getServletNameFilterMappings(String filterName) {
+    public Collection<String> getServletNameFilterMappings(String filterName) {
         HashSet<String> mappings = new HashSet();
         synchronized (filterMaps) {
             for (FilterMap fm : filterMaps) {
@@ -2358,10 +2358,10 @@ public class StandardContext
     }
 
     /**
-     * Gets an Iterable over the current URL pattern mappings of the Filter
-     * with the given name.
+     * Gets the current URL pattern mappings of the Filter with the given
+     * name.
      */
-    public Iterable<String> getUrlPatternFilterMappings(String filterName) {
+    public Collection<String> getUrlPatternFilterMappings(String filterName) {
         HashSet<String> mappings = new HashSet();
         synchronized (filterMaps) {
             for (FilterMap fm : filterMaps) {
