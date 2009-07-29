@@ -6753,13 +6753,14 @@ public class StandardContext
 
         private static final List<String> restrictedMethods =
             Arrays.asList(
+                "getEffectiveMajorVersion", "getEffectiveMinorVersion",
                 "setInitParameter", "addServlet", "createServlet",
                 "getServletRegistration", "getServletRegistrations", 
                 "addFilter", "createFilter", "getFilterRegistration",
                 "getFilterRegistrations", "getSessionCookieConfig",
                 "setSessionTrackingModes", "getDefaultSessionTrackingModes",
                 "getEffectiveSessionTrackingModes", "addListener",
-                "createListener", "getClassLoader");
+                "createListener", "getJspConfigDescriptor", "getClassLoader");
 
         /*
          * The ServletContext to which to delegate the invocation of any
@@ -6785,8 +6786,8 @@ public class StandardContext
                 throws Throwable {
 
             if (restrictedMethods.contains(m.getName())) {
-                throw new IllegalStateException("Not allowed to call " +
-                    m.getName());
+                throw new UnsupportedOperationException
+                    ("Not allowed to call " + m.getName());
             }
 
             Object result;
