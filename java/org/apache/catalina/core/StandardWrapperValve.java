@@ -413,7 +413,7 @@ final class StandardWrapperValve extends ValveBase {
      * Log a message on the Logger associated with our Container (if any)
      *
      * @param message Message to be logged
-     * @param throwable Associated exception
+     * @param t Associated exception
      */
     private void log(String message, Throwable t) {
         org.apache.catalina.Logger logger = null;
@@ -424,10 +424,10 @@ final class StandardWrapperValve extends ValveBase {
         }
         if (logger != null) {
             logger.log("StandardWrapperValve[" + containerName + "]: " +
-                       message, t);
+                message, t, org.apache.catalina.Logger.WARNING);
         } else {
             log.log(Level.WARNING, "StandardWrapperValve[" + containerName +
-                    "]: " + message, t);
+                "]: " + message, t);
         }
     }
 

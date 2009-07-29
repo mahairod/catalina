@@ -36,7 +36,6 @@ import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.catalina.Container;
 import org.apache.catalina.Globals;
 import org.apache.catalina.HttpRequest;
@@ -47,7 +46,6 @@ import org.apache.catalina.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
-
 import org.apache.commons.beanutils.PropertyUtils;
 
 /**
@@ -68,15 +66,9 @@ import org.apache.commons.beanutils.PropertyUtils;
 public class ErrorReportValve
     extends ValveBase {
 
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The debugging detail level for this component.
-     */
-    private int debug = 0;
-
+    private static final java.util.logging.Logger log =
+        java.util.logging.Logger.getLogger(
+            ErrorReportValve.class.getName());
 
     /**
      * The descriptive information related to this implementation.
@@ -84,12 +76,19 @@ public class ErrorReportValve
     private static final String info =
         "org.apache.catalina.valves.ErrorReportValve/1.0";
 
-
     /**
      * The StringManager for this package.
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
+
+
+    // ----------------------------------------------------- Instance Variables
+
+    /**
+     * The debugging detail level for this component.
+     */
+    private int debug = 0;
 
 
     // ------------------------------------------------------------- Properties
@@ -331,13 +330,12 @@ public class ErrorReportValve
      * @param message Message to be logged
      */
     protected void log(String message) {
-
         Logger logger = container.getLogger();
-        if (logger != null)
+        if (logger != null) {
             logger.log(this.toString() + ": " + message);
-        else
-            System.out.println(this.toString() + ": " + message);
-
+        } else {
+            log.info(this.toString() + ": " + message);
+        }
     }
 
 
@@ -345,18 +343,16 @@ public class ErrorReportValve
      * Log a message on the Logger associated with our Container (if any).
      *
      * @param message Message to be logged
-     * @param throwable Associated exception
+     * @param t Associated exception
      */
-    protected void log(String message, Throwable throwable) {
-
+    protected void log(String message, Throwable t) {
         Logger logger = container.getLogger();
-        if (logger != null)
-            logger.log(this.toString() + ": " + message, throwable);
-        else {
-            System.out.println(this.toString() + ": " + message);
-            throwable.printStackTrace(System.out);
+        if (logger != null) {
+            logger.log(this.toString() + ": " + message, t, Logger.WARNING);
+        } else {
+            log.log(java.util.logging.Level.WARNING,
+                this.toString() + ": " + message, t);
         }
-
     }
 
 

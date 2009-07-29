@@ -1062,7 +1062,7 @@ public class NamingContextListener
      * (if any).
      *
      * @param message Message to be logged
-     * @param throwable Related exception
+     * @param t Related exception
      */
     protected void log(String message, Throwable t) {
         if (!(container instanceof Container)) {
@@ -1072,7 +1072,8 @@ public class NamingContextListener
         org.apache.catalina.Logger logger =
             ((Container) container).getLogger();
         if (logger != null) {
-            logger.log(logName() + ": " + message, t);
+            logger.log(logName() + ": " + message, t,
+                org.apache.catalina.Logger.WARNING);
         } else {
             log.log(Level.WARNING, logName() + ": " + message, t);
         }

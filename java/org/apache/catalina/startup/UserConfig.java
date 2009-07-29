@@ -18,11 +18,7 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.startup;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +29,8 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Logger;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.StringManager;
-
 
 /**
  * Startup event listener for a <b>Host</b> that configures Contexts (web
@@ -50,45 +46,10 @@ import org.apache.catalina.util.StringManager;
 public final class UserConfig
     implements LifecycleListener {
 
+    // ----------------------------------------------------- Static Variables
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The Java class name of the Context configuration class we should use.
-     */
-    private String configClass = "org.apache.catalina.startup.ContextConfig";
-
-
-    /**
-     * The Java class name of the Context implementation we should use.
-     */
-    private String contextClass = "org.apache.catalina.core.StandardContext";
-
-
-    /**
-     * The debugging detail level for this component.
-     */
-    private int debug = 999;
-
-
-    /**
-     * The directory name to be searched for within each user home directory.
-     */
-    private String directoryName = "public_html";
-
-
-    /**
-     * The base directory containing user home directories.
-     */
-    private String homeBase = null;
-
-
-    /**
-     * The Host we are associated with.
-     */
-    private Host host = null;
-
+    private static java.util.logging.Logger log =
+        java.util.logging.Logger.getLogger(UserConfig.class.getName());
 
     /**
      * The string resources for this package.
@@ -96,6 +57,38 @@ public final class UserConfig
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+
+    // ----------------------------------------------------- Instance Variables
+
+    /**
+     * The Java class name of the Context configuration class we should use.
+     */
+    private String configClass = ContextConfig.class.getName();
+
+    /**
+     * The Java class name of the Context implementation we should use.
+     */
+    private String contextClass = StandardContext.class.getName();
+
+    /**
+     * The debugging detail level for this component.
+     */
+    private int debug = 999;
+
+    /**
+     * The directory name to be searched for within each user home directory.
+     */
+    private String directoryName = "public_html";
+
+    /**
+     * The base directory containing user home directories.
+     */
+    private String homeBase = null;
+
+    /**
+     * The Host we are associated with.
+     */
+    private Host host = null;
 
     /**
      * The Java class name of the user database class we should use.
@@ -111,9 +104,7 @@ public final class UserConfig
      * Return the Context configuration class name.
      */
     public String getConfigClass() {
-
         return (this.configClass);
-
     }
 
 
@@ -123,9 +114,7 @@ public final class UserConfig
      * @param configClass The new Context configuration class name.
      */
     public void setConfigClass(String configClass) {
-
         this.configClass = configClass;
-
     }
 
 
@@ -133,9 +122,7 @@ public final class UserConfig
      * Return the Context implementation class name.
      */
     public String getContextClass() {
-
         return (this.contextClass);
-
     }
 
 
@@ -145,9 +132,7 @@ public final class UserConfig
      * @param contextClass The new Context implementation class name.
      */
     public void setContextClass(String contextClass) {
-
         this.contextClass = contextClass;
-
     }
 
 
@@ -155,9 +140,7 @@ public final class UserConfig
      * Return the debugging detail level for this component.
      */
     public int getDebug() {
-
         return (this.debug);
-
     }
 
 
@@ -167,9 +150,7 @@ public final class UserConfig
      * @param debug The new debugging detail level
      */
     public void setDebug(int debug) {
-
         this.debug = debug;
-
     }
 
 
@@ -177,9 +158,7 @@ public final class UserConfig
      * Return the directory name for user web applications.
      */
     public String getDirectoryName() {
-
         return (this.directoryName);
-
     }
 
 
@@ -189,9 +168,7 @@ public final class UserConfig
      * @param directoryName The new directory name
      */
     public void setDirectoryName(String directoryName) {
-
         this.directoryName = directoryName;
-
     }
 
 
@@ -199,9 +176,7 @@ public final class UserConfig
      * Return the base directory containing user home directories.
      */
     public String getHomeBase() {
-
         return (this.homeBase);
-
     }
 
 
@@ -211,9 +186,7 @@ public final class UserConfig
      * @param homeBase The new base directory
      */
     public void setHomeBase(String homeBase) {
-
         this.homeBase = homeBase;
-
     }
 
 
@@ -221,9 +194,7 @@ public final class UserConfig
      * Return the user database class name for this component.
      */
     public String getUserClass() {
-
         return (this.userClass);
-
     }
 
 
@@ -231,9 +202,7 @@ public final class UserConfig
      * Set the user database class name for this component.
      */
     public void setUserClass(String userClass) {
-
         this.userClass = userClass;
-
     }
 
 
@@ -348,16 +317,15 @@ public final class UserConfig
      * @param message Message to be logged
      */
     private void log(String message) {
-
         Logger logger = null;
-        if (host != null)
+        if (host != null) {
             logger = host.getLogger();
-        if (logger != null)
+        }
+        if (logger != null) {
             logger.log("UserConfig[" + host.getName() + "]: " + message);
-        else
-            System.out.println("UserConfig[" + host.getName() + "]: "
-                               + message);
-
+        } else {
+            log.info("UserConfig[" + host.getName() + "]: " + message);
+        }
     }
 
 
@@ -365,23 +333,20 @@ public final class UserConfig
      * Log a message on the Logger associated with our Host (if any)
      *
      * @param message Message to be logged
-     * @param throwable Associated exception
+     * @param t Associated exception
      */
-    private void log(String message, Throwable throwable) {
-
+    private void log(String message, Throwable t) {
         Logger logger = null;
-        if (host != null)
+        if (host != null) {
             logger = host.getLogger();
-        if (logger != null)
-            logger.log("UserConfig[" + host.getName() + "] "
-                       + message, throwable);
-        else {
-            System.out.println("UserConfig[" + host.getName() + "]: "
-                               + message);
-            System.out.println("" + throwable);
-            throwable.printStackTrace(System.out);
         }
-
+        if (logger != null) {
+            logger.log("UserConfig[" + host.getName() + "] "
+                       + message, t, Logger.WARNING);
+        } else {
+            log.log(java.util.logging.Level.WARNING,
+                "UserConfig[" + host.getName() + "]: " + message, t);
+        }
     }
 
 

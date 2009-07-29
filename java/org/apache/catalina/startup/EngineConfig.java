@@ -52,9 +52,19 @@ import org.apache.catalina.util.StringManager;
 public final class EngineConfig
     implements LifecycleListener {
 
+    // ----------------------------------------------------- Static Variables
+
+    private static final java.util.logging.Logger log =
+        java.util.logging.Logger.getLogger(
+            EngineConfig.class.getName());
+
+    /**
+     * The string resources for this package.
+     */
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The debugging detail level for this component.
@@ -68,13 +78,6 @@ public final class EngineConfig
     private Engine engine = null;
 
 
-    /**
-     * The string resources for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
     // ------------------------------------------------------------- Properties
 
 
@@ -82,9 +85,7 @@ public final class EngineConfig
      * Return the debugging detail level for this component.
      */
     public int getDebug() {
-
         return (this.debug);
-
     }
 
 
@@ -94,9 +95,7 @@ public final class EngineConfig
      * @param debug The new debugging detail level
      */
     public void setDebug(int debug) {
-
         this.debug = debug;
-
     }
 
 
@@ -141,15 +140,15 @@ public final class EngineConfig
      * @param message Message to be logged
      */
     private void log(String message) {
-
         Logger logger = null;
-        if (engine != null)
+        if (engine != null) {
             logger = engine.getLogger();
-        if (logger != null)
+        }
+        if (logger != null) {
             logger.log("EngineConfig: " + message);
-        else
-            System.out.println("EngineConfig: " + message);
-
+        } else {
+            log.info("EngineConfig: " + message);
+        }
     }
 
 
@@ -157,21 +156,19 @@ public final class EngineConfig
      * Log a message on the Logger associated with our Engine (if any)
      *
      * @param message Message to be logged
-     * @param throwable Associated exception
+     * @param t Associated exception
      */
-    private void log(String message, Throwable throwable) {
-
+    private void log(String message, Throwable t) {
         Logger logger = null;
-        if (engine != null)
+        if (engine != null) {
             logger = engine.getLogger();
-        if (logger != null)
-            logger.log("EngineConfig: " + message, throwable);
-        else {
-            System.out.println("EngineConfig: " + message);
-            System.out.println("" + throwable);
-            throwable.printStackTrace(System.out);
         }
-
+        if (logger != null) {
+            logger.log("EngineConfig: " + message, t, Logger.WARNING);
+        } else {
+            log.log(java.util.logging.Level.WARNING,
+                "EngineConfig: " + message, t);
+        }
     }
 
 
