@@ -80,7 +80,7 @@ final class StandardHostValve
     extends ValveBase {
 
 
-    private static Logger log = Logger.getLogger(
+    private static final Logger log = Logger.getLogger(
         StandardHostValve.class.getName());
 
     private static final ClassLoader standardHostValveClassLoader =
@@ -463,13 +463,12 @@ final class StandardHostValve
      * @param message Message to be logged
      */
     protected void log(String message) {
-
         org.apache.catalina.Logger logger = container.getLogger();
-        if (logger != null)
+        if (logger != null) {
             logger.log(this.toString() + ": " + message);
-        else
-            System.out.println(this.toString() + ": " + message);
-
+        } else {
+            log.info(this.toString() + ": " + message);
+        }
     }
 
 
@@ -479,16 +478,13 @@ final class StandardHostValve
      * @param message Message to be logged
      * @param throwable Associated exception
      */
-    protected void log(String message, Throwable throwable) {
-
+    protected void log(String message, Throwable t) {
         org.apache.catalina.Logger logger = container.getLogger();
-        if (logger != null)
-            logger.log(this.toString() + ": " + message, throwable);
-        else {
-            System.out.println(this.toString() + ": " + message);
-            throwable.printStackTrace(System.out);
+        if (logger != null) {
+            logger.log(this.toString() + ": " + message, t);
+        } else {
+            log.log(Level.WARNING, this.toString() + ": " + message, t);
         }
-
     }
 
 
