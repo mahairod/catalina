@@ -35,6 +35,7 @@ import org.apache.catalina.Request;
 import org.apache.catalina.Wrapper;
 import static org.apache.catalina.InstanceEvent.EventType.BEFORE_FILTER_EVENT;
 import static org.apache.catalina.InstanceEvent.EventType.AFTER_FILTER_EVENT;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.catalina.util.StringManager;
@@ -66,9 +67,7 @@ final class ApplicationFilterChain implements FilterChain {
      * Construct a new chain instance with no defined filters.
      */
     public ApplicationFilterChain() {
-
         super();
-
     }
 
 
@@ -108,10 +107,10 @@ final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * The original request (implementation object) on which this
+     * The facade of the request implementation object on which this
      * FilterChain will be executed
      */
-    private Request origRequest = null;
+    private RequestFacade requestFacade = null;
 
 
     /**
@@ -196,10 +195,8 @@ final class ApplicationFilterChain implements FilterChain {
         // Call the next filter if there is one
         if (pos < n) {
             ApplicationFilterConfig filterConfig = filters[pos++];
-            if (origRequest != null) {
-                if (!filterConfig.isAsyncSupported()) {
-                    origRequest.disableAsyncSupport();
-                }
+            if (!filterConfig.isAsyncSupported()) {
+                requestFacade.disableAsyncSupport();
             }
             Filter filter = null;
             try {
@@ -309,7 +306,7 @@ final class ApplicationFilterChain implements FilterChain {
 
         */
         // START IASRI 4665318
-        wrapper.service(request, response, servlet, origRequest);
+        wrapper.service(request, response, servlet, requestFacade);
         // END IASRI 4665318
     }
 
@@ -342,7 +339,7 @@ final class ApplicationFilterChain implements FilterChain {
         pos = 0;
         servlet = null;
         wrapper = null;
-        origRequest = null;
+        requestFacade = null;
     }
 
 
@@ -371,11 +368,11 @@ final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * Sets the request implementation object on which this FilterChain will
-     * be executed.
+     * Sets the facade of the request implementation object on which this
+     * FilterChain will be executed.
      */
-    void setRequest(Request origRequest) {
-        this.origRequest = origRequest;
+    void setRequestFacade(RequestFacade requestFacade) {
+        this.requestFacade = requestFacade;
     }
 
 }

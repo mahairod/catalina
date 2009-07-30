@@ -32,6 +32,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import com.sun.grizzly.util.buf.MessageBytes;
 import org.apache.catalina.*;
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.valves.ValveBase;
@@ -105,7 +106,7 @@ final class StandardWrapperValve extends ValveBase {
          * return "/", rather than the context root of the default-web-module,
          * in this case.
          */
-        HttpServletRequest hreq = (HttpServletRequest) request.getRequest(true);
+        RequestFacade hreq = (RequestFacade) request.getRequest(true);
         HttpServletResponse hres =
             (HttpServletResponse) response.getResponse();
 
@@ -251,11 +252,11 @@ final class StandardWrapperValve extends ValveBase {
             // START IASRI 4665318
             if (servlet != null) {
                 if (filterChain != null) {
-                    filterChain.setRequest(request);
+                    filterChain.setRequestFacade(hreq);
                     filterChain.setWrapper(wrapper);
                     filterChain.doFilter(hreq, hres);
                 } else {
-                    wrapper.service(hreq, hres, servlet, request);
+                    wrapper.service(hreq, hres, servlet, hreq);
                 }
             }
             // END IASRI 4665318

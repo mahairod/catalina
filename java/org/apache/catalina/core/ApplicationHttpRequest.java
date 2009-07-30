@@ -32,6 +32,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.Manager;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
@@ -67,9 +68,14 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    /**
+     * Descriptive information about this implementation.
+     */
+    protected static final String info =
+        "org.apache.catalina.core.ApplicationHttpRequest/1.0";
+
 
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a new wrapped request around the specified servlet request.
@@ -109,22 +115,19 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     // ----------------------------------------------------- Instance Variables
 
-
     private String requestedSessionVersion = null;
-    private boolean isSessionVersioningSupported = false;
 
+    private boolean isSessionVersioningSupported = false;
 
     /**
      * The context for this request.
      */
     protected Context context = null;
 
-
     /**
      * The context path for this request.
      */
     protected String contextPath = null;
-
 
     /**
      * If this request is cross context, since this changes session accesss
@@ -132,19 +135,10 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected boolean crossContext = false;
 
-
     /**
      * The dispatcher type.
      */
     protected DispatcherType dispatcherType;
-
-
-    /**
-     * Descriptive information about this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.core.ApplicationHttpRequest/1.0";
-
 
     /**
      * The request parameters for this request.  This is initialized from the
@@ -582,9 +576,11 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     localSession.setId(other.getId());
                     */
                     // START GlassFish 896
-                    SessionTracker tracker = (SessionTracker) getAttribute(
-                        Globals.SESSION_TRACKER);
-                    tracker.track(localSession);
+                    SessionTracker sessionTracker = (SessionTracker)
+                        getRequestFacade().getNote(Globals.SESSION_TRACKER);
+                    if (sessionTracker != null) {
+                        sessionTracker.track(localSession);
+                    }
                     // END GlassFish 896
                 }
                 if (localSession != null) {
@@ -1043,4 +1039,14 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
         sessionVersions.put(path, versionString);
     }
 
+    /**
+     * Gets the facade for the request implementation object.
+     */
+    public RequestFacade getRequestFacade() {
+        if (getRequest() instanceof RequestFacade) {
+            return ((RequestFacade) (getRequest()));
+        } else {
+            return ((ApplicationHttpRequest) (getRequest())).getRequestFacade();
+        }
+    }
 }

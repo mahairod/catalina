@@ -41,6 +41,7 @@ import static org.apache.catalina.InstanceEvent.EventType.BEFORE_SERVICE_EVENT;
 import static org.apache.catalina.InstanceEvent.EventType.AFTER_SERVICE_EVENT;
 import static org.apache.catalina.InstanceEvent.EventType.AFTER_DESTROY_EVENT;
 import static org.apache.catalina.InstanceEvent.EventType.BEFORE_DESTROY_EVENT;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
@@ -1436,7 +1437,7 @@ public class StandardWrapper
 
     // START IASRI 4665318
     void service(ServletRequest request, ServletResponse response,
-                 Servlet serv, Request origRequest)
+                 Servlet serv, RequestFacade requestFacade)
              throws IOException, ServletException {
 
         InstanceSupport supp = getInstanceSupport();
@@ -1444,10 +1445,8 @@ public class StandardWrapper
         try {
             supp.fireInstanceEvent(BEFORE_SERVICE_EVENT,
                                    serv, request, response);
-            if (origRequest != null) {
-                if (!isAsyncSupported()) {
-                    origRequest.disableAsyncSupport();
-                }
+            if (!isAsyncSupported()) {
+                requestFacade.disableAsyncSupport();
             } 
             if ((request instanceof HttpServletRequest) &&
                 (response instanceof HttpServletResponse)) {
