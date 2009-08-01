@@ -320,7 +320,7 @@ public interface Container {
      *
      * @param resources The newly associated Resources
      */
-    void setResources(DirContext resources);
+    void setResources(DirContext resources) throws Exception;
 
 
     // --------------------------------------------------------- Public Methods
