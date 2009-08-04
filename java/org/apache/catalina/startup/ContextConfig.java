@@ -1203,9 +1203,6 @@ public class ContextConfig
 
         // FIXME : Removing status pages
 
-        // Removing taglibs
-        context.removeTaglibs();
-
         // Removing welcome files
         context.removeWelcomeFiles();
 
