@@ -3957,7 +3957,7 @@ public class Request
      */
     @Override
     public AsyncContext startAsync() throws IllegalStateException {
-        return startAsync(this, (Response) getResponse(), true);
+        return startAsync(getRequest(), getResponse().getResponse(), true);
     }
 
 
