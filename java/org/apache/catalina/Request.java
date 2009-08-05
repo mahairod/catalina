@@ -52,14 +52,6 @@ public interface Request {
 
 
     /**
-     * Set the authorization credentials sent with this request.
-     *
-     * @param authorization The new authorization credentials
-     */
-    public void setAuthorization(String authorization);
-
-
-    /**
      * Return the Connector through which this Request was received.
      */
     public Connector getConnector();
@@ -304,15 +296,6 @@ public interface Request {
      * @param remote The remote IP address
      */
     public void setRemoteAddr(String remote);
-
-
-    /**
-     * Set the name of the scheme associated with this request.  Typical values
-     * are <code>http</code>, <code>https</code>, and <code>ftp</code>.
-     *
-     * @param scheme The scheme
-     */
-    public void setScheme(String scheme);
 
 
     /**

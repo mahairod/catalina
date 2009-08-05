@@ -369,22 +369,8 @@ public final class ApplicationDispatcher
         State state = new State(request, response, dispatcherType);
 
         // Identify the HTTP-specific request and response objects (if any)
-        HttpServletRequest hrequest = null;
-        /* GlassFish 6386229
-        if (request instanceof HttpServletRequest)
-            hrequest = (HttpServletRequest) request;
-        */    
-        // START GlassFish 6386229
-        hrequest = (HttpServletRequest) request;
-        // END GlassFish 6386229
-        HttpServletResponse hresponse = null;
-        /* GlassFish 6386229
-        if (response instanceof HttpServletResponse)
-            hresponse = (HttpServletResponse) response;
-        */    
-        // START GlassFish 6386229
-        hresponse = (HttpServletResponse) response;
-        // END GlassFish 6386229
+        HttpServletRequest hrequest = (HttpServletRequest) request;
+        HttpServletResponse hresponse = (HttpServletResponse) response;
 
         // Handle a non-HTTP forward by passing the existing request/response
         if ((hrequest == null) || (hresponse == null)) {
@@ -438,7 +424,7 @@ public final class ApplicationDispatcher
                 wrequest.setQueryParams(queryString);
             }
 
-            processRequest(request,response,state);
+            processRequest(request, response, state);
 
             wrequest.recycle();
             unwrapRequest(state);
@@ -1023,7 +1009,6 @@ public final class ApplicationDispatcher
         // Instantiate a new wrapper and insert it in the chain
         ApplicationHttpRequest wrapper = new ApplicationHttpRequest(
             hcurrent, context, crossContext, state.dispatcherType);
-
         if (previous == null) {
             state.outerRequest = wrapper;
         } else {
