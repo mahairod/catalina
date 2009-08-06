@@ -79,6 +79,8 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 
 import org.apache.catalina.authenticator.SingleSignOn;
+import org.apache.catalina.core.ApplicationHttpRequest;
+import org.apache.catalina.core.ApplicationHttpResponse;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.session.StandardSession;
@@ -3674,7 +3676,17 @@ public class Request
     public AsyncContext startAsync(ServletRequest servletRequest,
                                    ServletResponse servletResponse)
             throws IllegalStateException {
-        return startAsync(servletRequest, servletResponse, false);
+        // If original or container-wrapped request and response,
+        // AsyncContext#hasOriginalRequestAndResponse must return true;
+        // false otherwise (i.e., if application-wrapped)
+        if ((servletRequest instanceof RequestFacade ||
+                    servletRequest instanceof ApplicationHttpRequest) &&
+                (servletResponse instanceof ResponseFacade ||
+                    servletResponse instanceof ApplicationHttpResponse)) {
+            return startAsync(servletRequest, servletResponse, true);
+        } else {
+            return startAsync(servletRequest, servletResponse, false);
+        }
     }
 
     private Multipart getMultipart() {
