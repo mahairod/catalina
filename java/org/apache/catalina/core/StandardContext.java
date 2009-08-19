@@ -135,12 +135,6 @@ public class StandardContext
     private String hostName;
 
     /**
-     * The list of application listener class names configured for this
-     * application, in the order they were encountered in the web.xml file.
-     */
-    private List<String> applicationListeners = new ArrayList<String>();
-
-    /**
      * The list of instantiated application event listeners
      */
     private transient List<EventListener> eventListeners =
@@ -683,7 +677,7 @@ public class StandardContext
     // ServletContextListeners may be registered (via
     // ServletContext#addListener) only within the scope of
     // ServletContainerInitializer#onStartup
-    private boolean isAllowedToRegisterServletContextListener = false;
+    private boolean isProgrammaticServletContextListenerRegistrationAllowed = false;
 
     /*
      * Security manager responsible for enforcing permission check on
@@ -1922,35 +1916,14 @@ public class StandardContext
 
 
     /**
-     * Adds the Listener with the given class name to the set of Listeners
-     * configured for this application.
+     * Adds the Listener with the given class name that is declared in the
+     * deployment descriptor to the set of Listeners configured for this
+     * application.
      *
      * @param listener the fully qualified class name of the Listener
      */
     public void addApplicationListener(String listener) {
-
-        if (applicationListeners.contains(listener)) {
-            if (log.isLoggable(Level.INFO)) {
-                log.info(sm.getString("standardContext.duplicateListener",
-                                      listener));
-            }
-            return;
-        }
-
-        if ("com.sun.faces.config.ConfigureListener".equals(listener)) {
-            // Always add the JSF listener as the first element,
-            // see GlassFish Issue 2563 for details
-            applicationListeners.add(0, listener);
-        } else {
-            applicationListeners.add(listener);
-        }
-
-        if (notifyContainerListeners) {
-            fireContainerEvent("addApplicationListener", listener);
-        }
-
-        // FIXME - add instance if already started?
-
+        addListener(listener, false);
     }
 
     /**
@@ -2619,30 +2592,61 @@ public class StandardContext
 
     /**
      * Adds the listener with the given class name to this ServletContext.
+     *
+     * @param className the fully qualified class name of the listener
      */
     public void addListener(String className) {
+        addListener(className, true);
+    }
+
+
+    /**
+     * Adds the listener with the given class name to this ServletContext.
+     *
+     * @param className the fully qualified class name of the listener
+     * @param isProgrammatic true if the listener is being added
+     * programmatically, and false if it has been declared in the deployment
+     * descriptor
+     */
+    private void addListener(String className, boolean isProgrammatic) {
         try {
-            addListener(loadListener(getClassLoader(), className));
+            addListener(loadListener(getClassLoader(), className),
+                        isProgrammatic);
         } catch (Throwable t) {
             throw new IllegalArgumentException(
-                "Unable to load listener of type " + className, t); 
+                "Unable to add listener of type " + className, t); 
         }
     }
 
     /**
      * Adds the given listener instance to this ServletContext.
+     *
+     * @param t the listener to be added
      */
     public <T extends EventListener> void addListener(T t) {
+        addListener(t, true);
+    }
+
+    /**
+     * Adds the given listener instance to this ServletContext.
+     *
+     * @param t the listener to be added
+     * @param isProgrammatic true if the listener is being added
+     * programmatically, and false if it has been declared in the deployment
+     * descriptor
+     */
+    private <T extends EventListener> void addListener(T t,
+            boolean isProgrammatic) {
         if (isContextInitializedCalled) {
             throw new IllegalStateException(
                 sm.getString("applicationContext.alreadyInitialized",
                              "addListener", getName()));
         }
 
-        if (!isAllowedToRegisterServletContextListener &&
-                t instanceof ServletContextListener) {
+        if ((t instanceof ServletContextListener) && isProgrammatic &&
+                !isProgrammaticServletContextListenerRegistrationAllowed) {
             throw new IllegalArgumentException("Not allowed to register " + 
-                "ServletContextListener");
+                "ServletContextListener programmatically");
         }
 
         boolean added = false;
@@ -2660,7 +2664,25 @@ public class StandardContext
             }
         }
         if (t instanceof ServletContextListener) {
-            restrictedServletContextListeners.add((ServletContextListener) t);
+            // Always add the JSF listener as the first element,
+            // see GlassFish Issue 2563 for details
+            boolean isFirst = "com.sun.faces.config.ConfigureListener".equals(
+                    t.getClass().getName());
+            if (isProgrammatic) {
+                if (isFirst) {
+                    restrictedServletContextListeners.add(0,
+                        (ServletContextListener) t);
+                } else {
+                    restrictedServletContextListeners.add(
+                        (ServletContextListener) t);
+                }
+            } else {
+                if (isFirst) {
+                    lifecycleListeners.add(0, t);
+                } else {
+                    lifecycleListeners.add(t);
+                }
+            }
             if (!added) {
                 added = true;
             }
@@ -3081,6 +3103,7 @@ public class StandardContext
                 servletMappings.put(pattern, name);
             }
         }
+
         Wrapper wrapper = (Wrapper) findChild(name);
         wrapper.addMapping(pattern);
 
@@ -3454,14 +3477,6 @@ public class StandardContext
         }
 
         return (wrapper);
-    }
-
-    /**
-     * Return the list of application listener class names configured
-     * for this application.
-     */
-    public List<String> findApplicationListeners() {
-        return applicationListeners;
     }
 
     /**
@@ -3993,21 +4008,6 @@ public class StandardContext
     }
 
     /**
-     * Removes any application listeners from this Context
-     */
-    public void removeApplicationListeners() {
-        // Inform interested listeners
-        if (notifyContainerListeners) {
-            Iterator<String> i = applicationListeners.iterator(); 
-            while (i.hasNext()) {
-                fireContainerEvent("removeApplicationListener", i.next());
-            }
-        }
-        applicationListeners.clear();
-        // FIXME - behavior if already started?
-    }
-
-    /**
      * Remove the application parameter with the specified name from
      * the set for this application.
      *
@@ -4501,49 +4501,6 @@ public class StandardContext
      */
     public boolean listenerStart() {
 
-        if (log.isLoggable(Level.FINE))
-            log.fine("Configuring application event listeners");
-
-        // Instantiate the required listeners
-        List<String> listeners = findApplicationListeners();
-        EventListener results[] = new EventListener[listeners.size()];
-        boolean ok = true;
-
-        int i = 0;
-        for (String listener : listeners) {
-            try {
-                results[i++] = loadListener(getClassLoader(), listener);
-            } catch (Throwable t) {
-                getServletContext().log
-                    (sm.getString("standardContext.applicationListener",
-                                  listener), t);
-                ok = false;
-            }
-        }
-        if (!ok) {
-            log.severe(sm.getString("standardContext.applicationSkipped"));
-            return (false);
-        }
-
-        // Sort listeners into lifecycle and event listeners
-        for (Object result : results) {
-            if (result instanceof ServletContextAttributeListener ||
-                    result instanceof ServletRequestAttributeListener ||
-                    result instanceof ServletRequestListener ||
-                    result instanceof HttpSessionAttributeListener) {
-                eventListeners.add((EventListener)result);
-            }
-            if (result instanceof ServletContextListener ||
-                    result instanceof HttpSessionListener) {
-                lifecycleListeners.add((EventListener)result);
-            }
-        }
-
-        // Send application start events
-        if (log.isLoggable(Level.FINE)) {
-            log.fine("Sending application start events");
-        }
-
         ServletContextEvent event =
             new ServletContextEvent(getServletContext());
         for (EventListener eventListener : lifecycleListeners) {
@@ -4580,7 +4537,7 @@ public class StandardContext
 
         isContextInitializedCalled = true;
 
-        return ok;
+        return true;
     }
 
 
@@ -5321,9 +5278,9 @@ public class StandardContext
             return true;
         }
 
-        // Allow registration of ServletContextListeners, but only within
-        // the scope of ServletContainerInitializer#onStartup
-        isAllowedToRegisterServletContextListener = true;
+        // Allow programmatic registration of ServletContextListeners, but
+        // only within the scope of ServletContainerInitializer#onStartup
+        isProgrammaticServletContextListenerRegistrationAllowed = true;
 
         // We have the list of initializers and the classes that satisfy
         // the condition. Time to call the initializers
@@ -5346,7 +5303,7 @@ public class StandardContext
                 }
             }
         } finally {
-            isAllowedToRegisterServletContextListener = false;
+            isProgrammaticServletContextListenerRegistrationAllowed = false;
         }
 
         return true;
@@ -5591,7 +5548,6 @@ public class StandardContext
         // Bugzilla 32867
         distributable = false;
 
-        applicationListeners.clear();
         eventListeners.clear();
         lifecycleListeners.clear();
         restrictedServletContextListeners.clear();
