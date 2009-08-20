@@ -52,6 +52,7 @@ import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.Resource;
 import com.sun.grizzly.util.buf.CharChunk;
 import com.sun.grizzly.util.buf.MessageBytes;
+import com.sun.grizzly.util.http.mapper.AlternateDocBase;
 import com.sun.grizzly.util.http.mapper.MappingData;
 
 
