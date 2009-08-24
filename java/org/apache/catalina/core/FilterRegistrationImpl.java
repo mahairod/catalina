@@ -33,6 +33,11 @@ public class FilterRegistrationImpl implements FilterRegistration {
     }
 
 
+    public FilterDef getFilterDefinition() {
+        return filterDef;
+    }
+
+
     public String getClassName() {
         return filterDef.getFilterClassName();
     }
