@@ -32,6 +32,11 @@ public class ServletRegistrationImpl implements ServletRegistration {
     }
 
 
+    public StandardWrapper getWrapper() {
+        return wrapper;
+    }
+
+
     public String getClassName() {
         return wrapper.getServletClassName();
     }
