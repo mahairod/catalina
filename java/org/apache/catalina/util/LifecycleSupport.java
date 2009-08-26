@@ -18,14 +18,12 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.util;
 
 import java.util.*;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 
 
@@ -102,7 +100,8 @@ public final class LifecycleSupport {
      * @param type Event type
      * @param data Event data
      */
-    public void fireLifecycleEvent(String type, Object data) {
+    public void fireLifecycleEvent(String type, Object data)
+            throws LifecycleException {
         LifecycleEvent event = new LifecycleEvent(lifecycle, type, data);
         Iterator<LifecycleListener> i = listeners.iterator(); 
         while (i.hasNext()) {

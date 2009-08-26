@@ -279,34 +279,29 @@ public class ContextConfig
      *
      * @param event The lifecycle event that has occurred
      */
-    public void lifecycleEvent(LifecycleEvent event) {
+    public void lifecycleEvent(LifecycleEvent event)
+            throws LifecycleException {
 
         // Identify the context we are associated with
         try {
             context = (Context) event.getLifecycle();
-//             if (context instanceof StandardContext) {
-//                 int contextDebug = ((StandardContext) context).getDebug();
-//                 if (contextDebug > this.debug)
-//                     this.debug = contextDebug;
-//             }
         } catch (ClassCastException e) {
-            log.log(Level.SEVERE,
-                    sm.getString("contextConfig.cce", event.getLifecycle()),
-                    e);
-            return;
+            throw new LifecycleException(
+                sm.getString("contextConfig.cce", event.getLifecycle()),
+                e);
         }
 
         // Called from ContainerBase.addChild() -> StandardContext.start()
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.START_EVENT)) 
+        if (event.getType().equals(Lifecycle.START_EVENT)) {
             start();
-        else if (event.getType().equals(Lifecycle.STOP_EVENT)) 
+        } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();
         // START GlassFish 2439
-        else if (event.getType().equals(Lifecycle.INIT_EVENT)) 
+        } else if (event.getType().equals(Lifecycle.INIT_EVENT)) {
             init();
         // END GlassFish 2439
-
+        }
     }
 
 
@@ -316,7 +311,7 @@ public class ContextConfig
     /**
      * Process the application configuration file, if it exists.
      */
-    protected void applicationConfig() {
+    protected void applicationConfig() throws LifecycleException {
 
         String altDDName = null;
 
@@ -325,12 +320,12 @@ public class ContextConfig
         ServletContext servletContext = context.getServletContext();
         if (servletContext != null) {
             altDDName = (String)servletContext.getAttribute(
-                                                        Globals.ALT_DD_ATTR);
+                    Globals.ALT_DD_ATTR);
             if (altDDName != null) {
                 try {
                     stream = new FileInputStream(altDDName);
                 } catch (FileNotFoundException e) {
-                    log.log(Level.SEVERE,
+                    throw new LifecycleException(
                             sm.getString("contextConfig.altDDNotFound",
                                          altDDName));
                 }
@@ -377,20 +372,15 @@ public class ContextConfig
                     webDigester.push(context);
                     webDigester.parse(is);
                 } else {
-                    log.info("No web.xml, using defaults " + context );
+                    log.info("No web.xml, using defaults " + context);
                 }
             } catch (SAXParseException e) {
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.applicationParse"), e);
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.applicationPosition",
-                                     "" + e.getLineNumber(),
-                                     "" + e.getColumnNumber()));
-                ok = false;
+                throw new LifecycleException(
+                    sm.getString("contextConfig.applicationParsePosition",
+                        e.getLineNumber(), e.getColumnNumber()), e);
             } catch (Exception e) {
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.applicationParse"), e);
-                ok = false;
+                throw new LifecycleException(
+                    sm.getString("contextConfig.applicationParse"), e);
             } finally {
                 try {
                     if (stream != null) {
@@ -417,11 +407,9 @@ public class ContextConfig
      * Set up a manager.
      */
     protected synchronized void managerConfig() {
-
         if (context.getManager() == null) {
             context.setManager(new StandardManager());
         }
-
     }
 
 
@@ -429,7 +417,8 @@ public class ContextConfig
      * Set up an Authenticator automatically if required, and one has not
      * already been configured.
      */
-    protected synchronized void authenticatorConfig() {
+    protected synchronized void authenticatorConfig()
+            throws LifecycleException {
 
         // Does this Context require an Authenticator?
         /* START IASRI 4856062
@@ -479,9 +468,8 @@ public class ContextConfig
         Realm rlm = context.getRealm();
         if (rlm == null) {
         // END IASRI 4856062
-            log.log(Level.SEVERE, sm.getString("contextConfig.missingRealm"));
-            ok = false;
-            return;
+            throw new LifecycleException(
+                sm.getString("contextConfig.missingRealm"));
         }
 
         // BEGIN IASRI 4856062
@@ -510,11 +498,9 @@ public class ContextConfig
                     && customAuthenticators.containsKey(loginMethod)) {
                 authenticator = (GlassFishValve) customAuthenticators.get(loginMethod);
                 if (authenticator == null) {
-                    log.log(Level.SEVERE,
-                            sm.getString("contextConfig.authenticatorMissing",
-                                         loginMethod));
-                    ok = false;
-                    return;
+                    throw new LifecycleException(
+                        sm.getString("contextConfig.authenticatorMissing",
+                                     loginMethod));
                 }
             }
             // END PWC 6392537
@@ -539,11 +525,9 @@ public class ContextConfig
             */
 
             if (authenticatorName == null) {
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.authenticatorMissing",
-                                     loginConfig.getAuthMethod()));
-                ok = false;
-                return;
+                throw new LifecycleException(
+                    sm.getString("contextConfig.authenticatorMissing",
+                                 loginConfig.getAuthMethod()));
             }
 
             // Instantiate and install an Authenticator of the requested class
@@ -551,11 +535,10 @@ public class ContextConfig
                 Class authenticatorClass = Class.forName(authenticatorName);
                 authenticator = (GlassFishValve) authenticatorClass.newInstance();
             } catch (Throwable t) {
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.authenticatorInstantiate",
-                                     authenticatorName),
-                        t);
-                ok = false;
+                throw new LifecycleException(
+                    sm.getString("contextConfig.authenticatorInstantiate",
+                                 authenticatorName),
+                    t);
             }
         }
 
@@ -564,8 +547,9 @@ public class ContextConfig
             if (pipeline != null) {
                 ((ContainerBase) context).addValve(authenticator);
                 if (log.isLoggable(Level.FINE)) {
-                    log.fine(sm.getString("contextConfig.authenticatorConfigured",
-                                          loginConfig.getAuthMethod()));
+                    log.fine(sm.getString(
+                        "contextConfig.authenticatorConfigured",
+                        loginConfig.getAuthMethod()));
                 }
             }
         }
@@ -629,7 +613,7 @@ public class ContextConfig
      * The default config must be read with the container loader - so
      * container servlets can be loaded
      */
-    protected void defaultConfig() {
+    protected void defaultConfig() throws LifecycleException {
         long t1 = System.currentTimeMillis();
 
         // Open the default web.xml file, if it exists
@@ -680,11 +664,9 @@ public class ContextConfig
                 stream = new FileInputStream(file);
             }
         } catch (Exception e) {
-            log.log(Level.SEVERE,
-                    sm.getString("contextConfig.defaultMissing") 
-                        + " " + defaultWebXml + " " + file,
-                    e);
-            return;
+            throw new LifecycleException(
+                sm.getString("contextConfig.defaultMissing") + " " +
+                    defaultWebXml + " " + file, e);
         }
 
         // Process the default web.xml file
@@ -703,17 +685,12 @@ public class ContextConfig
                 webDigester.push(context);
                 webDigester.parse(source);
             } catch (SAXParseException e) {
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.defaultParse"), e);
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.defaultPosition",
-                                     "" + e.getLineNumber(),
-                                     "" + e.getColumnNumber()));
-                ok = false;
+                throw new LifecycleException(
+                    sm.getString("contextConfig.defaultParsePosition",
+                        e.getLineNumber(), e.getColumnNumber()), e);
             } catch (Exception e) {
-                log.log(Level.SEVERE,
-                        sm.getString("contextConfig.defaultParse"), e);
-                ok = false;
+                throw new LifecycleException(
+                    sm.getString("contextConfig.defaultParse"), e);
             } finally {
                 try {
                     if (stream != null) {
@@ -1016,13 +993,12 @@ public class ContextConfig
     /**
      * Process a "start" event for this Context - in background
      */
-    protected synchronized void start() {
-        // Called from StandardContext.start()
-
-        if (log.isLoggable(Level.FINEST))
+    protected synchronized void start() throws LifecycleException {
+        if (log.isLoggable(Level.FINEST)) {
             log.finest(sm.getString("contextConfig.start"));
+        }
+
         context.setConfigured(false);
-        ok = true;
 
         // Set properties based on DefaultContext
         Container container = context.getParent();
@@ -1053,17 +1029,13 @@ public class ContextConfig
         // Process the default and application web.xml files
         defaultConfig();
         applicationConfig();
-        if (ok) {
-            validateSecurityRoles();
-        }
+        validateSecurityRoles();
 
         // Configure an authenticator if we need one
-        if (ok)
-            authenticatorConfig();
+        authenticatorConfig();
 
         // Configure a manager
-        if (ok)
-            managerConfig();
+        managerConfig();
 
         // Dump the contents of this pipeline if requested
         if ((log.isLoggable(Level.FINEST)) &&
@@ -1081,14 +1053,9 @@ public class ContextConfig
             log.finest("======================");
         }
 
-        // Make our application available if no problems were encountered
-        if (ok)
-            context.setConfigured(true);
-        else {
-            log.severe(sm.getString("contextConfig.unavailable"));
-            context.setConfigured(false);
-        }
-
+        // Make our application available because no problems
+        // were encountered
+        context.setConfigured(true);
     }
 
 

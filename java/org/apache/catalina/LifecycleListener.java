@@ -18,14 +18,9 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina;
 
-
 import java.util.EventObject;
-
 
 /**
  * Interface defining a listener for significant events (including "component
@@ -38,13 +33,11 @@ import java.util.EventObject;
 
 public interface LifecycleListener {
 
-
     /**
      * Acknowledge the occurrence of the specified event.
      *
      * @param event LifecycleEvent that has occurred
      */
-    public void lifecycleEvent(LifecycleEvent event);
-
-
+    public void lifecycleEvent(LifecycleEvent event)
+        throws LifecycleException;
 }
