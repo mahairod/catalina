@@ -192,6 +192,7 @@ public class CoyoteAdapter
         if (v3Enabled && !compatWithTomcat) {
             if (md != null) {
                 request.setMappingData(md);
+                request.updatePaths(md);
                 hostName = ((Host) md.host).getName();
             }
         }
@@ -481,6 +482,7 @@ public class CoyoteAdapter
             /*mod_jk*/
             connector.getMapper().map(req.serverName(), decodedURI, 
                                   request.getMappingData());
+            request.updatePaths(request.getMappingData());
             ctx = (Context) request.getMappingData().context;
         }
 
