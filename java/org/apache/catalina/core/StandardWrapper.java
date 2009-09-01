@@ -591,6 +591,14 @@ public class StandardWrapper
 
 
     /**
+     * @return the servlet class, or null if the servlet class has not
+     * been loaded yet
+     */
+    public Class <? extends Servlet> getServletClass() {
+        return servletClass;
+    }
+
+    /**
      * Sets the class object from which this servlet will be instantiated.
      *
      * @param servletClass The class object from which this servlet will
@@ -607,6 +615,15 @@ public class StandardWrapper
         if (Constants.JSP_SERVLET_CLASS.equals(servletClassName)) {
             isJspServlet = true;
         }
+    }
+
+
+    /**
+     * @return the servlet instance, or null if the servlet has not yet
+     * been instantiated
+     */
+    public Servlet getServlet() {
+        return instance;
     }
 
 
@@ -963,15 +980,6 @@ public class StandardWrapper
         if (notifyContainerListeners) {
             fireContainerEvent("addSecurityReference", name);
         }
-    }
-
-
-    /**
-     * @return the servlet instance, or null if no servlet instance was
-     * set or allocated
-     */
-    Servlet getServlet() {
-        return instance;
     }
 
 
