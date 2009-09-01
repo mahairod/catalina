@@ -804,7 +804,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Set the documenr root folder
      */
     public void setWebAppRootPath(String rootFolder){
-        SelectorThread.setWebAppRootPath(rootFolder);
+        selectorThread.setWebAppRootPath(rootFolder);
     }
 
 
@@ -812,7 +812,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
      * Return the folder's root where application are deployed.
      */
     public String getWebAppRootPath(){
-        return SelectorThread.getWebAppRootPath();
+        return selectorThread.getWebAppRootPath();
     }
 
 
