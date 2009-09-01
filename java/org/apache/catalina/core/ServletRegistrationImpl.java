@@ -21,7 +21,8 @@ public class ServletRegistrationImpl implements ServletRegistration {
     /**
      * Constructor
      */
-    ServletRegistrationImpl(StandardWrapper wrapper, StandardContext ctx) {
+    protected ServletRegistrationImpl(StandardWrapper wrapper,
+                                      StandardContext ctx) {
         this.wrapper = wrapper;
         this.ctx = ctx;
     }
@@ -29,6 +30,11 @@ public class ServletRegistrationImpl implements ServletRegistration {
 
     public String getName() {
         return wrapper.getName();
+    }
+
+
+    public StandardContext getContext() {
+        return ctx;
     }
 
 
