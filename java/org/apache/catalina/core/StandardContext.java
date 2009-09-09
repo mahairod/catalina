@@ -4692,11 +4692,11 @@ public class StandardContext
         Collection<ServletRegistrationImpl> servletRegistrations =
             servletRegisMap.values();
         for (ServletRegistrationImpl regis : servletRegistrations) {
-            if (null == regis.getClassName()) {
+            if (null == regis.getClassName() && null == regis.getJspFile()) {
                 throw new IllegalStateException(
                     sm.getString(
-                        "standardContext.servletOrFilterWithoutAnyClass",
-                        "Servlet", regis.getName()));
+                        "standardContext.servletWithoutAnyClassOrJspFile",
+                        regis.getName()));
             }
         }
         Collection<FilterRegistrationImpl> filterRegistrations =
@@ -4705,8 +4705,8 @@ public class StandardContext
             if (null == regis.getClassName()) {
                 throw new IllegalStateException(
                     sm.getString(
-                        "standardContext.servletOrFilterWithoutAnyClass",
-                        "Filter", regis.getName()));
+                        "standardContext.filterWithoutAnyClass",
+                        regis.getName()));
             }
         }
         
