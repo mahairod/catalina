@@ -148,6 +148,7 @@ public class CoyoteAdapter
     /**
      * Service method.
      */
+    @Override
     public void service(com.sun.grizzly.tcp.Request req,
                         com.sun.grizzly.tcp.Response res)
             throws Exception {
@@ -323,6 +324,7 @@ public class CoyoteAdapter
      * Finish the response and close the connection based on the connection
      * header.
      */
+    @Override
     public void afterService(com.sun.grizzly.tcp.Request req,
                              com.sun.grizzly.tcp.Response res)
             throws Exception{
@@ -468,7 +470,9 @@ public class CoyoteAdapter
             /*mod_jk*/
             connector.getMapper().map(req.serverName(), decodedURI, 
                                   request.getMappingData());
-            request.updatePaths(request.getMappingData());
+            MappingData md = request.getMappingData();
+            req.setNote(MAPPING_DATA, md);
+            request.updatePaths(md);
             ctx = (Context) request.getMappingData().context;
         }
 
