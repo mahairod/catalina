@@ -1899,7 +1899,7 @@ public class Request
                 }
                 try {
                     return realm.invokeAuthenticateDelegate(this, (HttpResponse) getResponse(), 
-                            context, (AuthenticatorBase) authBase);
+                            context, (AuthenticatorBase) authBase, true);
 
                 } catch (Exception ex) {
                    throw new ServletException("Exception thrown while attempting to authenticate", ex);
