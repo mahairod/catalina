@@ -5338,11 +5338,12 @@ public class StandardContext
                     iniInstance.onStartup(
                         initializerList.get(initializer), ctxt);
                 } catch (Throwable t) {
-                    throw new LifecycleException(
+                    log.log(Level.SEVERE,
                         sm.getString(
                             "standardContext.servletContainerInitializer.error",
                             initializer.getCanonicalName()),
                         t);
+                    throw new LifecycleException(t);
                 }
             }
         } finally {
