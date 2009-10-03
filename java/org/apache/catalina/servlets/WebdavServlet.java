@@ -927,7 +927,7 @@ public class WebdavServlet
                 lockDuration = MAX_TIMEOUT;
             }
         }
-        lock.expiresAt = System.currentTimeMillis() + (lockDuration * 1000);
+        lock.expiresAt = System.currentTimeMillis() + (lockDuration * 1000L);
 
         int lockRequestType = LOCK_CREATION;
 
