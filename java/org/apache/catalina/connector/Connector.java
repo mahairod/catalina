@@ -25,7 +25,6 @@ import java.lang.reflect.Constructor;
 import java.net.URLEncoder;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 // START OF SJSAS 8.1 PE 6191830
 import java.security.cert.X509Certificate;
@@ -42,6 +41,7 @@ import com.sun.grizzly.util.http.mapper.Mapper;
 
 import com.sun.grizzly.tcp.Adapter;
 import com.sun.grizzly.tcp.ProtocolHandler;
+import com.sun.enterprise.glassfish.web.*;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -58,12 +58,9 @@ import org.apache.catalina.net.ServerSocketFactory;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
 // START S1AS 6188932
-import com.sun.appserv.ProxyHandler;
 // END S1AS 6188932
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jvnet.hk2.annotations.Inject;
-
 
 
 /**
