@@ -51,6 +51,7 @@ import javax.security.auth.Subject;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import com.sun.grizzly.util.WorkerThread;
 import com.sun.grizzly.util.buf.B2CConverter;
 // START CR 6309511
 import com.sun.grizzly.util.buf.ByteChunk;
@@ -126,9 +127,6 @@ public class Request
      */
     private static boolean enforceScope = false;
 
-    // Default timeout for async operations
-    private static final long DEFAULT_ASYNC_TIMEOUT_MILLIS = 30000L;
-
     /**
      * The string manager for this package.
      */
@@ -186,11 +184,6 @@ public class Request
 
 
     // ----------------------------------------------------- Instance Variables
-
-    /* 
-     * Event notification types for async mode
-     */
-    private enum AsyncEventType { COMPLETE, TIMEOUT, ERROR }
 
     /**
      * The set of cookies associated with this Request.
@@ -478,8 +471,6 @@ public class Request
 
     private boolean asyncStarted;
     private AsyncContextImpl asyncContext;
-    private LinkedList<AsyncListenerHolder> asyncListenerHolders;
-    private long asyncTimeoutMillis = DEFAULT_ASYNC_TIMEOUT_MILLIS;
     // Has AsyncContext.complete been called?
     private boolean isAsyncComplete;
     private boolean isOkToReinitializeAsync;
@@ -637,17 +628,14 @@ public class Request
         /*
          * Clear and reinitialize all async related instance vars
          */
-        asyncContext = null;
-        if (asyncListenerHolders != null) {
-            asyncListenerHolders.clear();
-            asyncListenerHolders = null;
+        if (asyncContext != null) {
+            asyncContext.clear();
+            asyncContext = null;
         }
         isAsyncSupported = true;
         asyncStarted = false;
         isAsyncComplete = false;
         isOkToReinitializeAsync = false;
-
-        asyncTimeoutMillis = DEFAULT_ASYNC_TIMEOUT_MILLIS;
     }
 
 
@@ -3618,12 +3606,12 @@ public class Request
             // Reinitialize existing AsyncContext
             asyncContext.reinitialize(servletRequest, servletResponse,
                 isOriginalRequestAndResponse);
-            asyncContext.getIsDispatchInProgress().set(false);
         } else {
             asyncContext = new AsyncContextImpl(this, servletRequest,
                 (Response) getResponse(), servletResponse,
                 isOriginalRequestAndResponse);
         }
+
         asyncStarted = true;
         isOkToReinitializeAsync = false;
 
@@ -3631,8 +3619,11 @@ public class Request
             new CompletionHandler<Request>() {
 
                 public void resumed(Request attachment) {
-                    attachment.notifyAsyncListeners(AsyncEventType.COMPLETE,
-                        null);
+                    if (attachment.asyncContext != null) {
+                        attachment.asyncContext.notifyAsyncListeners(
+                            AsyncContextImpl.AsyncEventType.COMPLETE,
+                            null);
+                    }
                 }
 
                 public void cancelled(Request attachment) {
@@ -3643,10 +3634,10 @@ public class Request
         org.apache.catalina.connector.Response res =
             (org.apache.catalina.connector.Response)
             coyoteRequest.getResponse().getNote(CoyoteAdapter.ADAPTER_NOTES);
-        coyoteRequest.getResponse().suspend(asyncTimeoutMillis, 
-                this,requestCompletionHandler,
+        coyoteRequest.getResponse().suspend(asyncContext.getTimeout(), 
+                this, requestCompletionHandler,
                 new RequestAttachment<org.apache.catalina.connector.Request>(
-                    asyncTimeoutMillis, this, requestCompletionHandler,
+                    asyncContext.getTimeout(), this, requestCompletionHandler,
                     res));
 
         return asyncContext;
@@ -3679,6 +3670,16 @@ public class Request
         isOkToReinitializeAsync = okToReInit;
     }
 
+    void setAsyncTimeout(long timeout) {
+        Thread t = Thread.currentThread();
+        if (t instanceof WorkerThread) {
+            WorkerThread wt = (WorkerThread) t;
+            if (wt.getAttachment() != null) {
+                wt.getAttachment().setIdleTimeoutDelay(timeout);
+            }
+        }
+    }
+
     /**
      * Checks whether this request supports async.
      */
@@ -3697,73 +3698,6 @@ public class Request
         }
 
         return asyncContext;
-    }
-
-    /**
-     * Registers the given AsyncListener with this request.
-     */
-    @Override
-    public void addAsyncListener(AsyncListener listener) {
-        if (listener == null) {
-            throw new IllegalArgumentException("Missing listener");
-        }
-
-        synchronized(this) {
-            if (asyncListenerHolders == null) {
-                asyncListenerHolders = new LinkedList<AsyncListenerHolder>();
-            }
-
-            asyncListenerHolders.add(new AsyncListenerHolder(listener));
-        }
-    }
-
-    /**
-     * Registers the given AsyncListener, ServletRequest, and 
-     * ServletResponse with this request.
-     */
-    @Override
-    public void addAsyncListener(AsyncListener listener,
-                                 ServletRequest request,
-                                 ServletResponse response) {
-        if (listener == null || request == null || response == null) {
-            throw new IllegalArgumentException(
-                "Missing listener, request, or response");
-        }
-
-        synchronized(this) {
-            if (asyncListenerHolders == null) {
-                asyncListenerHolders = new LinkedList<AsyncListenerHolder>();
-            }
-
-            asyncListenerHolders.add(new AsyncListenerHolder(
-                listener, request, response));
-        }
-    }
-
-    /**
-     * Sets the timeout (in milliseconds) for any asynchronous operations
-     * initiated on this request.
-     *
-     * @param timeout the timeout
-     */
-    @Override
-    public void setAsyncTimeout(long timeout) {
-        if (isAsyncStarted()) {
-            throw new IllegalStateException("Request already in async mode");
-        }
-        asyncTimeoutMillis = timeout;
-    }
-
-    /**
-     * Gets the timeout (in milliseconds) for any asynchronous operations
-     * initiated on this request.
-     *
-     * @return the timeout (in milliseconds) for any asynchronous
-     * operations initiated on this request
-     */
-    @Override
-    public long getAsyncTimeout() {
-        return asyncTimeoutMillis;
     }
 
     /*
@@ -3788,27 +3722,14 @@ public class Request
      * if none of the listeners have done so.
      */
     void asyncTimeout() {
-        if (asyncListenerHolders != null && !asyncListenerHolders.isEmpty()) {
-            notifyAsyncListeners(AsyncEventType.TIMEOUT, null);
+        if (asyncContext != null) {
+            asyncContext.notifyAsyncListeners(
+                AsyncContextImpl.AsyncEventType.TIMEOUT, null);
         }
         errorDispatchAndComplete(null);
     }
 
-    /*
-     * Invokes all registered AsyncListener instances at their
-     * <tt>onError</tt> method.
-     *
-     * This method also performs an error dispatch and completes the response
-     * if none of the listeners have done so.
-     */
-    void asyncError(Throwable t) {
-        if (asyncListenerHolders != null && !asyncListenerHolders.isEmpty()) {
-            notifyAsyncListeners(AsyncEventType.ERROR, t);
-        }
-        errorDispatchAndComplete(t);
-    }
-
-    private void errorDispatchAndComplete(Throwable t) {
+    void errorDispatchAndComplete(Throwable t) {
         /*
          * If no listeners, or none of the listeners called
          * AsyncContext#complete or any of the AsyncContext#dispatch
@@ -3841,39 +3762,6 @@ public class Request
         }
     }
    
-    /*
-     * Notifies all AsyncListeners of the given async event type
-     */
-    private void notifyAsyncListeners(AsyncEventType asyncEventType,
-                                      Throwable t) {
-        if (asyncListenerHolders != null) {
-            for (AsyncListenerHolder asyncListenerHolder :
-                            asyncListenerHolders) {
-                AsyncListener asyncListener =
-                    asyncListenerHolder.getAsyncListener();
-                AsyncEvent asyncEvent = new AsyncEvent(
-                    asyncContext, asyncListenerHolder.getRequest(),
-                    asyncListenerHolder.getResponse(), t);
-                try {
-                    switch (asyncEventType) {
-                    case COMPLETE:
-                        asyncListener.onComplete(asyncEvent);
-                        break;
-                    case TIMEOUT:
-                        asyncListener.onTimeout(asyncEvent);
-                        break;
-                    case ERROR:
-                        asyncListener.onError(asyncEvent);
-                        break;
-                    }
-                } catch (IOException ioe) {
-                    log.log(Level.WARNING, "Error invoking AsyncListener",
-                            ioe);
-                }
-            }
-        }
-    }
-
     private Multipart getMultipart() {
         if (multipart == null) {
             multipart = new Multipart(this,
@@ -3955,41 +3843,6 @@ public class Request
         notes.put(Globals.SESSION_TRACKER, sessionTracker);
     }
     // END GlassFish 896
-
-    /**
-     * Class holding all the information required for invoking an
-     * AsyncListener (including the AsyncListener itself).
-     */
-    private static class AsyncListenerHolder {
-
-        private AsyncListener listener;
-        private ServletRequest request;
-        private ServletResponse response;
-
-        public AsyncListenerHolder(AsyncListener listener) {
-            this(listener, null, null);
-        }
-
-        public AsyncListenerHolder(AsyncListener listener,
-                                   ServletRequest request,
-                                   ServletResponse response) {
-            this.listener = listener;
-            this.request = request;
-            this.response = response;
-        }
-
-        public AsyncListener getAsyncListener() {
-            return listener;
-        }
-
-        public ServletRequest getRequest() {
-            return request;
-        }
-
-        public ServletResponse getResponse() {
-            return response;
-        }
-    }
 
     /**
      * This class will be invoked by Grizzly when a suspend operation is either
