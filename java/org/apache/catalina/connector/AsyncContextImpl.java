@@ -54,6 +54,8 @@ public class AsyncContextImpl implements AsyncContext {
     // defaults to false
     private AtomicBoolean isDispatchInProgress = new AtomicBoolean(); 
 
+    private AtomicBoolean isOkToConfigure = new AtomicBoolean(true); 
+
     private long asyncTimeoutMillis = DEFAULT_ASYNC_TIMEOUT_MILLIS;
 
     private LinkedList<AsyncListenerHolder> asyncListenerHolders =
@@ -202,6 +204,11 @@ public class AsyncContextImpl implements AsyncContext {
             throw new IllegalArgumentException("Null listener");
         }
 
+        if (!isOkToConfigure.get()) {
+            throw new IllegalStateException(
+                STRING_MANAGER.getString("async.addListenerIllegalState"));
+        }
+
         synchronized(asyncListenerHolders) {
             asyncListenerHolders.add(new AsyncListenerHolder(listener));
         }
@@ -217,6 +224,11 @@ public class AsyncContextImpl implements AsyncContext {
                 "Null listener, request, or response");
         }
 
+        if (!isOkToConfigure.get()) {
+            throw new IllegalStateException(
+                STRING_MANAGER.getString("async.addListenerIllegalState"));
+        }
+
         synchronized(asyncListenerHolders) {
             asyncListenerHolders.add(new AsyncListenerHolder(
                 listener, servletRequest, servletResponse));
@@ -225,6 +237,10 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void setTimeout(long timeout) {
+        if (!isOkToConfigure.get()) {
+            throw new IllegalStateException(
+                STRING_MANAGER.getString("async.setTimeoutIllegalState"));
+        }
         asyncTimeoutMillis = timeout;
         origRequest.setAsyncTimeout(timeout);
     }
@@ -251,6 +267,7 @@ public class AsyncContextImpl implements AsyncContext {
         this.servletResponse = servletResponse;
         this.isOriginalRequestAndResponse = isOriginalRequestAndResponse;
         isDispatchInProgress.set(false);
+        setOkToConfigure(true);
         notifyAsyncListeners(AsyncEventType.START_ASYNC, null);
         if (isOriginalRequestAndResponse) {
             zeroArgDispatchTarget = getZeroArgDispatchTarget(origRequest);
@@ -261,6 +278,15 @@ public class AsyncContextImpl implements AsyncContext {
             log.warning("Unable to determine target of " +
                         "zero-argument dispatch");
         }
+    }
+
+    /**
+     * @param value true if calls to AsyncContext#addListener and
+     * AsyncContext#setTimeout will be accepted, and false if these
+     * calls will result in an IllegalStateException
+     */
+    void setOkToConfigure(boolean value) {
+        isOkToConfigure.set(value);
     }
 
     /**
