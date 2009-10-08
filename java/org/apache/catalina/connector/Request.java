@@ -18,11 +18,7 @@
  * limitations under the License.
  */
 
-
-
-
 package org.apache.catalina.connector;
-
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -92,9 +88,9 @@ import org.apache.catalina.util.StringManager;
 import org.apache.catalina.util.StringParser;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.fileupload.Multipart;
-import com.sun.appserv.ProxyHandler;
 
 // START S1AS 6170450
+import com.sun.appserv.ProxyHandler;
 // END S1AS 6170450
 import com.sun.enterprise.security.integration.RealmInitializer;
 import org.apache.catalina.authenticator.AuthenticatorBase;
@@ -3610,35 +3606,35 @@ public class Request
             asyncContext = new AsyncContextImpl(this, servletRequest,
                 (Response) getResponse(), servletResponse,
                 isOriginalRequestAndResponse);
-        }
 
-        asyncStarted = true;
-        isOkToReinitializeAsync = false;
-
-        CompletionHandler requestCompletionHandler =
-            new CompletionHandler<Request>() {
-
-                public void resumed(Request attachment) {
-                    if (attachment.asyncContext != null) {
-                        attachment.asyncContext.notifyAsyncListeners(
-                            AsyncContextImpl.AsyncEventType.COMPLETE,
-                            null);
+            CompletionHandler requestCompletionHandler =
+                new CompletionHandler<Request>() {
+                    public void resumed(Request attachment) {
+                        if (attachment.asyncContext != null) {
+                            attachment.asyncContext.notifyAsyncListeners(
+                                AsyncContextImpl.AsyncEventType.COMPLETE,
+                                null);
+                        }
                     }
-                }
 
-                public void cancelled(Request attachment) {
-                    attachment.asyncTimeout();
-                }
-        };
+                    public void cancelled(Request attachment) {
+                        attachment.asyncTimeout();
+                    }
+            };
 
-        org.apache.catalina.connector.Response res =
-            (org.apache.catalina.connector.Response)
-            coyoteRequest.getResponse().getNote(CoyoteAdapter.ADAPTER_NOTES);
-        coyoteRequest.getResponse().suspend(asyncContext.getTimeout(), 
+            org.apache.catalina.connector.Response res =
+                (org.apache.catalina.connector.Response)
+                    coyoteRequest.getResponse().getNote(
+                        CoyoteAdapter.ADAPTER_NOTES);
+            coyoteRequest.getResponse().suspend(asyncContext.getTimeout(), 
                 this, requestCompletionHandler,
                 new RequestAttachment<org.apache.catalina.connector.Request>(
                     asyncContext.getTimeout(), this, requestCompletionHandler,
                     res));
+        }
+
+        asyncStarted = true;
+        isOkToReinitializeAsync = false;
 
         return asyncContext;
     }
@@ -3694,7 +3690,8 @@ public class Request
     @Override
     public AsyncContext getAsyncContext() {
         if (!isAsyncStarted()) {
-            throw new IllegalStateException("Request not in async mode");
+            throw new IllegalStateException(
+                sm.getString("async.requestNotInAsyncMode"));
         }
 
         return asyncContext;
