@@ -3667,13 +3667,8 @@ public class Request
     }
 
     void setAsyncTimeout(long timeout) {
-        Thread t = Thread.currentThread();
-        if (t instanceof WorkerThread) {
-            WorkerThread wt = (WorkerThread) t;
-            if (wt.getAttachment() != null) {
-                wt.getAttachment().setIdleTimeoutDelay(timeout);
-            }
-        }
+        coyoteRequest.getResponse().getResponseAttachment()
+                .setIdleTimeoutDelay(timeout);
     }
 
     /**
@@ -3861,6 +3856,8 @@ public class Request
     private final static class RequestAttachment<A> extends com.sun.grizzly.tcp.Response.ResponseAttachment{
         private org.apache.catalina.connector.Response res;
 
+        private long timeout;
+
         public RequestAttachment(Long timeout,A attachment,
                 CompletionHandler<? super A> completionHandler,  org.apache.catalina.connector.Response res){
             super(timeout, attachment, completionHandler, res.getCoyoteResponse());
@@ -3886,6 +3883,16 @@ public class Request
             }
             res.recycle();
             res.getRequest().recycle();
+        }
+
+        @Override
+        public long getIdleTimeoutDelay(){
+            return timeout;
+        }
+
+        @Override
+        public void setIdleTimeoutDelay(long timeout){
+            this.timeout = timeout;
         }
 
         @Override
