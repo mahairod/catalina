@@ -6682,7 +6682,8 @@ public class StandardContext
                 "getFilterRegistrations", "getSessionCookieConfig",
                 "setSessionTrackingModes", "getDefaultSessionTrackingModes",
                 "getEffectiveSessionTrackingModes", "addListener",
-                "createListener", "getJspConfigDescriptor", "getClassLoader");
+                "createListener", "getJspConfigDescriptor", "getClassLoader",
+                "declareRoles");
 
         /*
          * The ServletContext to which to delegate the invocation of any
