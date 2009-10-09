@@ -680,6 +680,12 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
+    public void declareRoles(String... roleNames) {
+        // TBD
+    }
+
+
     // START PWC 1.2
     /**
      * Gets the underlying StandardContext to which this
