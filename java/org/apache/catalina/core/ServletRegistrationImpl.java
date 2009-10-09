@@ -91,8 +91,7 @@ public class ServletRegistrationImpl implements ServletRegistration {
     }
 
     public String getRunAsRole() {
-        // TBD
-        return null;
+        return wrapper.getRunAs();
     }
 }
 
