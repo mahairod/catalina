@@ -3226,12 +3226,13 @@ public class StandardContext
                 Wrapper wrapper = null;
                 if (regis == null) {
                     wrapper = createWrapper();
+                    wrapper.setServletClassName(className);
                 } else {
                     // Complete preliminary servlet registration
                     wrapper = regis.getWrapper();
+                    regis.setServletClassName(className);
                 }
                 wrapper.setName(servletName);
-                wrapper.setServletClassName(className);
                 addChild(wrapper, true, (null == regis));
                 if (null == regis) {
                     regis = (DynamicServletRegistrationImpl)
@@ -3268,12 +3269,13 @@ public class StandardContext
                 Wrapper wrapper = null;
                 if (regis == null) {
                     wrapper = createWrapper();
+                    wrapper.setServletClass(servletClass);
                 } else {
                     // Complete preliminary servlet registration
                     wrapper = regis.getWrapper();
+                    regis.setServletClass(servletClass);
                 }
                 wrapper.setName(servletName);
-                wrapper.setServletClass(servletClass);
                 addChild(wrapper, true, (null == regis));
                 if (null == regis) {
                     regis = (DynamicServletRegistrationImpl)
