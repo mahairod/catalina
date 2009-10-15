@@ -3609,6 +3609,7 @@ public class Request
 
             CompletionHandler requestCompletionHandler =
                 new CompletionHandler<Request>() {
+                @Override
                     public void resumed(Request attachment) {
                         if (attachment.asyncContext != null) {
                             attachment.asyncContext.notifyAsyncListeners(
@@ -3617,6 +3618,7 @@ public class Request
                         }
                     }
 
+                @Override
                     public void cancelled(Request attachment) {
                         attachment.asyncTimeout();
                     }
@@ -3631,8 +3633,6 @@ public class Request
                 new RequestAttachment<org.apache.catalina.connector.Request>(
                     asyncContext.getTimeout(), this, requestCompletionHandler,
                     res));
-            // XXX: The following call should not be needed
-            setAsyncTimeout(asyncContext.getTimeout());
         }
 
         asyncStarted = true;
@@ -3858,8 +3858,6 @@ public class Request
     private final static class RequestAttachment<A> extends com.sun.grizzly.tcp.Response.ResponseAttachment{
         private org.apache.catalina.connector.Response res;
 
-        private long timeout;
-
         public RequestAttachment(Long timeout,A attachment,
                 CompletionHandler<? super A> completionHandler,  org.apache.catalina.connector.Response res){
             super(timeout, attachment, completionHandler, res.getCoyoteResponse());
@@ -3885,16 +3883,6 @@ public class Request
             }
             res.recycle();
             res.getRequest().recycle();
-        }
-
-        @Override
-        public long getIdleTimeoutDelay(){
-            return timeout;
-        }
-
-        @Override
-        public void setIdleTimeoutDelay(long timeout){
-            this.timeout = timeout;
         }
 
         @Override
