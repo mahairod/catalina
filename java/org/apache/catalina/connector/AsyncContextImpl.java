@@ -285,7 +285,6 @@ public class AsyncContextImpl implements AsyncContext {
         this.isOriginalRequestAndResponse = isOriginalRequestAndResponse;
         isDispatchInProgress.set(false);
         setOkToConfigure(true);
-        setTimeout(DEFAULT_ASYNC_TIMEOUT_MILLIS);
         notifyAsyncListeners(AsyncEventType.START_ASYNC, null);
         if (isOriginalRequestAndResponse) {
             zeroArgDispatchTarget = getZeroArgDispatchTarget(origRequest);
