@@ -396,7 +396,6 @@ public final class ApplicationDispatcher
         else {
             ApplicationHttpRequest wrequest = (ApplicationHttpRequest)
                 wrapRequest(state);
-            String contextPath = context.getPath();
 
             // If the request is being FORWARD- or ASYNC-dispatched for 
             // the first time, initialize it with the required request
@@ -413,8 +412,17 @@ public final class ApplicationDispatcher
                                                hrequest.getPathInfo(),
                                                hrequest.getQueryString());
             }
- 
-            wrequest.setContextPath(contextPath);
+
+            String targetContextPath = context.getPath();
+            // START IT 10395
+            RequestFacade requestFacade = wrequest.getRequestFacade();
+            String originContextPath = requestFacade.getContextPath(false);
+            if (originContextPath != null &&
+                    originContextPath.equals(targetContextPath)) {
+                targetContextPath = hrequest.getContextPath();
+            }
+            // END IT 10395
+            wrequest.setContextPath(targetContextPath);
             wrequest.setRequestURI(requestURI);
             wrequest.setServletPath(servletPath);
             wrequest.setPathInfo(pathInfo);
@@ -427,7 +435,6 @@ public final class ApplicationDispatcher
 
             wrequest.recycle();
             unwrapRequest(state);
-
         }
     }
 
