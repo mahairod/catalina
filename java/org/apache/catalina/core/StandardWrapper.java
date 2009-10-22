@@ -1700,8 +1700,7 @@ public class StandardWrapper
             //if( System.getSecurityManager() != null) {
             if ( SecurityUtil.executeUnderSubjectDoAs() ){
             // END OF SJS WS 7.0 6236329
-                SecurityUtil.doAsPrivilege("destroy",
-                                           instance);
+                SecurityUtil.doAsPrivilege("destroy", instance);
                 SecurityUtil.remove(instance);                           
             } else {
                 instance.destroy();
