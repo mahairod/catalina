@@ -93,6 +93,9 @@ import org.apache.catalina.fileupload.Multipart;
 import com.sun.appserv.ProxyHandler;
 // END S1AS 6170450
 import com.sun.enterprise.security.integration.RealmInitializer;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.deploy.LoginConfig;
 
@@ -171,6 +174,11 @@ public class Request
         };
     }
     // ----------------------------------------------------- Instance Variables
+
+    // Is the remote browser closed the connection.
+    protected boolean clientClosedConnection = false;
+
+
     /**
      * The set of cookies associated with this Request.
      */
@@ -423,6 +431,10 @@ public class Request
     private String servletPath;
     private String pathInfo;
 
+    // Allow Grizzly to auto detect a remote close connection.
+    public final static boolean discardDisconnectEvent =
+            Boolean.getBoolean("com.sun.grizzly.discardDisconnect");
+
     // ----------------------------------------------------------- Constructor
     public Request() {
         // START OF SJSAS 6231069
@@ -462,6 +474,7 @@ public class Request
      * Release all object references, and initialize instance variables, in
      * preparation for reuse of this object.
      */
+    @Override
     public void recycle() {
 
         if (isAsyncStarted()) {
@@ -558,6 +571,7 @@ public class Request
         isAsyncSupported = true;
         asyncStarted.set(false);
         isAsyncComplete = false;
+        clientClosedConnection = false;
     }
 
     // -------------------------------------------------------- Request Methods
@@ -3564,7 +3578,14 @@ public class Request
 
                         @Override
                         public void cancelled(Request attachment) {
-                            attachment.asyncTimeout();
+                            if (attachment.clientClosedConnection &&
+                                    attachment.asyncContext != null) {
+                                attachment.asyncContext.notifyAsyncListeners(
+                                            AsyncContextImpl.AsyncEventType.ERROR,
+                                            null);
+                           } else {
+                                attachment.asyncTimeout();
+                            }
                         }
                     };
 
@@ -3811,6 +3832,28 @@ public class Request
                 log.log(Level.FINE, "RequestAttachement.resume: " + res);
             }
             completeProcessing();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        //@Override
+        public void handleSelectedKey(SelectionKey selectionKey) {
+            if (!selectionKey.isValid() || discardDisconnectEvent){
+                selectionKey.cancel();
+                return;
+            }
+            try {
+                ((Request)getAttachment()).clientClosedConnection = ((SocketChannel)selectionKey.channel()).
+                    read(ByteBuffer.allocate(1)) == -1;
+            } catch (IOException ex) {
+
+            } finally{
+                if (((Request)getAttachment()).clientClosedConnection){
+                   selectionKey.cancel();
+                   getCompletionHandler().cancelled(getAttachment());
+                }
+            }
         }
 
         void completeProcessing() {
