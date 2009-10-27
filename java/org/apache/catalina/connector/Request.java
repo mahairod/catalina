@@ -36,6 +36,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.*;
 import java.util.logging.*;
 
 import java.security.AccessController;
@@ -465,11 +466,11 @@ public class Request
     // operation, in which case async operation will be disabled
     private boolean isAsyncSupported = true;
 
-    private boolean asyncStarted;
+    private AtomicBoolean asyncStarted = new AtomicBoolean();
+
     private AsyncContextImpl asyncContext;
     // Has AsyncContext.complete been called?
     private boolean isAsyncComplete;
-    private boolean isOkToReinitializeAsync;
 
     /**
      * Multi-Part support
@@ -629,9 +630,8 @@ public class Request
             asyncContext = null;
         }
         isAsyncSupported = true;
-        asyncStarted = false;
+        asyncStarted.set(false);
         isAsyncComplete = false;
-        isOkToReinitializeAsync = false;
     }
 
 
@@ -3591,14 +3591,24 @@ public class Request
         }      
 
         if (!isAsyncSupported()) {
-            throw new IllegalStateException("Async not supported for this " +
-                                            "request");
+            throw new IllegalStateException(
+                sm.getString("request.startAsync.notSupported"));
         }
 
         if (asyncContext != null) {
-            if (!isOkToReinitializeAsync) {
-                throw new IllegalStateException("startAsync already called");
-            } 
+            if (isAsyncStarted()) {
+                throw new IllegalStateException(
+                    sm.getString("request.startAsync.alreadyCalled"));
+            }
+            if (isAsyncComplete) {
+                throw new IllegalStateException(
+                    sm.getString("request.startAsync.alreadyComplete"));
+            }
+            if (!asyncContext.isStartAsyncInScope()) {
+                throw new IllegalStateException(
+                    sm.getString("request.startAsync.notInScope"));
+            }
+
             // Reinitialize existing AsyncContext
             asyncContext.reinitialize(servletRequest, servletResponse,
                 isOriginalRequestAndResponse);
@@ -3635,8 +3645,7 @@ public class Request
                     res));
         }
 
-        asyncStarted = true;
-        isOkToReinitializeAsync = false;
+        asyncStarted.set(true);
 
         return asyncContext;
     }
@@ -3646,11 +3655,11 @@ public class Request
      */
     @Override
     public boolean isAsyncStarted() {
-        return asyncStarted;
+        return asyncStarted.get();
     }
 
     void setAsyncStarted(boolean asyncStarted) {
-        this.asyncStarted = asyncStarted;
+        this.asyncStarted.set(asyncStarted);
     }
  
     /**
@@ -3662,10 +3671,6 @@ public class Request
      */
     public void disableAsyncSupport() {
         isAsyncSupported = false;
-    }
-
-    void setOkToReinitializeAsync(boolean okToReInit) {
-        isOkToReinitializeAsync = okToReInit;
     }
 
     void setAsyncTimeout(long timeout) {
@@ -3688,7 +3693,7 @@ public class Request
     public AsyncContext getAsyncContext() {
         if (!isAsyncStarted()) {
             throw new IllegalStateException(
-                sm.getString("async.requestNotInAsyncMode"));
+                sm.getString("request.notInAsyncMode"));
         }
 
         return asyncContext;
@@ -3700,11 +3705,11 @@ public class Request
      */
     void asyncComplete() {
         if (isAsyncComplete) {
-            throw new IllegalStateException("Request already released from " +
-                "asynchronous mode");
+            throw new IllegalStateException(
+                sm.getString("request.asyncComplete.alreadyComplete"));
         }
         isAsyncComplete = true;
-        asyncStarted = false;
+        asyncStarted.set(false);
         coyoteRequest.getResponse().resume();
     }
 
