@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  *
  *
@@ -67,24 +67,32 @@ class ApplicationDispatcherForward {
         StringManager.getManager(org.apache.catalina.valves.Constants.Package);
 
 
-    static void commit(HttpServletRequest request,
-                       HttpServletResponse response,
+    static void commit(ServletRequest request,
+                       ServletResponse response,
                        Context context,
                        Wrapper wrapper)
             throws IOException, ServletException {
 
-        int statusCode = response.getStatus();
-        Object exception = request.getAttribute(
+        if (!(request instanceof HttpServletRequest) ||
+                !(response instanceof HttpServletResponse)) {
+            closeResponse(response);
+            return;
+        }
+
+        HttpServletRequest hreq = (HttpServletRequest) request;
+        HttpServletResponse hres = (HttpServletResponse) response;
+        int statusCode = hres.getStatus();
+        Object exception = hreq.getAttribute(
             RequestDispatcher.ERROR_EXCEPTION);
         String errorReportValveClass = 
             ((StandardHost)(context.getParent())).getErrorReportValveClass();
         if (errorReportValveClass != null && statusCode >= 400
                 && exception == null) {
-            boolean matchFound = status(request, response,
-                getResponseFacade(response), context, wrapper, statusCode);
+            boolean matchFound = status(hreq, hres,
+                getResponseFacade(hres), context, wrapper, statusCode);
             if (!matchFound) {
-                serveDefaultErrorPage(request, response,
-                    getResponseFacade(response), statusCode);
+                serveDefaultErrorPage(hreq, hres,
+                    getResponseFacade(hres), statusCode);
             }
         }
 
@@ -93,23 +101,7 @@ class ApplicationDispatcherForward {
          */
         if (statusCode < 400
                 || (exception == null && errorReportValveClass != null)) {
-            try {
-                PrintWriter writer = response.getWriter();
-                writer.flush();
-                writer.close();
-            } catch (IllegalStateException e) {
-                try {
-                    ServletOutputStream stream = response.getOutputStream();
-                    stream.flush();
-                    stream.close();
-                } catch (IllegalStateException f) {
-                    ;
-                } catch (IOException f) {
-                    ;
-                }
-            } catch (IOException e) {
-                ;
-            }
+            closeResponse(response);
         }
     }
 
@@ -353,10 +345,29 @@ class ApplicationDispatcherForward {
 
         return ((ResponseFacade) response);
     }
-
     
     private static void resetResponse(ResponseFacade responseFacade) {
         responseFacade.setSuspended(false);
         responseFacade.setAppCommitted(false);
+    }
+
+    private static void closeResponse(ServletResponse response) {
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.flush();
+            writer.close();
+        } catch (IllegalStateException e) {
+            try {
+                ServletOutputStream stream = response.getOutputStream();
+                stream.flush();
+                stream.close();
+            } catch (IllegalStateException f) {
+                ;
+            } catch (IOException f) {
+                ;
+            }
+        } catch (IOException e) {
+            ;
+        }
     }
 }
