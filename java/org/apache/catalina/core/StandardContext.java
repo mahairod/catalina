@@ -144,7 +144,7 @@ public class StandardContext
     /**
      * The list of ServletContextListeners
      */
-    private transient List<ServletContextListener> contextListeners =
+    protected transient ArrayList<ServletContextListener> contextListeners =
         new ArrayList<ServletContextListener>();
 
     /**
@@ -5211,7 +5211,7 @@ public class StandardContext
         }
     }
 
-    private void callServletContainerInitializers()
+    protected void callServletContainerInitializers()
             throws LifecycleException {
 
         // Get the list of ServletContainerInitializers and the classes
@@ -6562,7 +6562,7 @@ public class StandardContext
         // Deliberate noop
     }
     
-    private static class RestrictedServletContextListener
+    public static class RestrictedServletContextListener
             implements ServletContextListener {
 
         /*
