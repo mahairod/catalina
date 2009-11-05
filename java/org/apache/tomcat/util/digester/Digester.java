@@ -706,7 +706,6 @@ public class Digester extends DefaultHandler {
      * is a problem creating the parser, return <code>null</code>.
      */
     public SAXParser getParser() {
-
         // Return the parser we already created (if any)
         if (parser != null) {
             return (parser);
@@ -995,10 +994,13 @@ public class Digester extends DefaultHandler {
      * @exception SAXException if no XMLReader can be instantiated
      */
     public XMLReader getXMLReader() throws SAXException {
+        // Clear any cached parser and factory, see IT 9894
+        parser = null;
+        factory = null;
+
         if (reader == null){
             reader = getParser().getXMLReader();
         }        
-                               
         reader.setDTDHandler(this);           
         reader.setContentHandler(this);        
         
@@ -1658,12 +1660,10 @@ public class Digester extends DefaultHandler {
      * @exception IOException if an input/output error occurs
      * @exception SAXException if a parsing exception occurs
      */
-    public Object parse(InputSource input) throws IOException, SAXException {
- 
+    public Object parse(InputSource input) throws IOException, SAXException { 
         configure();
         getXMLReader().parse(input);
         return (root);
-
     }
 
 
@@ -1677,12 +1677,10 @@ public class Digester extends DefaultHandler {
      * @exception SAXException if a parsing exception occurs
      */
     public Object parse(InputStream input) throws IOException, SAXException {
-
         configure();
         InputSource is = new InputSource(input);
         getXMLReader().parse(is);
         return (root);
-
     }
 
 
