@@ -381,4 +381,8 @@ public interface Request {
      * already exist, false otherwise
      */
     public Session getSessionInternal(boolean create);
+
+    public Session lockSession();
+
+    public void unlockSession();
 }

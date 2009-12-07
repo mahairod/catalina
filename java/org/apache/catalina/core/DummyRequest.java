@@ -309,7 +309,6 @@ public class DummyRequest implements HttpRequest, HttpServletRequest {
     }
     // END CR 6415120
 
-
     // START SJSAS 6346226
     /**
      * Gets the jroute id of this request, which may have been 
@@ -324,7 +323,6 @@ public class DummyRequest implements HttpRequest, HttpServletRequest {
     }
     // END SJSAS 6346226
     
-
     /**
      * This object does not implement a session ID generator. Provide
      * a dummy implementation so that the default one will be used.
@@ -332,7 +330,6 @@ public class DummyRequest implements HttpRequest, HttpServletRequest {
     public String generateSessionId() {
         return null;
     }
-
 
     /**
      * Gets the servlet context to which this servlet request was last
@@ -344,5 +341,12 @@ public class DummyRequest implements HttpRequest, HttpServletRequest {
     public ServletContext getServletContext() {
         return null;
     }
+
+    public Session lockSession() {
+        return null;
+    }
+
+    public void unlockSession() {}
+
 }
 
