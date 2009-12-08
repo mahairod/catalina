@@ -13,9 +13,10 @@ package org.apache.catalina.fileupload;
 
 import java.io.*;
 import java.util.*;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
-import javax.servlet.ServletException;
 
 public class Multipart {
 
@@ -38,7 +39,7 @@ public class Multipart {
         this.maxRequestSize = maxRequestSize;
         this.fileSizeThreshold = fileSizeThreshold;
         repository = (File) request.getServletContext().getAttribute(
-                                "javax.servlet.context.tempdir");
+            ServletContext.TEMPDIR);
         if (location != null && location.length() != 0) {
             File tempFile= new File(location);
             if (tempFile.isAbsolute()) {
