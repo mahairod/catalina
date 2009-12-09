@@ -285,10 +285,10 @@ public final class RequestUtil {
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
      */
-    public static String URLDecode(String str) {
+    public static String urlDecode(String str) {
         // Implementation has been moved to org.apache.naming.Util
         // so that it may be accessed by code in war-util
-        return Util.URLDecode(str);
+        return Util.urlDecode(str);
     }
 
 
@@ -300,10 +300,10 @@ public final class RequestUtil {
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
      */
-    public static String URLDecode(String str, String enc) {
+    public static String urlDecode(String str, String enc) {
         // Implementation has been moved to org.apache.naming.Util
         // so that it may be accessed by code in war-util
-        return Util.URLDecode(str, enc);
+        return Util.urlDecode(str, enc);
     }
 
 
@@ -314,10 +314,10 @@ public final class RequestUtil {
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
      */
-    public static String URLDecode(byte[] bytes) {
+    public static String urlDecode(byte[] bytes) {
         // Implementation has been moved to org.apache.naming.Util
         // so that it may be accessed by code in war-util
-        return Util.URLDecode(bytes);
+        return Util.urlDecode(bytes);
     }
 
 
@@ -329,10 +329,10 @@ public final class RequestUtil {
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
      */
-    public static String URLDecode(byte[] bytes, String enc) {
+    public static String urlDecode(byte[] bytes, String enc) {
         // Implementation has been moved to org.apache.naming.Util
         // so that it may be accessed by code in war-util
-        return Util.URLDecode(bytes, enc);
+        return Util.urlDecode(bytes, enc);
     }
 
 
@@ -350,7 +350,7 @@ public final class RequestUtil {
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
      */
-    public static String URLDecode(ByteChunk bc, boolean toString) {
+    public static String urlDecode(ByteChunk bc, boolean toString) {
 
         if (bc == null) {
             return (null);

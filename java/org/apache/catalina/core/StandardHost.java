@@ -672,7 +672,7 @@ public class StandardHost
      */
     @Override
     public Container findChild(String contextRoot) {
-        return super.findChild(RequestUtil.URLDecode(contextRoot, "UTF-8"));
+        return super.findChild(RequestUtil.urlDecode(contextRoot, "UTF-8"));
     }
     // END GlassFish 862
 

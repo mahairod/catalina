@@ -554,7 +554,7 @@ public class MapperListener
         if (slash != -1) {
             hostName = name.substring(0, slash);
             contextName = name.substring(slash);
-            contextName = RequestUtil.URLDecode(contextName , "UTF-8");
+            contextName = RequestUtil.urlDecode(contextName , "UTF-8");
         } else {
             return;
         }
@@ -594,7 +594,7 @@ public class MapperListener
         if (slash != -1) {
             hostName = name.substring(0, slash);
             contextName = name.substring(slash);
-            contextName = RequestUtil.URLDecode(contextName , "UTF-8");
+            contextName = RequestUtil.urlDecode(contextName , "UTF-8");
         } else {
             return;
         }
@@ -661,7 +661,7 @@ public class MapperListener
         if (slash != -1) {
             hostName = name.substring(0, slash);
             contextName = name.substring(slash);
-            contextName = RequestUtil.URLDecode(contextName , "UTF-8");
+            contextName = RequestUtil.urlDecode(contextName , "UTF-8");
         } else {
             return;
         }
