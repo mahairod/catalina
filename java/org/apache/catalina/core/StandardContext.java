@@ -5239,6 +5239,11 @@ public class StandardContext
         try {
             for (Class<? extends ServletContainerInitializer> initializer :
                     initializerList.keySet()) {
+                // See IT 11333
+                if (isUseMyFaces() &&
+                        Globals.FACES_INITIALIZER.equals(initializer.getName())) {
+                    continue;
+                }
                 try {
                     ServletContainerInitializer iniInstance =
                         initializer.newInstance();
