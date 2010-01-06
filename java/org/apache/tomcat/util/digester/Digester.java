@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  *
  *
@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
+
 // $Id: Digester.java 565464 2007-08-13 18:13:47Z remm $
 
 package org.apache.tomcat.util.digester;
