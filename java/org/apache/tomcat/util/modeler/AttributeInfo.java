@@ -21,11 +21,10 @@
 package org.apache.tomcat.util.modeler;
 
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
 import javax.management.Descriptor;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 
 /**

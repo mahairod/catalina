@@ -20,9 +20,8 @@
 
 package org.apache.tomcat.util.modeler.modules;
 
-import java.util.List;
-
 import javax.management.ObjectName;
+import java.util.List;
 
 
 /**
