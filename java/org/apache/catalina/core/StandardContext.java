@@ -4916,6 +4916,25 @@ public class StandardContext
     }
 
     /**
+     * Starts the session manager of this Context.
+     */
+    protected void managerStart() throws LifecycleException {
+        if ((manager != null) && (manager instanceof Lifecycle)) {
+            ((Lifecycle) getManager()).start();
+        }
+    }
+
+
+    /**
+     * Stops the session manager of this Context.
+     */
+    protected void managerStop() throws LifecycleException {
+        if ((manager != null) && (manager instanceof Lifecycle)) {
+            ((Lifecycle) manager).stop();
+        }
+    }
+
+    /**
      * Start this Context component.
      *
      * @exception LifecycleException if a startup error occurs
