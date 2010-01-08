@@ -20,8 +20,8 @@
 
 package org.apache.catalina;
 
-import java.util.*;
 import javax.servlet.http.Cookie;
+import java.util.Collection;
 
 /**
  * An <b>HttpResponse</b> is the Catalina-internal facade for an

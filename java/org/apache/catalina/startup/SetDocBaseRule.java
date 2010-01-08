@@ -20,10 +20,6 @@
 
 package org.apache.catalina.startup;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.Deployer;
 import org.apache.catalina.Host;
@@ -31,6 +27,10 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.xml.sax.Attributes;
+
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
 
 /**
  * <p>Rule that modifies the docBase of the host, setting it appropriately,

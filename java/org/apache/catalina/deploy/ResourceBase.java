@@ -21,8 +21,8 @@
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 /**

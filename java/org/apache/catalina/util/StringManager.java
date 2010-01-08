@@ -24,11 +24,7 @@
 package org.apache.catalina.util;
 
 import java.text.MessageFormat;
-import java.util.Hashtable;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * An internationalization / localization helper class which reduces

@@ -5,8 +5,9 @@
 
 package org.apache.catalina.core;
 
-import javax.servlet.*;
 import org.apache.catalina.util.StringManager;
+
+import javax.servlet.SessionCookieConfig;
 
 /**
  * Class that may be used to configure various properties of cookies 
