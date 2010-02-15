@@ -1114,9 +1114,10 @@ public abstract class RealmBase
      * a response already
      */
     public boolean hasUserDataPermission(HttpRequest request,
-                HttpResponse response, SecurityConstraint[] constraints)
-            throws IOException {
-         return hasUserDataPermission(request,response,constraints,null,null);
+                                         HttpResponse response,
+                                         SecurityConstraint[] constraints)
+        throws IOException {
+        return hasUserDataPermission(request,response,constraints,null,null);
     }
 
     /**
@@ -1142,8 +1143,11 @@ public abstract class RealmBase
      * will have been redirected to HTTPS)
      */
     public boolean hasUserDataPermission(HttpRequest request,
-                HttpResponse response, SecurityConstraint[] constraints,
-                String uri, String method) throws IOException {
+                                         HttpResponse response,
+                                         SecurityConstraint[] constraints,
+                                         String uri,
+                                         String method)
+        throws IOException {
         // Is there a relevant user data constraint?
         if (constraints == null || constraints.length == 0) {
             if (log.isLoggable(Level.FINE))
