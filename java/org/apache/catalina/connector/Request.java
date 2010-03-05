@@ -2586,7 +2586,7 @@ public class Request
         }
         Session localSession = null;
         try {
-            localSession = manager.findSession(requestedSessionId);
+            localSession = manager.findSession(requestedSessionId, this);
         } catch (IOException e) {
             localSession = null;
         }
@@ -2698,6 +2698,7 @@ public class Request
     }
 
     // ------------------------------------------------------ Protected Methods
+    
     protected Session doGetSession(boolean create) {
 
         // There cannot be a session if no context has been assigned yet
@@ -2724,7 +2725,7 @@ public class Request
         if (requestedSessionId != null) {
             if (!checkUnsuccessfulSessionFind || !unsuccessfulSessionFind) {
                 try {
-                    session = manager.findSession(requestedSessionId);
+                    session = manager.findSession(requestedSessionId, this);
                     if (session == null) {
                         unsuccessfulSessionFind = true;
                     }

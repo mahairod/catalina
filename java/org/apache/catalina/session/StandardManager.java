@@ -179,9 +179,7 @@ public class StandardManager
      */
     @Override
     public String getInfo() {
-
-        return (this.info);
-
+        return info;
     }
 
 
@@ -190,9 +188,7 @@ public class StandardManager
      * no limit.
      */
     public int getMaxActiveSessions() {
-
-        return (this.maxActiveSessions);
-
+        return maxActiveSessions;
     }
 
 
@@ -213,7 +209,6 @@ public class StandardManager
      * @param max The new maximum number of sessions
      */
     public void setMaxActiveSessions(int max) {
-
         int oldMaxActiveSessions = this.maxActiveSessions;
         this.maxActiveSessions = max;
         support.firePropertyChange("maxActiveSessions",
@@ -227,9 +222,7 @@ public class StandardManager
      */
     @Override
     public String getName() {
-
-        return (name);
-
+        return name;
     }
 
 
@@ -237,9 +230,7 @@ public class StandardManager
      * Return the session persistence pathname, if any.
      */
     public String getPathname() {
-
-        return (this.pathname);
-
+        return pathname;
     }
 
 
@@ -250,11 +241,9 @@ public class StandardManager
      * @param pathname New session persistence pathname
      */
     public void setPathname(String pathname) {
-
         String oldPathname = this.pathname;
         this.pathname = pathname;
         support.firePropertyChange("pathname", oldPathname, this.pathname);
-
     }
 
 
@@ -272,7 +261,6 @@ public class StandardManager
      */
     @Override
     public Session createSession() {
-
         if ((maxActiveSessions >= 0) &&
                 (sessions.size() >= maxActiveSessions)) {
             rejectedSessions++;
@@ -283,7 +271,6 @@ public class StandardManager
         }
 
         return (super.createSession());
-
     }
 
     // START S1AS8PE 4817642
@@ -305,7 +292,6 @@ public class StandardManager
      */
     @Override
     public Session createSession(String sessionId) {
-
         if ((maxActiveSessions >= 0) &&
                 (sessions.size() >= maxActiveSessions)) {
             rejectedSessions++;
@@ -314,7 +300,6 @@ public class StandardManager
         }
 
         return (super.createSession(sessionId));
-
     }
     // END S1AS8PE 4817642
 
@@ -381,7 +366,6 @@ public class StandardManager
      * @exception IOException if a read error occurs
      */
     private void doLoadFromFile() throws ClassNotFoundException, IOException {
-
         if (log.isLoggable(Level.FINE)) {
             log.fine("Start: Loading persisted sessions");
         }
@@ -864,18 +848,20 @@ public class StandardManager
 
         // Expire all active sessions and notify their listeners
         Session sessions[] = findSessions();
-        for(Session session : sessions) {
-            if(!session.isValid()) {
-                continue;
-            }
-            try {
-                session.expire();
-            } catch(Throwable t) {
-                // Ignore
-            } finally {
-                // Measure against memory leaking if references to the session
-                // object are kept in a shared field somewhere
-                session.recycle();
+        if (sessions != null) {
+            for (Session session : sessions) {
+                if (!session.isValid()) {
+                    continue;
+                }
+                try {
+                    session.expire();
+                } catch (Throwable t) {
+                    // Ignore
+                } finally {
+                    // Measure against memory leaking if references to the session
+                    // object are kept in a shared field somewhere
+                    session.recycle();
+                }
             }
         }
 
@@ -964,14 +950,16 @@ public class StandardManager
 
         long timeNow = System.currentTimeMillis();
 
-        Session sessions[] = findSessions();
-        for (int i = 0; i < sessions.length; i++) {
-            StandardSession sess = (StandardSession) sessions[i];
-            if (sess.lockBackground()) {
-                try {
-                    sess.isValid();
-                } finally {
-                    sess.unlockBackground();
+        Session[] sessions = findSessions();
+        if (sessions != null) {
+            for (Session session : sessions) {
+                StandardSession sess = (StandardSession) session;
+                if (sess.lockBackground()) {
+                    try {
+                        sess.isValid();
+                    } finally {
+                        sess.unlockBackground();
+                    }
                 }
             }
         }
