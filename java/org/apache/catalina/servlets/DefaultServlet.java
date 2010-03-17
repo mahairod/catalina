@@ -293,8 +293,16 @@ public class DefaultServlet
         }
 
     }
+    
+    
+    /**
+     * Return if directory listings are enabled
+     */
+    public boolean isListings() {
+        return this.listings;
+    }
 
-
+    
     /**
      * Enables or disables directory listings for this DefaultServlet.
      *
