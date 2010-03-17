@@ -264,7 +264,7 @@ public class StandardContext
     /**
      * Thread local data used during request dispatch.
      */
-    private ThreadLocal<DispatchData> dispatchData =
+    private transient ThreadLocal<DispatchData> dispatchData =
         new ThreadLocal<DispatchData>();
         
     /**
