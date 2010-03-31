@@ -51,15 +51,12 @@ import java.io.IOException;
 
 public interface Manager {
 
-
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Return the Container with which this Manager is associated.
      */
     public Container getContainer();
-
 
     /**
      * Set the Container with which this Manager is associated.
@@ -68,12 +65,10 @@ public interface Manager {
      */
     public void setContainer(Container container);
 
-
     /**
      * Return the DefaultContext with which this Manager is associated.
      */
     public DefaultContext getDefaultContext();
-
 
     /**
      * Set the DefaultContext with which this Manager is associated.
@@ -82,13 +77,11 @@ public interface Manager {
      */
     public void setDefaultContext(DefaultContext defaultContext);
 
-
     /**
      * Return the distributable flag for the sessions supported by
      * this Manager.
      */
     public boolean getDistributable();
-
 
     /**
      * Set the distributable flag for the sessions supported by this
@@ -99,7 +92,6 @@ public interface Manager {
      */
     public void setDistributable(boolean distributable);
 
-
     /**
      * Return descriptive information about this Manager implementation and
      * the corresponding version number, in the format
@@ -107,12 +99,10 @@ public interface Manager {
      */
     public String getInfo();
 
-
     /**
      * Same as getMaxInactiveIntervalSeconds
      */
     public int getMaxInactiveInterval();
-
 
     /**
      * Return the default maximum inactive interval (in seconds)
@@ -120,12 +110,10 @@ public interface Manager {
      */
     public int getMaxInactiveIntervalSeconds();
 
-
     /**
      * Same as setMaxInactiveIntervalSeconds
      */
     public void setMaxInactiveInterval(int interval);
-
 
     /**
      * Set the default maximum inactive interval (in seconds)
@@ -135,7 +123,6 @@ public interface Manager {
      */
     public void setMaxInactiveIntervalSeconds(int interval);
 
-
     /**
      * Gets the session id length (in bytes) of Sessions created by
      * this Manager.
@@ -143,7 +130,6 @@ public interface Manager {
      * @return The session id length
      */
     public int getSessionIdLength();
-
 
     /**
      * Sets the session id length (in bytes) for Sessions created by this
@@ -153,12 +139,10 @@ public interface Manager {
      */
     public void setSessionIdLength(int length);
 
-
     /** 
      * Same as getSessionCount
      */
     public int getSessionCounter();
-
 
     /** 
      * Returns the total number of sessions created by this manager.
@@ -167,12 +151,10 @@ public interface Manager {
      */
     public int getSessionCount();
 
-
     /** 
      * Same as setSessionCount
      */
     public void setSessionCounter(int sessionCounter);
-
 
     /** 
      * Sets the total number of sessions created by this manager.
@@ -180,7 +162,6 @@ public interface Manager {
      * @param sessionCounter Total number of sessions created by this manager.
      */
     public void setSessionCount(int sessionCounter);
-
 
     /**
      * Gets the maximum number of sessions that have been active at the same
@@ -191,7 +172,6 @@ public interface Manager {
      */
     public int getMaxActive();
 
-
     /**
      * (Re)sets the maximum number of sessions that have been active at the
      * same time.
@@ -201,14 +181,12 @@ public interface Manager {
      */
     public void setMaxActive(int maxActive);
 
-
     /** 
      * Gets the number of currently active sessions.
      *
      * @return Number of currently active sessions
      */
     public int getActiveSessions();
-
 
     /**
      * Gets the number of sessions that have expired.
@@ -217,14 +195,12 @@ public interface Manager {
      */
     public int getExpiredSessions();
 
-
     /**
      * Sets the number of sessions that have expired.
      *
      * @param expiredSessions Number of sessions that have expired
      */
     public void setExpiredSessions(int expiredSessions);
-
 
     /**
      * Gets the number of sessions that were not created because the maximum
@@ -234,7 +210,6 @@ public interface Manager {
      */
     public int getRejectedSessions();
 
-
     /**
      * Sets the number of sessions that were not created because the maximum
      * number of active sessions was reached.
@@ -243,12 +218,10 @@ public interface Manager {
      */
     public void setRejectedSessions(int rejectedSessions);
 
-
     /**
      * Same as getSessionMaxAliveTimeSeconds
      */
     public int getSessionMaxAliveTime();
-
 
     /**
      * Gets the longest time (in seconds) that an expired session had been
@@ -259,12 +232,10 @@ public interface Manager {
      */
     public int getSessionMaxAliveTimeSeconds();
 
-
     /**
      * Same as setSessionMaxAliveTimeSeconds
      */
     public void setSessionMaxAliveTime(int sessionMaxAliveTime);
-
 
     /**
      * Sets the longest time (in seconds) that an expired session had been
@@ -275,12 +246,10 @@ public interface Manager {
      */
     public void setSessionMaxAliveTimeSeconds(int sessionMaxAliveTime);
 
-
     /**
      * Same as getSessionAverageAliveTimeSeconds
      */
     public int getSessionAverageAliveTime();
-
 
     /**
      * Gets the average time (in seconds) that expired sessions had been
@@ -291,12 +260,10 @@ public interface Manager {
      */
     public int getSessionAverageAliveTimeSeconds();
 
-
     /**
      * Same as setSessionAverageAliveTimeSeconds
      */
     public void setSessionAverageAliveTime(int sessionAverageAliveTime);
-
 
     /**
      * Sets the average time (in seconds) that expired sessions had been
@@ -310,14 +277,12 @@ public interface Manager {
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Add this Session to the set of active Sessions for this Manager.
      *
      * @param session Session to be added
      */
     public void add(Session session);
-
 
     /**
      * Add a property change listener to this component.
@@ -345,7 +310,6 @@ public interface Manager {
      */
     public Session createSession();
 
-
     // START S1AS8PE 4817642
     /**
      * Construct and return a new session object, based on the default
@@ -363,7 +327,6 @@ public interface Manager {
     public Session createSession(String sessionId);
     // END S1AS8PE 4817642
 
-
     /**
      * Return the active Session, associated with this Manager, with the
      * specified session id (if any); otherwise return <code>null</code>.
@@ -378,6 +341,26 @@ public interface Manager {
     public Session findSession(String id) throws IOException;
 
     /**
+     * Finds and returns the session with the given id that also satisfies
+     * the given version requirement.
+     *
+     * This overloaded version of findSession() will be invoked only if
+     * isSessionVersioningSupported() returns true. By default, this method
+     * delegates to the version of findSession() that does not take any
+     * session version number.
+     *
+     * @param id The session id to match
+     * @param version The session version requirement to satisfy
+     *
+     * @return The session that matches the given id and also satisfies the
+     * given version requirement, or null if no such session could be found
+     * by this session manager
+     *
+     * @exception IOException if an IO error occurred
+     */
+    public Session findSession(String id, String version) throws IOException;
+
+    /**
      * Gets the session with the given id from the given request.
      *
      * @param id the session id
@@ -388,11 +371,19 @@ public interface Manager {
     public Session findSession(String id, HttpServletRequest request) throws IOException;
 
     /**
+     * Returns true if this session manager supports session versioning, false
+     * otherwise.
+     *
+     * @return true if this session manager supports session versioning, false
+     * otherwise.
+     */
+    public boolean isSessionVersioningSupported();
+
+    /**
      * Return the set of active Sessions associated with this Manager.
      * If this Manager has no active Sessions, a zero-length array is returned.
      */
     public Session[] findSessions();
-
 
     /**
      * Load any currently active sessions that were previously unloaded
@@ -405,7 +396,6 @@ public interface Manager {
      */
     public void load() throws ClassNotFoundException, IOException;
 
-
     /**
      * Remove this Session from the active Sessions for this Manager.
      *
@@ -413,14 +403,12 @@ public interface Manager {
      */
     public void remove(Session session);
 
-
     /**
      * Remove a property change listener from this component.
      *
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
-
 
     /**
      * Save any currently active sessions in the appropriate persistence
@@ -431,7 +419,6 @@ public interface Manager {
      */
     public void unload() throws IOException;
 
-     
     //PWC Extension
     //START OF RIMOD# 4820359 -- Support for iWS6.0 session managers
     /**

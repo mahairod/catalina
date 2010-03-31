@@ -22,7 +22,6 @@ package org.apache.catalina.util;
 
 import com.sun.grizzly.util.buf.ByteChunk;
 import org.apache.naming.Util;
-
 import javax.servlet.http.Cookie;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -475,7 +474,6 @@ public final class RequestUtil {
      */
     public static final HashMap<String, String> parseSessionVersions(
                                                 String sessionVersion) {
-
         if (sessionVersion == null) {
             return null;
         }
@@ -503,12 +501,11 @@ public final class RequestUtil {
      * @return The string representation of the given session version mappings
      */
     public static String makeSessionVersionString(HashMap sessionVersions) {
-
         if (sessionVersions == null) {
             return null;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator<String> iter = sessionVersions.keySet().iterator();
         boolean first = true;
         while (iter.hasNext()) {
