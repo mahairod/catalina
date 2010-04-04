@@ -647,7 +647,7 @@ public class OutputBuffer extends Writer
         if (sessionVersions != null) {
             Cookie cookie = new Cookie(
                 Globals.SESSION_VERSION_COOKIE_NAME,
-                RequestUtil.makeSessionVersionString(sessionVersions));
+                RequestUtil.createSessionVersionString(sessionVersions));
             request.configureSessionCookie(cookie);
             if (request.isRequestedSessionIdFromCookie()) {
                 /*

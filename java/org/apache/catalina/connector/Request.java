@@ -3417,7 +3417,7 @@ public class Request
         }
 
         HashMap<String, String> sessionVersions =
-            RequestUtil.parseSessionVersions(sessionVersionString);
+            RequestUtil.parseSessionVersionString(sessionVersionString);
         if (sessionVersions != null) {
             attributes.put(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE,
                            sessionVersions);
