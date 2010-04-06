@@ -191,6 +191,11 @@ public class CoyoteAdapter
             }
         }
 
+        if (response.getContentType() == null) {
+            response.setContentType(
+                    response.getConnector().getDefaultResponseType());
+        }
+
         try {
             doService(req, request, res, response);
         } catch (IOException e) {
