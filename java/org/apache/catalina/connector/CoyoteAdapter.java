@@ -192,8 +192,7 @@ public class CoyoteAdapter
         }
 
         if (response.getContentType() == null) {
-            response.setContentType(
-                    response.getConnector().getDefaultResponseType());
+            response.setContentType(connector.getDefaultResponseType());
         }
 
         try {
