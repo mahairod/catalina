@@ -244,7 +244,7 @@ public class JAASRealm
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
-    public Principal authenticate(String username, String credentials) {
+    public Principal authenticate(String username, char[] credentials) {
 
         // Establish a LoginContext to use for authentication
         try {
@@ -346,7 +346,7 @@ public class JAASRealm
     /**
      * Return the password associated with the given principal's user name.
      */
-    protected String getPassword(String username) {
+    protected char[] getPassword(String username) {
 
         return (null);
 
@@ -372,7 +372,7 @@ public class JAASRealm
      */
     protected Principal createPrincipal(String username, Subject subject) {
         // Prepare to scan the Principals for this Subject
-        String password = null; // Will not be carried forward
+        char[] password = null; // Will not be carried forward
         ArrayList roles = new ArrayList();
 
         // Scan the Principals for this Subject

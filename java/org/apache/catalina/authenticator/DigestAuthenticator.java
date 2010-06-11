@@ -282,9 +282,10 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(a2.getBytes());
         }
-        String md5a2 = md5Encoder.encode(buffer);
+        char[] md5a2 = md5Encoder.encode(buffer);
+        char[] responseCharArray = ((response != null) ? response.toCharArray() : null);
 
-        return (realm.authenticate(userName, response, nOnce, nc, cnonce, qop,
+        return (realm.authenticate(userName, responseCharArray, nOnce, nc, cnonce, qop,
                                    realmName, md5a2));
 
     }
@@ -365,7 +366,7 @@ public class DigestAuthenticator
             currentTime + ":" + key;
 
         byte[] buffer = md5Helper.digest(nOnceValue.getBytes());
-        nOnceValue = md5Encoder.encode(buffer);
+        nOnceValue = String.valueOf(md5Encoder.encode(buffer));
 
         // Updating the value in the no once hashtable
         nOnceTokens.put(nOnceValue, Long.valueOf(currentTime + nOnceTimeout));
@@ -418,7 +419,7 @@ public class DigestAuthenticator
 
         String authenticateHeader = "Digest realm=\"" + realmName + "\", "
             +  "qop=\"auth\", nonce=\"" + nOnce + "\", " + "opaque=\""
-            + md5Encoder.encode(buffer) + "\"";
+            + String.valueOf(md5Encoder.encode(buffer)) + "\"";
         response.setHeader("WWW-Authenticate", authenticateHeader);
 
     }

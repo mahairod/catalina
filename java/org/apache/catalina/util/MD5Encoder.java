@@ -54,7 +54,7 @@ public final class MD5Encoder {
      * @param binaryData Array containing the digest
      * @return Encoded MD5, or null if encoding failed
      */
-    public String encode( byte[] binaryData ) {
+    public char[] encode( byte[] binaryData ) {
 
         if (binaryData.length != 16)
             return null;
@@ -68,7 +68,6 @@ public final class MD5Encoder {
             buffer[i*2 + 1] = hexadecimal[low];
         }
 
-        return new String(buffer);
-
+        return buffer;
     }
 }

@@ -133,7 +133,7 @@ public class BasicAuthenticator
 
         if (authorization != null) {
             String username = parseUsername(authorization);
-            String password = parsePassword(authorization);
+            char[] password = parsePassword(authorization);
             principal = context.getRealm().authenticate(username, password);
             if (principal != null) {
                 register(request, response, principal, Constants.BASIC_METHOD,
@@ -199,7 +199,7 @@ public class BasicAuthenticator
      *
      * @param authorization Authorization credentials from this request
      */
-    protected String parsePassword(String authorization) {
+    protected char[] parsePassword(String authorization) {
 
         if (authorization == null)
             return (null);
@@ -214,7 +214,7 @@ public class BasicAuthenticator
         if (colon < 0)
             return (null);
         //        String username = unencoded.substring(0, colon).trim();
-        String password = unencoded.substring(colon + 1);
+        char[] password = unencoded.substring(colon + 1).toCharArray();
         return (password);
 
     }

@@ -1089,7 +1089,7 @@ public class WebdavServlet
                 + lock.expiresAt + "-" + System.currentTimeMillis() + "-"
                 + secret;
             String lockToken =
-                md5Encoder.encode(md5Helper.digest(lockTokenStr.getBytes()));
+                new String(md5Encoder.encode(md5Helper.digest(lockTokenStr.getBytes())));
 
             if ( (exists) && (object instanceof DirContext) &&
                  (lock.depth == INFINITY) ) {

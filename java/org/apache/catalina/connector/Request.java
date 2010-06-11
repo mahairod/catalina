@@ -1836,7 +1836,11 @@ public class Request
     @Override
     public void login(final String username, final String password)
             throws ServletException {
+        login(username, password.toCharArray());
+    }
 
+    public void login(final String username, final char[] password)
+            throws ServletException {
         if (getUserPrincipal() != null) {
             log.severe("Attempt to re-login while the " +
                     "user identity already exists");
