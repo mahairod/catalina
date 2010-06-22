@@ -1056,6 +1056,10 @@ public class Response
      */
     public void addDateHeader(String name, long value) {
 
+        if (name == null || name.length() == 0) {
+            return;
+        }
+
         if (isCommitted())
             return;
 
@@ -1083,6 +1087,10 @@ public class Response
      */
     public void addHeader(String name, String value) {
 
+        if (name == null || name.length() == 0 || value == null) {
+            return;
+        }
+
         if (isCommitted())
             return;
 
@@ -1102,6 +1110,10 @@ public class Response
      * @param value Integer value to be set
      */
     public void addIntHeader(String name, int value) {
+
+        if (name == null || name.length() == 0) {
+            return;
+        }
 
         if (isCommitted())
             return;
@@ -1394,6 +1406,10 @@ public class Response
      */
     public void setDateHeader(String name, long value) {
 
+        if (name == null || name.length() == 0) {
+            return;
+        }
+
         if (isCommitted())
             return;
 
@@ -1421,6 +1437,10 @@ public class Response
      */
     public void setHeader(String name, String value) {
 
+        if (name == null || name.length() == 0 || value == null) {
+            return;
+        }
+
         if (isCommitted())
             return;
 
@@ -1440,6 +1460,10 @@ public class Response
      * @param value Integer value to be set
      */
     public void setIntHeader(String name, int value) {
+
+        if (name == null || name.length() == 0) {
+            return;
+        }
 
         if (isCommitted())
             return;
