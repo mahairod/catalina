@@ -567,7 +567,7 @@ public final class URL implements Serializable {
      */
     public String toExternalForm() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (protocol != null) {
             sb.append(protocol);
             sb.append(":");

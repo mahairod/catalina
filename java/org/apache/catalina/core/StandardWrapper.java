@@ -1609,7 +1609,7 @@ public class StandardWrapper
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (getParent() != null) {
             sb.append(getParent().toString());
             sb.append(".");
@@ -1897,7 +1897,7 @@ public class StandardWrapper
      */
     protected String logName() {
 
-        StringBuffer sb = new StringBuffer("StandardWrapper[");
+        StringBuilder sb = new StringBuilder("StandardWrapper[");
         if (getParent() != null)
             sb.append(getParent().getName());
         else

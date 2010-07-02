@@ -1013,7 +1013,7 @@ public class Response
         cookies.add(cookie);
 
         /* GlassFish 898
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run(){
@@ -1753,7 +1753,7 @@ public class Response
             path = path.substring(0, pound);
         }
 
-        StringBuffer sb = new StringBuffer(path);
+        StringBuilder sb = new StringBuilder(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
             StandardContext ctx = (StandardContext) getContext();
             String sessionParamName =

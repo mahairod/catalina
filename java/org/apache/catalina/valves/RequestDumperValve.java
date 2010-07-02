@@ -133,7 +133,7 @@ public class RequestDumperValve extends ValveBase {
         while (pnames.hasMoreElements()) {
             String pname = pnames.nextElement();
             String pvalues[] = hreq.getParameterValues(pname);
-            StringBuffer result = new StringBuffer(pname);
+            StringBuilder result = new StringBuilder(pname);
             result.append('=');
             for (int i = 0; i < pvalues.length; i++) {
                 if (i > 0)
@@ -202,7 +202,7 @@ public class RequestDumperValve extends ValveBase {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("RequestDumperValve[");
+        StringBuilder sb = new StringBuilder("RequestDumperValve[");
         if (container != null)
             sb.append(container.getName());
         sb.append("]");
