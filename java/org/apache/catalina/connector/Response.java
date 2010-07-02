@@ -1600,11 +1600,7 @@ public class Response
                 if ((file == null) || !file.startsWith(contextPath)) {
                     return false;
                 }
-                String sessionParamName =
-                    (ctx.isSessionCookieConfigInitialized() &&
-                            ctx.getSessionCookieName() != null) ?
-                        ctx.getSessionCookieName() :
-                        Globals.SESSION_PARAMETER_NAME;
+                String sessionParamName = ctx.getSessionParameterName();
                 if (file.indexOf(";" + sessionParamName + "=" +
                         session.getIdInternal()) >= 0) {
                     return false;
@@ -1757,9 +1753,7 @@ public class Response
         if( sb.length() > 0 ) { // jsessionid can't be first.
             StandardContext ctx = (StandardContext) getContext();
             String sessionParamName =
-                (ctx != null && ctx.isSessionCookieConfigInitialized() &&
-                        ctx.getSessionCookieName() != null) ?
-                    ctx.getSessionCookieName() :
+                (ctx != null) ? ctx.getSessionParameterName() :
                     Globals.SESSION_PARAMETER_NAME;
             sb.append(";" + sessionParamName + "=");
             sb.append(sessionId);

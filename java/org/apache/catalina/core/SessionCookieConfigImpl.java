@@ -6,6 +6,7 @@
 package org.apache.catalina.core;
 
 import org.apache.catalina.util.StringManager;
+import org.apache.catalina.Globals;
 
 import javax.servlet.SessionCookieConfig;
 
@@ -18,7 +19,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private String name;
+    private String name = Globals.SESSION_COOKIE_NAME;
     private String domain;
     private String path;
     private String comment;
