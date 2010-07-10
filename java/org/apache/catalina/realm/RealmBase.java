@@ -130,7 +130,7 @@ public abstract class RealmBase
     /**
      * The MessageDigest object for digesting user credentials (passwords).
      */
-    protected MessageDigest md = null;
+    protected volatile MessageDigest md = null;
 
 
     /**
@@ -142,7 +142,7 @@ public abstract class RealmBase
     /**
      * MD5 message digest provider.
      */
-    protected static MessageDigest md5Helper;
+    protected static volatile MessageDigest md5Helper;
 
 
     /**
