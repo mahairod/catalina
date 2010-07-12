@@ -114,7 +114,7 @@ public class StandardPipeline
     /**
      * Descriptive information about this implementation.
      */
-    protected String info = "org.apache.catalina.core.StandardPipeline/1.0";
+    protected static final String info = "org.apache.catalina.core.StandardPipeline/1.0";
 
 
     /**
@@ -169,7 +169,7 @@ public class StandardPipeline
      */
     public String getInfo() {
 
-        return (this.info);
+        return info;
 
     }
 
