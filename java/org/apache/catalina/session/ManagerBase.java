@@ -183,7 +183,9 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     // Number of sessions created by this manager
     protected int sessionCounter=0;
 
-    protected int maxActive=0;
+    protected volatile int maxActive=0;
+    
+    protected final Object maxActiveUpdateLock = new Object();
 
     // number of duplicated session ids - anything >0 means we have problems
     protected int duplicates=0;
@@ -665,7 +667,11 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         sessions.put(session.getIdInternal(), session);
         int size = sessions.size();
         if (size > maxActive) {
-            maxActive = size;
+            synchronized(maxActiveUpdateLock) {
+                if( size > maxActive ) {
+                    maxActive = size;
+                }
+            }
         }
     }
     
@@ -1062,7 +1068,9 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
 
 
     public void setMaxActive(int maxActive) {
-        this.maxActive = maxActive;
+        synchronized (maxActiveUpdateLock) {
+            this.maxActive = maxActive;
+        }
     }
 
 
