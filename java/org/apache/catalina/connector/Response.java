@@ -270,12 +270,6 @@ public class Response
 
 
     /**
-     * The set of Cookies associated with this Response.
-     */
-    protected ArrayList cookies = new ArrayList();
-
-
-    /**
      * Using output stream flag.
      */
     protected boolean usingOutputStream = false;
@@ -322,8 +316,6 @@ public class Response
         isContentTypeSet = false;
         isCharacterEncodingSet = false;
         detailErrorMsg = null;
-
-        cookies.clear();
 
         if (enforceScope) {
             if (facade != null) {
@@ -921,15 +913,6 @@ public class Response
 
 
     /**
-     * Return an array of all cookies set for this response, or
-     * a zero-length array if no cookies have been set.
-     */
-    public Cookie[] getCookies() {
-        return ((Cookie[]) cookies.toArray(new Cookie[cookies.size()]));
-    }
-
-
-    /**
      * Return the value for the specified header, or <code>null</code> if this
      * header has not been set.  If more than one value was added for this
      * name, only the first is returned; use {@link #getHeaders(String)} to
@@ -1009,8 +992,6 @@ public class Response
         // Ignore any call from an included servlet
         if (included)
             return;
-
-        cookies.add(cookie);
 
         /* GlassFish 898
         final StringBuilder sb = new StringBuilder();
