@@ -180,7 +180,10 @@ final class StandardContextValve
     @Override
     public void postInvoke(Request request, Response response)
             throws IOException, ServletException {
-        ((Context) container).fireRequestDestroyedEvent(request.getRequest());
+        if (!Boolean.TRUE.equals(request.getNote(Constants.FIRE_REQUEST_DESTROY_EVENT))) {
+            request.setNote(Constants.FIRE_REQUEST_DESTROY_EVENT, Boolean.TRUE);
+            ((Context) container).fireRequestDestroyedEvent(request.getRequest());
+        } 
     }
 
 
@@ -306,7 +309,10 @@ final class StandardContextValve
             }
         }
 
-        ((Context) container).fireRequestInitializedEvent(request.getRequest());
+        if (!Boolean.TRUE.equals(request.getNote(Constants.FIRE_REQUEST_INIT_EVENT))) {
+            request.setNote(Constants.FIRE_REQUEST_INIT_EVENT, Boolean.TRUE);
+            ((Context) container).fireRequestInitializedEvent(request.getRequest());
+        }
 
         return wrapper;
     }
