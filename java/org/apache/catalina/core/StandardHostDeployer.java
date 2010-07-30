@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -197,7 +198,7 @@ public class StandardHostDeployer implements Deployer {
         boolean isWAR = false;
         if (url.startsWith("jar:")) {
             url = url.substring(4, url.length() - 2);
-            if (!url.toLowerCase().endsWith(".war")) {
+            if (!url.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 throw new IllegalArgumentException
                     (sm.getString("standardHost.warURL", url));
             }
@@ -333,7 +334,7 @@ public class StandardHostDeployer implements Deployer {
         boolean isWAR = false;
         if (url.startsWith("jar:")) {
             url = url.substring(4, url.length() - 2);
-            if (!url.toLowerCase().endsWith(".war")) {
+            if (!url.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 throw new IllegalArgumentException
                     (sm.getString("standardHost.warURL", url));
             }
@@ -625,7 +626,7 @@ public class StandardHostDeployer implements Deployer {
                 }
 
                 boolean isWAR = false;
-                if (contextFile.getName().toLowerCase().endsWith(".war")) {
+                if (contextFile.getName().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     isWAR = true;
                 }
                 // Only remove directory and/or war if they are located in the

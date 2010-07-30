@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * <p>Rule that modifies the docBase of the host, setting it appropriately,
@@ -126,7 +127,7 @@ public class SetDocBaseRule extends Rule {
             docBase = file.getCanonicalPath();
         }
 
-        if (docBase.toLowerCase().endsWith(".war")) {
+        if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
             URL war = new URL("jar:" + (new File(docBase)).toURL() + "!/");
             String contextPath = child.getPath();
             if (contextPath.equals("")) {

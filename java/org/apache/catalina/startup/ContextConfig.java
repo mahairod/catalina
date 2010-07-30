@@ -42,6 +42,7 @@ import javax.servlet.ServletContext;
 import java.io.*;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -885,7 +886,7 @@ public class ContextConfig
             // Context path must start with '/'
             pathName = pathName.substring(1).replace('/','#');
         }
-        if (docBase.toLowerCase().endsWith(".war") && !file.isDirectory() && unpackWARs) {
+        if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {
             URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
             docBase = ExpandWar.expand(host, war, pathName);
             file = new File(docBase);
@@ -893,7 +894,7 @@ public class ContextConfig
             if (context instanceof StandardContext) {
                 ((StandardContext) context).setOriginalDocBase(origDocBase);
             }
-        } else if (docBase.toLowerCase().endsWith(".war") &&
+        } else if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") &&
                 !file.isDirectory() && !unpackWARs) {
             URL war =
                 new URL("jar:" + (new File (docBase)).toURI().toURL() + "!/");

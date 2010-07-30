@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -230,7 +231,7 @@ class RequestItemIterator {
         this.multipart = multipart;
         String contentType = request.getContentType();
         if ((null == contentType)
-                || (!contentType.toLowerCase().startsWith(MULTIPART))) {
+                || (!contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART))) {
             throw new ServletException(
                     "the request doesn't contain a "
                     + MULTIPART_FORM_DATA
@@ -315,7 +316,7 @@ class RequestItemIterator {
                 if (fieldName != null) {
                     String subContentType = headers.getHeader(CONTENT_TYPE);
                     if (subContentType != null
-                                &&  subContentType.toLowerCase()
+                                &&  subContentType.toLowerCase(Locale.ENGLISH)
                                         .startsWith(MULTIPART_MIXED)) {
                         currentFieldName = fieldName;
                         // Multiple files associated with this field name
@@ -375,7 +376,7 @@ class RequestItemIterator {
     private String getFileName(String pContentDisposition) {
         String fileName = null;
         if (pContentDisposition != null) {
-            String cdl = pContentDisposition.toLowerCase();
+            String cdl = pContentDisposition.toLowerCase(Locale.ENGLISH);
             if (cdl.startsWith(FORM_DATA) || cdl.startsWith(ATTACHMENT)) {
                 ParameterParser parser = new ParameterParser();
                 parser.setLowerCaseNames(true);
@@ -420,7 +421,7 @@ class RequestItemIterator {
     private String getFieldName(String pContentDisposition) {
         String fieldName = null;
         if (pContentDisposition != null
-                && pContentDisposition.toLowerCase().startsWith(FORM_DATA)) {
+                && pContentDisposition.toLowerCase(Locale.ENGLISH).startsWith(FORM_DATA)) {
             ParameterParser parser = new ParameterParser();
             parser.setLowerCaseNames(true);
             // Parameter parser can handle null input

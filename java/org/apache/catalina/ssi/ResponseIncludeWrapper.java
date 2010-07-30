@@ -216,7 +216,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
     public void addDateHeader(String name, long value) {
         super.addDateHeader(name, value);
-        String lname = name.toLowerCase();
+        String lname = name.toLowerCase(Locale.ENGLISH);
         if (lname.equals(LAST_MODIFIED)) {
             lastModified = value;
         }
@@ -224,7 +224,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
     public void addHeader(String name, String value) {
         super.addHeader(name, value);
-        String lname = name.toLowerCase();
+        String lname = name.toLowerCase(Locale.ENGLISH);
         if (lname.equals(LAST_MODIFIED)) {
             try {
                 lastModified = rfc1123Format.parse(value).getTime();
@@ -236,7 +236,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
     public void setDateHeader(String name, long value) {
         super.setDateHeader(name, value);
-        String lname = name.toLowerCase();
+        String lname = name.toLowerCase(Locale.ENGLISH);
         if (lname.equals(LAST_MODIFIED)) {
             lastModified = value;
         }
@@ -244,7 +244,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
     public void setHeader(String name, String value) {
         super.setHeader(name, value);
-        String lname = name.toLowerCase();
+        String lname = name.toLowerCase(Locale.ENGLISH);
         if (lname.equals(LAST_MODIFIED)) {
             try {
                 lastModified = rfc1123Format.parse(value).getTime();

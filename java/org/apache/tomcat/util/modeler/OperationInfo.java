@@ -25,6 +25,7 @@ import javax.management.Descriptor;
 import javax.management.MBeanParameterInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 import java.io.Serializable;
+import java.util.Locale;
 
 
 /**
@@ -131,7 +132,7 @@ public class OperationInfo extends FeatureInfo implements Serializable {
         if (impact == null)
             this.impact = null;
         else
-            this.impact = impact.toUpperCase();
+            this.impact = impact.toUpperCase(Locale.ENGLISH);
     }
 
 

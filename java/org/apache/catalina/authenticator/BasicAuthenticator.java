@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -176,7 +177,7 @@ public class BasicAuthenticator
 
         if (authorization == null)
             return (null);
-        if (!authorization.toLowerCase().startsWith("basic "))
+        if (!authorization.toLowerCase(Locale.ENGLISH).startsWith("basic "))
             return (null);
         authorization = authorization.substring(6).trim();
 
@@ -203,7 +204,7 @@ public class BasicAuthenticator
 
         if (authorization == null)
             return (null);
-        if (!authorization.toLowerCase().startsWith("basic "))
+        if (!authorization.toLowerCase(Locale.ENGLISH).startsWith("basic "))
             return (null);
         authorization = authorization.substring(6).trim();
 

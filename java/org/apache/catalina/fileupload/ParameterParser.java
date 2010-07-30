@@ -22,6 +22,7 @@
 package org.apache.catalina.fileupload;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -325,7 +326,7 @@ class ParameterParser {
             }
             if ((paramName != null) && (paramName.length() > 0)) {
                 if (this.lowerCaseNames) {
-                    paramName = paramName.toLowerCase();
+                    paramName = paramName.toLowerCase(Locale.ENGLISH);
                 }
                 params.put(paramName, paramValue);
             }
