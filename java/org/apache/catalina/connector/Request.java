@@ -2793,8 +2793,11 @@ public class Request
                     if (manager.isSessionVersioningSupported()) {
                         session = manager.findSession(requestedSessionId,
                                                       requestedSessionVersion);
-                        incrementSessionVersion((StandardSession) session,
-                                                context);
+                        //XXX need to revisit
+                        if (session instanceof StandardSession) {
+                            incrementSessionVersion((StandardSession) session,
+                                                    context);
+                        }
                     } else {
                         session = manager.findSession(requestedSessionId, this);
                     }
@@ -3995,7 +3998,9 @@ public class Request
     public Session lockSession() {
         Session sess = getSessionInternal(false);
         // Now lock the session
-        if (sess != null) {
+        //XXX need to revisit
+        //if (sess != null) {
+        if (sess instanceof StandardSession) {
             long pollTime = 200L;
             int maxNumberOfRetries = 7;
             int tryNumber = 0;
@@ -4041,7 +4046,9 @@ public class Request
     public void unlockSession() {
         Session sess = getSessionInternal(false);
         // Now unlock the session
-        if (sess != null) {
+        //XXX need to revisit
+        //if (sess != null) {
+        if (sess instanceof StandardSession) {
             StandardSession haSess = (StandardSession) sess;
             haSess.unlockForeground();
         }        
