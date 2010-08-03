@@ -151,7 +151,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * The request parameters for this request.  This is initialized from the
      * wrapped request, but updates are allowed.
      */
-    protected Map parameters = null;
+    protected Map<String, String[]> parameters = null;
 
     /**
      * Have the parameters for this request already been parsed?
@@ -210,6 +210,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the attribute to retrieve
      */
+    @Override
     public Object getAttribute(String name) {
 
         if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
@@ -254,6 +255,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getAttributeNames()</code> method of the wrapped
      * request.
      */
+    @Override
     public Enumeration<String> getAttributeNames() {
         return (new AttributeNamesEnumerator());
     }
@@ -264,6 +266,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the attribute to remove
      */
+    @Override
     public void removeAttribute(String name) {
 
         if (isSpecial(name)) {
@@ -283,6 +286,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param name Name of the attribute to set
      * @param value Value of the attribute to set
      */
+    @Override
     public void setAttribute(String name, Object value) {
 
         if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
@@ -306,6 +310,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param path Path of the resource to be wrapped
      */
+    @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
         if (context == null)
@@ -346,6 +351,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
+    @Override
     public DispatcherType getDispatcherType() {
         return dispatcherType;
     }
@@ -358,6 +364,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getContextPath()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getContextPath() {
 
         return (this.contextPath);
@@ -370,9 +377,10 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the requested parameter
      */
+    @Override
     public String getParameter(String name) {
 
-	parseParameters();
+        parseParameters();
         synchronized (parameters) {
             Object value = parameters.get(name);
             if (value == null)
@@ -392,9 +400,10 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterMap()</code> method of the
      * wrapped request.
      */
-    public Map getParameterMap() {
+    @Override
+    public Map<String, String[]> getParameterMap() {
 
-	parseParameters();
+        parseParameters();
         return (parameters);
 
     }
@@ -404,11 +413,12 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterNames()</code> method of the
      * wrapped request.
      */
-    public Enumeration getParameterNames() {
+    @Override
+    public Enumeration<String> getParameterNames() {
 
-	parseParameters();
+        parseParameters();
         synchronized (parameters) {
-            return (new Enumerator(parameters.keySet()));
+            return (new Enumerator<String>(parameters.keySet()));
         }
 
     }
@@ -420,9 +430,10 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param name Name of the requested parameter
      */
+    @Override
     public String[] getParameterValues(String name) {
 
-	parseParameters();
+        parseParameters();
         synchronized (parameters) {
             Object value = parameters.get(name);
             if (value == null)
@@ -446,6 +457,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Override the <code>getPathInfo()</code> method of the wrapped request.
      */
+    @Override
     public String getPathInfo() {
 
         return (this.pathInfo);
@@ -457,6 +469,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getQueryString()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getQueryString() {
 
         return (this.queryString);
@@ -468,6 +481,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getRequestURI()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getRequestURI() {
 
         return (this.requestURI);
@@ -479,6 +493,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getRequestURL()</code> method of the wrapped
      * request.
      */
+    @Override
     public StringBuffer getRequestURL() {
 
         StringBuffer url = new StringBuffer();
@@ -505,6 +520,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getServletPath()</code> method of the wrapped
      * request.
      */
+    @Override
     public String getServletPath() {
 
         return (this.servletPath);
@@ -516,6 +532,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Return the session associated with this Request, creating one
      * if necessary.
      */
+    @Override
     public HttpSession getSession() {
         return (getSession(true));
     }
@@ -527,6 +544,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param create Create a new session if one does not exist
      */
+    @Override
     public HttpSession getSession(boolean create) {
 
         if (crossContext) {
@@ -620,6 +638,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return true if the request specifies a JSESSIONID that is valid within
      * the context of this ApplicationHttpRequest, false otherwise.
      */
+    @Override
     public boolean isRequestedSessionIdValid() {
 
         if (crossContext) {
@@ -677,16 +696,14 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param orig Origin Map to be copied
      */
-    Map copyMap(Map orig) {
+    Map<String, String[]> copyMap(Map<String, String[]> orig) {
 
         if (orig == null)
-            return (new HashMap());
-        HashMap dest = new HashMap();
+            return (new HashMap<String, String[]>());
+        HashMap<String, String[]> dest = new HashMap<String, String[]>();
         synchronized (orig) {
-            Iterator keys = orig.keySet().iterator();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                dest.put(key, orig.get(key));
+            for (Map.Entry<String, String[]> entry : orig.entrySet()) {
+                dest.put(entry.getKey(), entry.getValue());
             }
         }
         return (dest);
@@ -766,11 +783,11 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * content, they are merged.
      */
     void parseParameters() {
-	if (parsedParams) {
-	    return;
-	}
+        if (parsedParams) {
+            return;
+        }
 
-        parameters = new HashMap();
+        parameters = new HashMap<String, String[]>();
         synchronized (parameters) {
             parameters = copyMap(getRequest().getParameterMap());
 	    mergeParameters();
@@ -910,7 +927,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return;
         }
 
-        HashMap queryParameters = new HashMap();
+        HashMap<String, String[]> queryParameters = new HashMap<String, String[]>();
         String encoding = getCharacterEncoding();
         if (encoding == null)
             encoding = Globals.ISO_8859_1_ENCODING;
