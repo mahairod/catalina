@@ -76,7 +76,7 @@ public class FileLogger
     /**
      * The string manager for this package.
      */
-    private StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
 
