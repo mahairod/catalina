@@ -113,7 +113,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Servlet</code> on which the method will
      * be called.
-     * @param targetType <code>Class</code> array used to instanciate a i
+     * @param targetType <code>Class</code> array used to instantiate a i
      * <code>Method</code> object.
      * @param targetObject <code>Object</code> array contains the runtime 
      * parameters instance.
@@ -139,7 +139,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Servlet</code> on which the method will
      * be called.
-     * @param targetType <code>Class</code> array used to instanciate a 
+     * @param targetType <code>Class</code> array used to instantiate a 
      * <code>Method</code> object.
      * @param targetArgumentst <code>Object</code> array contains the 
      * runtime parameters instance.
@@ -198,7 +198,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Filter</code> on which the method will 
      * be called.
-     * @param targetType <code>Class</code> array used to instanciate a
+     * @param targetType <code>Class</code> array used to instantiate a
      * <code>Method</code> object.
      * @param targetArgumentst <code>Object</code> array contains the 
      * runtime parameters instance.
@@ -220,7 +220,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Filter</code> on which the method will 
      * be called.
-     * @param targetType <code>Class</code> array used to instanciate a
+     * @param targetType <code>Class</code> array used to instantiate a
      * <code>Method</code> object.
      * @param targetArguments <code>Object</code> array contains the 
      * runtime parameters instance.
@@ -264,7 +264,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Servlet</code> on which the method will
      * be called.
-     * @param targetType <code>Class</code> array used to instanciate a 
+     * @param targetType <code>Class</code> array used to instantiate a 
      * <code>Method</code> object.
      * @param targetArgumentst <code>Object</code> array contains the 
      * runtime parameters instance.
@@ -373,7 +373,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Servlet</code> on which the method will
      * be called.
-     * @param targetType <code>Class</code> array used to instanciate a 
+     * @param targetType <code>Class</code> array used to instantiate a 
      * <code>Method</code> object.
      * @return the method instance.
      */
