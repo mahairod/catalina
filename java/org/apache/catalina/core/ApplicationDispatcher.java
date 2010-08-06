@@ -249,7 +249,7 @@ public final class ApplicationDispatcher
      * for which this dispatcher was acquired.
      *
      * <p>Any runtime exceptions, IOException, or ServletException thrown
-     * by the target will be propogated to the caller.
+     * by the target will be propagated to the caller.
      *
      * @param request The request to be forwarded
      * @param response The response to be forwarded
@@ -267,7 +267,7 @@ public final class ApplicationDispatcher
      * for which this dispatcher was acquired.
      *
      * <p>Any runtime exceptions, IOException, or ServletException thrown
-     * by the target will be propogated to the caller.
+     * by the target will be propagated to the caller.
      *
      * @param request The request to be forwarded
      * @param response The response to be forwarded
@@ -519,7 +519,7 @@ public final class ApplicationDispatcher
     /**
      * Include the response from another resource in the current response.
      * Any runtime exception, IOException, or ServletException thrown by the
-     * called servlet will be propogated to the caller.
+     * called servlet will be propagated to the caller.
      *
      * @param request The servlet request that is including this one
      * @param response The servlet response to be appended to

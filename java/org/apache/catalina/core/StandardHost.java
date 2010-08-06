@@ -165,7 +165,7 @@ public class StandardHost
 
 
     /**
-     * Attribute value used to turn on/off XML namespace awarenes.
+     * Attribute value used to turn on/off XML namespace awareness.
      */
      private boolean xmlNamespaceAware = false;
 
@@ -344,7 +344,7 @@ public class StandardHost
 
     /**
      * Return the value of the deploy on startup flag.  If true, it indicates 
-     * that this host's child webapps should be discovred and automatically 
+     * that this host's child webapps should be discovered and automatically 
      * deployed at startup time.
      */
     public boolean getDeployOnStartup() {
@@ -510,7 +510,7 @@ public class StandardHost
 
     /**
      * Get the server.xml <host> attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
+     * @return true if namespace awareness is enabled.
      *
      */
     public boolean getXmlNamespaceAware(){
@@ -1187,7 +1187,7 @@ public class StandardHost
 
     // -------------------- JMX  --------------------
     /**
-      * Return the MBean Names of the Valves assoicated with this Host
+      * Return the MBean Names of the Valves associated with this Host
       *
       * @exception Exception if an MBean cannot be created or registered
       */

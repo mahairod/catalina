@@ -544,7 +544,7 @@ public class StandardService
         if( oname==controller ) {
             // we registered ourself on init().
             // That should be the typical case - this object is just for
-            // backward compat, nobody should bother to load it explicitely
+            // backward compat, nobody should bother to load it explicitly
             Registry.getRegistry(null, null).unregisterComponent(oname);
         }        
         */
@@ -562,7 +562,7 @@ public class StandardService
     public void initialize()
             throws LifecycleException
     {
-        // Service shouldn't be used with embeded, so it doesn't matter
+        // Service shouldn't be used with embedded, so it doesn't matter
         if (initialized) {
             log.info(sm.getString("standardService.initialize.initialized"));
             return;
@@ -610,7 +610,7 @@ public class StandardService
             if( oname==controller ) {
                 // we registered ourself on init().
                 // That should be the typical case - this object is just for
-                // backward compat, nobody should bother to load it explicitely
+                // backward compat, nobody should bother to load it explicitly
                 Registry.getRegistry(null, null).unregisterComponent(oname);
             }
             initialized = false;
