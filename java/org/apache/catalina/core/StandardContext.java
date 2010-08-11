@@ -43,6 +43,7 @@ import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
+import org.glassfish.hk2.classmodel.reflect.Types;
 import org.glassfish.web.loader.ServletContainerInitializerUtil;
 import org.glassfish.web.valve.GlassFishValve;
 
@@ -5336,6 +5337,10 @@ public class StandardContext
         }
     }
 
+    protected Types getTypes() {
+        return null;
+    }
+
     protected void callServletContainerInitializers()
             throws LifecycleException {
 
@@ -5347,6 +5352,7 @@ public class StandardContext
         Map<Class<? extends ServletContainerInitializer>, HashSet<Class<?>>> initializerList =
             ServletContainerInitializerUtil.getInitializerList(
                 servletContainerInitializers, interestList,
+                getTypes(),
                 getClassLoader());
         if (initializerList == null) {
             return;
