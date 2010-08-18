@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -91,7 +90,7 @@ public class SingleSignOn
      * The cache of SingleSignOnEntry instances for authenticated Principals,
      * keyed by the cookie value that is used to select them.
      */
-    protected Map<String, SingleSignOnEntry> cache = new HashMap<String, SingleSignOnEntry>();
+    protected HashMap cache = new HashMap();
 
     /**
      * The lifecycle event support for this component.
@@ -104,7 +103,7 @@ public class SingleSignOn
      * The cache of single sign on identifiers, keyed by the Session that is
      * associated with them.
      */
-    protected Map<Session, String> reverse = new HashMap<Session, String>();
+    protected HashMap reverse = new HashMap();
 
     /**
      * Component started flag.
@@ -259,7 +258,7 @@ public class SingleSignOn
 
         String ssoId = null;
         synchronized (reverse) {
-            ssoId = reverse.get(session);
+            ssoId = (String) reverse.get(session);
         }
         if (ssoId == null) {
             return;
@@ -399,13 +398,10 @@ public class SingleSignOn
             log("Associate sso id " + ssoId + " with session " + session);
 
         SingleSignOnEntry sso = lookup(ssoId);
-        if (sso != null) {
-            boolean wasAdded = sso.addSession(this, session);
-            if (wasAdded) {
-                synchronized (reverse) {
-                    reverse.put(session, ssoId);
-                }
-            }
+        if (sso != null)
+            sso.addSession(this, session);
+        synchronized (reverse) {
+            reverse.put(session, ssoId);
         }
 
     }
@@ -432,7 +428,7 @@ public class SingleSignOn
         // see if we are the last session, if so blow away ssoId
         if (sso.isEmpty()) {
             synchronized (cache) {
-                sso = cache.remove(ssoId);
+                sso = (SingleSignOnEntry) cache.remove(ssoId);
             }
         }
     }
@@ -510,7 +506,7 @@ public class SingleSignOn
     protected SingleSignOnEntry lookup(String ssoId) {
 
         synchronized (cache) {
-            return cache.get(ssoId);
+            return ((SingleSignOnEntry) cache.get(ssoId));
         }
 
     }
