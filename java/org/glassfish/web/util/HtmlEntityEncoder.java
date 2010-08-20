@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
  *
  */
 
