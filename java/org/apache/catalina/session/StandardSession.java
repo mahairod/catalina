@@ -284,6 +284,11 @@ public class StandardSession
      */
     protected AtomicLong version = new AtomicLong(-1);
 
+    /**
+     * single sign on id. It is null if there is no SSO.
+     */
+    protected String ssoId = null;
+
 
     // ----------------------------------------------------- Session Properties
 
@@ -1007,6 +1012,23 @@ public class StandardSession
     public void setVersion(long value) {
         version.set(value);
     }    
+
+
+    /**
+     * Return the single sign on id.
+     * It is null if there is no SSO.
+     */
+    public String getSsoId() {
+        return ssoId;
+    }
+
+
+    /**
+     * Set the single sign on id.
+     */
+    public void setSsoId(String ssoId) {
+        this.ssoId = ssoId;
+    }
 
 
     /**
