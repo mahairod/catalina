@@ -44,6 +44,7 @@ import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 import org.glassfish.hk2.classmodel.reflect.Types;
+import org.glassfish.web.loader.WebappClassLoader;
 import org.glassfish.web.loader.ServletContainerInitializerUtil;
 import org.glassfish.web.valve.GlassFishValve;
 
@@ -59,6 +60,7 @@ import javax.servlet.http.HttpSessionListener;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -6676,8 +6678,7 @@ public class StandardContext
             try {
                 // Try looking up resource in
                 // WEB-INF/lib/[*.jar]/META-INF/resources
-                java.net.URL u = getLoader().getClassLoader().getResource(
-                    Globals.META_INF_RESOURCES + path);
+                URL u = getMetaInfResource(path);
                 return (u != null ? u.getPath() : file.getAbsolutePath());
             } catch (Exception e) {
                 return null;
@@ -6772,8 +6773,7 @@ public class StandardContext
                 try {
                     // Try looking up resource in
                     // WEB-INF/lib/[*.jar]/META-INF/resources
-                    java.net.URL u = getLoader().getClassLoader().getResource(
-                        Globals.META_INF_RESOURCES + path);
+                    URL u = getMetaInfResource(path);
                     return (u != null ? u.openStream() : null);
                 } catch (Exception ee) {
                     // do nothing
@@ -6849,7 +6849,7 @@ public class StandardContext
                     try {
                         // Try looking up resource in
                         // WEB-INF/lib/[*.jar]/META-INF/resources
-                        return getLoader().getClassLoader().getResource(Globals.META_INF_RESOURCES + path);
+                        return getMetaInfResource(path);
                     } catch (Exception ee) {
                         // do nothing
                     }
@@ -6919,8 +6919,7 @@ public class StandardContext
         }
         try {
             // Trigger expansion of bundled JAR files
-            java.net.URL u = getLoader().getClassLoader().getResource(
-                Globals.META_INF_RESOURCES + path);
+            URL u = getMetaInfResource(path);
             String realPath = (u != null ? u.getPath() : null);
             if (realPath != null) {
                 File[] children = new File(realPath).listFiles();
@@ -7437,5 +7436,21 @@ public class StandardContext
             uriCC.setLimit(-1);
             mappingData = new MappingData();
         }
+    }
+
+    /**
+     * Get resource from META-INF/resources/ in jars.
+     */
+    URL getMetaInfResource(String path) {
+
+        path = Globals.META_INF_RESOURCES + path;
+
+        ClassLoader cl = getLoader().getClassLoader();
+        if (cl instanceof WebappClassLoader) {
+            return ((WebappClassLoader)cl).getResourceFromJars(path);
+        }
+
+        // This probably won't happen
+        return cl.getResource(path);
     }
 }
