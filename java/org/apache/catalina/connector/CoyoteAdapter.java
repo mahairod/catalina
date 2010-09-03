@@ -21,6 +21,7 @@
 package org.apache.catalina.connector;
 
 import com.sun.appserv.ProxyHandler;
+import com.sun.grizzly.config.ContextRootInfo;
 import com.sun.grizzly.tcp.ActionCode;
 import com.sun.grizzly.tcp.Adapter;
 import com.sun.grizzly.util.buf.ByteChunk;
@@ -461,7 +462,16 @@ public class CoyoteAdapter
             request.updatePaths(md);
         }
 
-        Context ctx = (Context) request.getMappingData().context;
+        Object context = request.getMappingData().context;
+        if (context instanceof ContextRootInfo) {
+            // this block of code will be invoked when an AJP request is intended
+            // for an Adapter other than the CoyoteAdapter
+            final Adapter toInvoke = ((ContextRootInfo) context).getAdapter();
+            toInvoke.service(req, res);
+            return false;
+        }
+
+        Context ctx = (Context) context;
 
         // Parse session id
         if (ctx != null && !uriParamsCC.isNull()) {
