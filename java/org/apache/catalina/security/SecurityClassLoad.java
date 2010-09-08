@@ -46,6 +46,7 @@ public final class SecurityClassLoad {
         loadJavaxPackage(loader);
         loadCoyotePackage(loader);        
         loadHttp11Package(loader);        
+        loadTomcatPackage(loader);
     }
     
     
@@ -197,4 +198,9 @@ public final class SecurityClassLoad {
              "Response$3");
     }
 
+    private final static void loadTomcatPackage(ClassLoader loader)
+        throws Exception {
+        String basePackage = "com.sun.grizzly.";
+        loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
+    }
 }
