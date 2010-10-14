@@ -199,6 +199,11 @@ final class StandardHostValve
                 errorReportValve.postInvoke(request, response);
             }
             // END SJSAS 6374691
+
+            Context context = request.getContext();
+            if (context != null) {
+                context.fireRequestDestroyedEvent(hreq);
+            }
         } finally {
             Thread.currentThread().setContextClassLoader
                 (standardHostValveClassLoader);
@@ -579,6 +584,8 @@ final class StandardHostValve
         HttpServletRequest hreq = (HttpServletRequest) request.getRequest();
         hreq.getSession(false);
         // END GlassFish Issue 1057
+
+        context.fireRequestInitializedEvent(hreq);
 
         return context;
     }
