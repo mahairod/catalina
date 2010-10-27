@@ -127,7 +127,7 @@ public abstract class AuthenticatorBase
      * Should the session ID, if any, be changed upon a successful
      * authentication to prevent a session fixation attack?
      */
-    protected boolean changeSessionIdOnAuthentication = false;
+    protected boolean changeSessionIdOnAuthentication = true;
 
 
     /**
