@@ -507,6 +507,7 @@ public class Request
         localAddr = null;
         localName = null;
         multipart = null;
+        jrouteId = null;
 
         attributes.clear();
         notes.clear();
