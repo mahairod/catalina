@@ -212,6 +212,7 @@ public class Embedded  extends StandardService implements Lifecycle {
      */
     protected boolean await = false;
 
+    protected boolean embeddedDirectoryListing = false;
 
     // ------------------------------------------------------------- Properties
 
@@ -328,6 +329,13 @@ public class Embedded  extends StandardService implements Lifecycle {
         return System.getProperty("catalina.base");
     }
 
+    public void setDirectoryListing(boolean listings) {
+        embeddedDirectoryListing = listings;
+    }
+
+    public boolean isDirectoryListing() {
+        return embeddedDirectoryListing;
+    }
 
     // --------------------------------------------------------- Public Methods
 
