@@ -1003,7 +1003,7 @@ public abstract class ContainerBase
                 return;
             children.remove(child.getName());
         }
-        
+
         if (started && (child instanceof Lifecycle)) {
             try {
                 if( child instanceof ContainerBase ) {
