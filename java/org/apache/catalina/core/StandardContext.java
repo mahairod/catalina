@@ -4711,7 +4711,7 @@ public class StandardContext
     private boolean contextListenerStop() {
 
         boolean ok = true;
-        
+
         if (contextListeners.isEmpty()) {
             return ok;
         }
@@ -6282,6 +6282,9 @@ public class StandardContext
             StandardHost host = (StandardHost) getParent();
             oname = createObjectName(host.getDomain(), host.getJmxName());
             controller = oname;
+            for (Container wrapper : findChildren()) {
+                ((StandardWrapper)wrapper).registerJMX(this);
+            }
         } catch(Exception ex) {
             log.log(Level.INFO,
                     "Error updating ctx with jmx " + this + " " +

@@ -865,7 +865,7 @@ public abstract class ContainerBase
     }
 
     private void addChildInternal(Container child) {
-
+        
         if(log.isLoggable(Level.FINEST))
             log.finest("Add child " + child + " " + this);
         synchronized(children) {
