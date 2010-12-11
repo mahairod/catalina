@@ -132,6 +132,10 @@ public final class ApplicationContextFacade
         return (theContext);
     }
 
+    public ApplicationContext getApplicationContext() {
+        return context;
+    }
+
 
     public int getMajorVersion() {
         return context.getMajorVersion();
