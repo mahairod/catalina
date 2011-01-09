@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -483,9 +483,16 @@ public final class RequestUtil {
         HashMap<String, String> result =
             new HashMap<String, String>(st.countTokens());
         while (st.hasMoreTokens()) {
-            String contextPath = st.nextToken();
+            String hexPath = st.nextToken();
             if (st.hasMoreTokens()) {
-                result.put(contextPath, st.nextToken());
+                try {
+                    String contextPath = new String(
+                            HexUtils.convert(hexPath), "UTF-8");
+                    result.put(contextPath, st.nextToken());
+                } catch(UnsupportedEncodingException ex) {
+                    //should not be here
+                    throw new IllegalArgumentException(ex);
+                }
             }
         }
 
@@ -521,7 +528,13 @@ public final class RequestUtil {
                 sb.append(':');
             }
             String contextPath = iter.next();
-            sb.append(contextPath);
+            // encode so that there is no / or %2F
+            try {
+                sb.append(new String(HexUtils.convert(contextPath.getBytes("UTF-8"))));
+            } catch(UnsupportedEncodingException ex) {
+                //should not be here
+                throw new IllegalArgumentException(ex);
+            }
             sb.append(SESSION_VERSION_SEPARATOR);
             sb.append(sessionVersions.get(contextPath));
         }

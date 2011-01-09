@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -490,6 +490,10 @@ public class CoyoteAdapter
         // START SJSAS 6253524
         request.setContext(ctx);
         // END SJSAS 6253524
+
+        if (ctx != null && !uriParamsCC.isNull()) {
+            request.parseSessionVersion(uriParamsCC);
+        }
 
         request.setWrapper((Wrapper) request.getMappingData().wrapper);
 
