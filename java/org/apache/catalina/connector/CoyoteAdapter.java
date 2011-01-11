@@ -476,8 +476,7 @@ public class CoyoteAdapter
 
         // Parse session id
         if (ctx != null && !uriParamsCC.isNull()) {
-            String sessionParam = ";" + ctx.getSessionParameterName() + "=";
-            request.parseSessionId(sessionParam, uriParamsCC);
+            request.parseSessionId(ctx.getSessionParameterName(), uriParamsCC);
         }
 
         // START GlassFish 1024
@@ -493,6 +492,10 @@ public class CoyoteAdapter
 
         if (ctx != null && !uriParamsCC.isNull()) {
             request.parseSessionVersion(uriParamsCC);
+        }
+
+        if (!uriParamsCC.isNull()) {
+            request.parseJReplica(uriParamsCC);
         }
 
         request.setWrapper((Wrapper) request.getMappingData().wrapper);
@@ -564,7 +567,6 @@ public class CoyoteAdapter
                 }
             }
             // END CR 6590921
-
             // Issue a permanent redirect
             response.sendRedirect(redirectPath, false);
 

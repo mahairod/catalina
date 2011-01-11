@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -1750,11 +1750,14 @@ public class Response
             }
             // END SJSAS 6337561
 
-            String replicaLocation =
-                    (String) request.getAttribute("jreplicaLocation");
-            if (replicaLocation != null) {
-                sb.append(";jreplica=");
-                sb.append(replicaLocation);
+            final Session session = request.getSessionInternal(false);
+            if (session != null) {
+                String replicaLocation =
+                    (String) session.getNote(Globals.JREPLICA_SESSION_NOTE);
+                if (replicaLocation != null) {
+                    sb.append(Globals.JREPLICA_PARAMETER);
+                    sb.append(replicaLocation);
+                }
             }
 
             if (sessionVersion != null) {
