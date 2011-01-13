@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -62,7 +62,7 @@ public final class HexUtils {
 
 
     /**
-     * Convert a char[] of hexadecimal digits into the corresponding
+     * Convert a String of hexadecimal digits into the corresponding
      * byte array by encoding each two hexadecimal digits as a byte.
      *
      * @param digits Hexadecimal digits representation
@@ -71,15 +71,19 @@ public final class HexUtils {
      *  is found, or the input string contains an odd number of hexadecimal
      *  digits
      */
-    public static byte[] convert(char[] digits) {
+    public static byte[] convert(String digits) {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (int i = 0; i < digits.length; i += 2) {
-            char c1 = digits[i];
-            if ((i+1) >= digits.length)
-                throw new IllegalArgumentException
+        int length = digits.length();
+        if (length % 2 != 0) {
+            throw new IllegalArgumentException
                     (sm.getString("hexUtil.odd"));
-            char c2 = digits[i + 1];
+        }
+
+        int bLength = length / 2;
+        byte[] bytes = new byte[bLength];
+        for (int i = 0; i < bLength; i++) {
+            char c1 = digits.charAt(2*i);
+            char c2 = digits.charAt(2*i + 1);
             byte b = 0;
             if ((c1 >= '0') && (c1 <= '9'))
                 b += ((c1 - '0') * 16);
@@ -99,9 +103,9 @@ public final class HexUtils {
             else
                 throw new IllegalArgumentException
                     (sm.getString("hexUtil.bad"));
-            baos.write(b);
+            bytes[i] = b;
         }
-        return (baos.toByteArray());
+        return bytes;
 
     }
 

@@ -18,21 +18,20 @@
  * limitations under the License.
  */
 
-package org.apache.catalina.core;
+package org.apache.catalina.util;
 
 
-public class Constants {
+/**
+ * Encode a digest into a String.
+ * <p>
+ * The digest hash is converted into a character long String.
+ * Each character of the String is the hexadecimal representation of 4 bits
+ * of the digest.
+ *
+ * @author Remy Maucherat
+ * @version $Revision: 1.2 $ $Date: 2005/12/08 01:28:18 $
+ */
 
-    public static final String Package = "org.apache.catalina.core";
-    public static final int MAJOR_VERSION = 3;
-    public static final int MINOR_VERSION = 0;
+public final class DigestEncoder extends DigestEncoderBase {
 
-    public static final String JSP_SERVLET_CLASS =
-        "org.apache.jasper.servlet.JspServlet";
-
-    public static final String JSP_SERVLET_NAME = "jsp";
-
-    public static final String DEFAULT_SERVLET_NAME = "default";
-
-    public static final String IS_DEFAULT_ERROR_PAGE_ENABLED_INIT_PARAM = "org.glassfish.web.isDefaultErrorPageEnabled";
 }

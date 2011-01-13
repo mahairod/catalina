@@ -865,7 +865,7 @@ public abstract class ContainerBase
     }
 
     private void addChildInternal(Container child) {
-
+        
         if(log.isLoggable(Level.FINEST))
             log.finest("Add child " + child + " " + this);
         synchronized(children) {
@@ -1003,7 +1003,7 @@ public abstract class ContainerBase
                 return;
             children.remove(child.getName());
         }
-        
+
         if (started && (child instanceof Lifecycle)) {
             try {
                 if( child instanceof ContainerBase ) {
@@ -1114,8 +1114,9 @@ public abstract class ContainerBase
             if( lb.getObjectName()==null ) {
                 ObjectName lname=lb.createObjectName();
                 try {
-                    Registry.getRegistry(null, null).registerComponent(lb, lname,
-                                                             null);
+                    // Do not register unused tomcat mbeans 
+                    //Registry.getRegistry(null, null).registerComponent(lb, lname,
+                    //                                         null);
                 } catch( Exception ex ) {
                     log.log(Level.SEVERE, "Can't register logger " + lname,
                             ex);
@@ -1232,8 +1233,9 @@ public abstract class ContainerBase
         if( logger instanceof LoggerBase ) {
             LoggerBase lb=(LoggerBase)logger;
             if( lb.getObjectName()!=null ) {
-                try {
-                    Registry.getRegistry(null, null).unregisterComponent(lb.getObjectName());
+                try {             
+                    // Do not register unused tomcat mbeans
+                    //Registry.getRegistry(null, null).unregisterComponent(lb.getObjectName());
                 } catch( Exception ex ) {
                     log.log(Level.SEVERE,
                             "Can't unregister logger " + lb.getObjectName(),

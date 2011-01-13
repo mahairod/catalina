@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -695,17 +695,15 @@ public class OutputBuffer extends Writer
             Session sess) {
 
         String replicaLocation = null;
-        HttpSession session = null;
 
         if (sess != null) {
-            session = sess.getSession();
-            replicaLocation = (String)session.getAttribute("jreplicaLocation");
+            replicaLocation = (String)sess.getNote(Globals.JREPLICA_SESSION_NOTE);
+            sess.removeNote(Globals.JREPLICA_SESSION_NOTE);
         }
 
         if (replicaLocation != null) {
-            session.removeAttribute("jreplicaLocation");
             Cookie cookie = new Cookie(
-                "JREPLICA", replicaLocation);
+                Globals.JREPLICA_COOKIE_NAME, replicaLocation);
             request.configureSessionCookie(cookie);
             if (request.isRequestedSessionIdFromCookie()) {
                 cookie.setSecure(
