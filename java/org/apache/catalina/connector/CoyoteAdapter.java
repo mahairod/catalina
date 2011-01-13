@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -514,8 +514,7 @@ public class CoyoteAdapter
 
         // Parse session id
         if (ctx != null && !uriParamsCC.isNull()) {
-            String sessionParam = ";" + ctx.getSessionParameterName() + "=";
-            request.parseSessionId(sessionParam, uriParamsCC);
+            request.parseSessionId(ctx.getSessionParameterName(), uriParamsCC);
         }
 
         // START GlassFish 1024
@@ -528,6 +527,14 @@ public class CoyoteAdapter
         // START SJSAS 6253524
         request.setContext(ctx);
         // END SJSAS 6253524
+
+        if (ctx != null && !uriParamsCC.isNull()) {
+            request.parseSessionVersion(uriParamsCC);
+        }
+
+        if (!uriParamsCC.isNull()) {
+            request.parseJReplica(uriParamsCC);
+        }
 
         request.setWrapper((Wrapper) request.getMappingData().wrapper);
 
@@ -598,7 +605,6 @@ public class CoyoteAdapter
                 }
             }
             // END CR 6590921
-
             // Issue a permanent redirect
             response.sendRedirect(redirectPath, false);
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -99,6 +99,8 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -164,7 +166,10 @@ public class StandardContext
         pipeline.setBasic(new StandardContextValve());
         namingResources.setContainer(this);
         broadcaster = new NotificationBroadcasterSupport();
-        mySecurityManager = new MySecurityManager();
+        if (Globals.IS_SECURITY_ENABLED) {
+            mySecurityManager = (MySecurityManager)AccessController.doPrivileged(
+                    new PrivilegedCreateSecurityManager());
+        }
         
         //START PWC 6403328
         this.logPrefix = sm.getString("standardContext.logPrefix", logName());
@@ -698,8 +703,6 @@ public class StandardContext
      * Cache the name here as the getSessionCookieConfig() is synchronized.
      */
     private String sessionCookieName = Globals.SESSION_COOKIE_NAME;
-
-    private boolean sessionCookieConfigInitialized = false;
 
     private boolean sessionCookieNameInitialized = false;
 
@@ -2570,24 +2573,6 @@ public class StandardContext
     }
 
     /**
-     * @param initialized true if any of the setter methods have been
-     * called on the SessionCookieConfig object of this context, false
-     * otherwise
-     */
-    public void setSessionCookieConfigInitialized(boolean initialized) {
-        sessionCookieConfigInitialized = initialized;
-    }
-
-    /**
-     * @return true if any of the setter methods have been
-     * called on the SessionCookieConfig object of this context, false
-     * otherwise
-     */
-    public boolean isSessionCookieConfigInitialized() {
-        return sessionCookieConfigInitialized;
-    }
-
-    /**
      * Sets the name that will be assigned to any session tracking
      * cookies created on behalf of this context
      */
@@ -2838,7 +2823,9 @@ public class StandardContext
         if (webappLoader == null) {
             return null;
         }
-        mySecurityManager.checkGetClassLoaderPermission(webappLoader);
+        if (mySecurityManager != null) {
+            mySecurityManager.checkGetClassLoaderPermission(webappLoader);
+        }
         return webappLoader;
     }
 
@@ -5280,11 +5267,6 @@ public class StandardContext
             // Notify our interested LifecycleListeners
             lifecycle.fireLifecycleEvent(START_EVENT, null);
             // END SJSAS 8.1 5049111
-
-            // START SJSAS 8.1 5049111
-            // Notify our interested LifecycleListeners
-            // lifecycle.fireLifecycleEvent(START_EVENT, null);
-            // END SJSAS 8.1 504911
         } catch (Throwable t) {
             throw new LifecycleException(t);
         } finally {
@@ -5582,6 +5564,22 @@ public class StandardContext
                 ((Lifecycle) loader).stop();
             }
             */
+        } catch(Throwable t) {
+            // started was "true" when it first enters the try block.
+            // Note that it is set to false after STOP_EVENT is fired.
+            // One need to fire STOP_EVENT to clean up naming information 
+            // if START_EVENT is processed successfully.
+            if (started) {
+                lifecycle.fireLifecycleEvent(STOP_EVENT, null);
+            }
+
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException)t;
+            } else if (t instanceof LifecycleException) {
+                throw (LifecycleException)t;
+            } else {
+                throw new LifecycleException(t);
+            }
         } finally {
 
             // Unbinding thread
@@ -6335,11 +6333,27 @@ public class StandardContext
         return new ObjectName(getDomain() + ":" + onameStr);
     }
 
+    public void updateObjectName() { 
+        try {
+            StandardHost host = (StandardHost) getParent();
+            oname = createObjectName(host.getDomain(), host.getJmxName());
+            controller = oname;
+            for (Container wrapper : findChildren()) {
+                ((StandardWrapper)wrapper).registerJMX(this);
+            }
+        } catch(Exception ex) {
+            log.log(Level.INFO,
+                    "Error updating ctx with jmx " + this + " " +
+                    oname + " " + ex.toString(),
+                    ex );
+        }
+    }
+
     private void preRegisterJMX() {
         try {
             StandardHost host = (StandardHost) getParent();
             if ((oname == null)
-                || (oname.getKeyProperty("j2eeType") == null)) {
+                    || (oname.getKeyProperty("j2eeType") == null)) {
                 oname = createObjectName(host.getDomain(), host.getJmxName());
                 controller = oname;
             }
@@ -6721,11 +6735,7 @@ public class StandardContext
                 // Try looking up resource in
                 // WEB-INF/lib/[*.jar]/META-INF/resources
                 URL u = getMetaInfResource(path);
-                String realPath = urlEncoder.encode(file.getAbsolutePath());
-                if (realPath.length() > Constants.CHAR_LIMIT) {
-                    realPath = realPath.substring(0, Constants.CHAR_LIMIT);
-                }
-                return (u != null ? u.getPath() : realPath);
+                return (u != null ? u.getPath() : file.getAbsolutePath());
             } catch (Exception e) {
                 return null;
             }
@@ -7431,6 +7441,12 @@ public class StandardContext
                     !isAncestor(webappLoader, ccl)) {
                 sm.checkPermission(GET_CLASSLOADER_PERMISSION);
             }
+        }
+    }
+
+    private static class PrivilegedCreateSecurityManager implements PrivilegedAction {
+        public Object run() {
+            return new MySecurityManager();
         }
     }
 
