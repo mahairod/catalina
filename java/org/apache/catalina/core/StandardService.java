@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -335,6 +335,21 @@ public class StandardService
     public Connector[] findConnectors() {
 
         return (connectors);
+
+    }
+
+
+    /**
+     * Find and return the Connector associated with this Service and Connector name.
+     */
+    public Connector findConnector(String name) {
+
+        for (Connector connector : connectors) {
+            if (connector.getName().equals(name)) {
+                return connector;
+            }
+        }
+        return null;
 
     }
 
