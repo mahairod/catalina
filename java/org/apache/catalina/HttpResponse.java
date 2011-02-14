@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -64,6 +64,14 @@ public interface HttpResponse
      * of the response header with the given name
      */
     public Collection<String> getHeaders(String name);
+
+
+    /**
+     * Special method for adding a session cookie as we should be overriding 
+     * any previous 
+     * @param cookie
+     */
+    public void addSessionCookieInternal(final Cookie cookie);
 
 
     /**

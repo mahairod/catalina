@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  */
 
@@ -32,7 +32,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
     /**
      * Constructor
      */
-    SessionCookieConfigImpl(StandardContext ctx) {
+    public SessionCookieConfigImpl(StandardContext ctx) {
         this.ctx = ctx;
     }
 
