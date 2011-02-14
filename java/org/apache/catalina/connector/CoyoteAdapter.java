@@ -314,7 +314,7 @@ public class CoyoteAdapter
                     if (host == null) {
                         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                         response.setDetailMessage(sm.getString(
-                                "standardEngine.noHost",
+                                "coyoteAdapter.noHost",
                                 request.getRequest().getServerName()));
                         return;
                     }
@@ -505,9 +505,14 @@ public class CoyoteAdapter
             // this block of code will be invoked when an AJP request is intended
             // for an Adapter other than the CoyoteAdapter
             final Adapter toInvoke = ((ContextRootInfo) context).getAdapter();
-            toInvoke.service(req, res);
-            toInvoke.afterService(req, res);
-            return false;
+            // Ensure the Adapter isn't the ContainerMapper.  It could be there
+            // is only one container/adapter currently active.  If this is the
+            // case, it could cause recursion and blow the stack.
+            if (!"com.sun.enterprise.v3.services.impl.ContainerMapper".equals(toInvoke.getClass().getName())) {
+                toInvoke.service(req, res);
+                toInvoke.afterService(req, res);
+                return false;
+            }
         }
 
         Context ctx = (Context) context;

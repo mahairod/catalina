@@ -2778,7 +2778,7 @@ public class Request
             Cookie newCookie = new Cookie(
                     getContext().getSessionCookieName(), newSessionId);
             configureSessionCookie(newCookie);
-            ((HttpServletResponse) response).addCookie(newCookie);
+            ((HttpResponse)response).addSessionCookieInternal(newCookie);
         }
     }
 
@@ -2940,7 +2940,7 @@ public class Request
                     Cookie cookie = new Cookie(
                             getContext().getSessionCookieName(), id);
                     configureSessionCookie(cookie);
-                    ((HttpServletResponse) response).addCookie(cookie);
+                    ((HttpResponse)response).addSessionCookieInternal(cookie);
                 }
             }
         }
@@ -3002,7 +3002,10 @@ public class Request
                 cookie.setVersion(1);
                 cookie.setComment(sessionCookieConfig.getComment());
             }
-            cookie.setSecure(sessionCookieConfig.isSecure());
+            // do nothing if it is already secure
+            if (!cookie.getSecure()) {
+                cookie.setSecure(sessionCookieConfig.isSecure());
+            }
             cookie.setHttpOnly(sessionCookieConfig.isHttpOnly());
             cookie.setMaxAge(sessionCookieConfig.getMaxAge());
         }
@@ -3271,7 +3274,12 @@ public class Request
             int semi = entry.indexOf(";q=");
             if (semi >= 0) {
                 try {
-                    quality = Double.parseDouble(entry.substring(semi + 3));
+                    String strQuality = entry.substring(semi + 3);
+                    if (strQuality.length() <= 5) {
+                        quality = Double.parseDouble(strQuality);
+                    } else {
+                        quality = 0.0;
+                    } 
                 } catch (NumberFormatException e) {
                     quality = 0.0;
                 }
