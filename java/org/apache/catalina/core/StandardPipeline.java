@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -743,11 +743,15 @@ public class StandardPipeline
                 logger.log("StandardPipeline[" + container.getName() + "]: " +
                         message);
             } else {
-                log.info("StandardPipeline[" + container.getName() +
-                        "]: " + message);
+                if (log.isLoggable(Level.INFO)) {
+                    log.info("StandardPipeline[" + container.getName() +
+                            "]: " + message);
+                }
             }
         } else {
-            log.info("StandardPipeline[null]: " + message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info("StandardPipeline[null]: " + message);
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -204,15 +204,19 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
             throw ex;
         }
         
-        logger.log(Level.INFO, "grizzlyHttpProtocol.start",
-            String.valueOf(getPort()));
+        if (logger.isLoggable(Level.INFO)) {
+            logger.log(Level.INFO, "grizzlyHttpProtocol.start",
+                String.valueOf(getPort()));
+        }
     }
 
 
     @Override
     public void destroy() throws Exception {
-        logger.log(Level.INFO, "grizzlyHttpProtocol.stop", 
-            String.valueOf(getPort()));
+        if (logger.isLoggable(Level.INFO)) {
+            logger.log(Level.INFO, "grizzlyHttpProtocol.stop", 
+                String.valueOf(getPort()));
+        }
         if ( domain != null ){
            jmxManagement.
                     unregisterComponent(new ObjectName(domain,"type", "Selector"));

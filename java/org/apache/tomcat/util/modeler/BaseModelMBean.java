@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -1210,10 +1210,10 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      */
     protected void initModelInfo( String type ) {
         try {
-            if (log.isLoggable(Level.FINE))
+            if (log.isLoggable(Level.FINE)) {
                 log.fine("setModeledType " + type);
-            
-            log.fine( "Set model Info " + type);
+                log.fine("Set model Info " + type);
+            }
             if(type==null) {
                 return;
             }
@@ -1223,7 +1223,9 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             try {
                 c=Class.forName( type);
             } catch( Throwable t ) {
-                log.fine( "Error creating class " + t);
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine( "Error creating class " + t);
+                }
             }
 
             // The class c doesn't need to exist

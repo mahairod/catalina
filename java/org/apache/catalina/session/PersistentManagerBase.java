@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -1171,7 +1171,9 @@ public abstract class PersistentManagerBase
 
         // Validate and update our current component state
         if (started) {
-            log.info(sm.getString("standardManager.alreadyStarted"));
+            if (log.isLoggable(Level.INFO)) {
+                log.info(sm.getString("standardManager.alreadyStarted"));
+            }
             return;
         }
         if( ! initialized )
@@ -1210,7 +1212,9 @@ public abstract class PersistentManagerBase
 
         // Validate and update our current component state
         if (!isStarted()) {
-            log.info(sm.getString("standardManager.notStarted"));
+            if (log.isLoggable(Level.INFO)) {
+                log.info(sm.getString("standardManager.notStarted"));
+            }
             return;
         }
         

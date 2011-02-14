@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -361,7 +361,9 @@ public class StandardEngine
                 if (domain==null) {
                     domain=getName();
                 }
-                log.fine( "Register " + domain );
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine( "Register " + domain );
+                }
                 oname=new ObjectName(domain + ":type=Engine");
                 controller=oname;
                 Registry.getRegistry(null, null).registerComponent(this, oname, null);

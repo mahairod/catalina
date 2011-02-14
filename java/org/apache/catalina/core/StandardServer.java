@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -706,7 +706,9 @@ public final class StandardServer
 
         // Validate and update our current component state
         if (started) {
-            log.fine(sm.getString("standardServer.start.started"));
+            if (log.isLoggable(Level.FINE)) {
+                log.fine(sm.getString("standardServer.start.started"));
+            }
             return;
         }
 

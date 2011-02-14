@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -220,8 +220,10 @@ final class StandardContextValve
             logger.log("StandardContextValve[" + container.getName() + "]: " +
                        message);
         } else {
-            log.info("StandardContextValve[" + containerName + "]: " +
-                     message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info("StandardContextValve[" + containerName + "]: " +
+                         message);
+            }
         }
     }
 

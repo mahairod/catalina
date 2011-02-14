@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -497,8 +497,10 @@ public class Catalina extends Embedded {
             }
         }
 
-        long t2 = System.currentTimeMillis();
-        log.info("Initialization processed in " + (t2 - t1) + " ms");
+        if (log.isLoggable(Level.INFO)) {
+            long t2 = System.currentTimeMillis();
+            log.info("Initialization processed in " + (t2 - t1) + " ms");
+        }
 
     }
 
@@ -545,8 +547,10 @@ public class Catalina extends Embedded {
             }
         }
 
-        long t2 = System.currentTimeMillis();
-        log.info("Server startup in " + (t2 - t1) + " ms");
+        if (log.isLoggable(Level.INFO)) {
+            long t2 = System.currentTimeMillis();
+            log.info("Server startup in " + (t2 - t1) + " ms");
+        }
 
         try {
             // Register shutdown hook

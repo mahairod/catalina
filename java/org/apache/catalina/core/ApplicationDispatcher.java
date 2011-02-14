@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -847,8 +847,10 @@ public final class ApplicationDispatcher
             logger.log("ApplicationDispatcher[" + context.getPath() +
                        "]: " + message);
         } else {
-            log.info("ApplicationDispatcher[" +
-                     context.getPath() + "]: " + message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info("ApplicationDispatcher[" +
+                         context.getPath() + "]: " + message);
+            }
         }
     }
 

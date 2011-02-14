@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -498,7 +498,9 @@ public abstract class ValveBase
                     Registry.getRegistry(null, null).registerComponent(this, vname, getClass().getName());
                 }
             } catch( Throwable t ) {
-                log.log(Level.INFO, "Can't register valve " + this , t );
+                if (log.isLoggable(Level.INFO)) {
+                    log.log(Level.INFO, "Can't register valve " + this , t );
+                }
             }
         }
     }
@@ -513,7 +515,9 @@ public abstract class ValveBase
                 setController(null);
             }
         } catch( Throwable t ) {
-            log.log(Level.INFO, "Can't unregister valve " + this , t );
+            if (log.isLoggable(Level.INFO)) {
+                log.log(Level.INFO, "Can't unregister valve " + this , t );
+            }
         }
     }
     // END CR 6411114

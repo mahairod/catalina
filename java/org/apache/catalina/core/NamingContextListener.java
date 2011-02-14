@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -1018,7 +1018,9 @@ public class NamingContextListener
      */
     protected void log(String message) {
         if (!(container instanceof Container)) {
-            log.info(logName() + ": " + message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info(logName() + ": " + message);
+            }
             return;
         }
         org.apache.catalina.Logger logger =
@@ -1026,7 +1028,9 @@ public class NamingContextListener
         if (logger != null) {
             logger.log(logName() + ": " + message);
         } else {
-            log.info(logName() + ": " + message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info(logName() + ": " + message);
+            }
         }
     }
 

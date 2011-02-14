@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -965,9 +965,13 @@ public class StandardHost
         // START SJSAS_PE 8.1 5034793
         if (log.isLoggable(Level.FINE)) {
             if (xmlValidation) {
-                log.fine(sm.getString("standardHost.validationEnabled"));
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine(sm.getString("standardHost.validationEnabled"));
+                }
             } else {
-                log.fine(sm.getString("standardHost.validationDisabled"));
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine(sm.getString("standardHost.validationDisabled"));
+                }
             }
         }
         // END SJSAS_PE 8.1 5034793 
@@ -1218,7 +1222,9 @@ public class StandardHost
     public Deployer getDeployer() {
         if( deployer!= null )
             return deployer;
-        log.info( "Create Host deployer for direct deployment ( non-jmx ) ");
+        if (log.isLoggable(Level.INFO)) {
+            log.info( "Create Host deployer for direct deployment ( non-jmx ) ");
+        }
         try {
             Class c=Class.forName( STANDARD_HOST_DEPLOYER );
             deployer=(Deployer)c.newInstance();

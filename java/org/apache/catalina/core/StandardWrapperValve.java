@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -379,8 +379,10 @@ final class StandardWrapperValve extends ValveBase {
             logger.log("StandardWrapperValve[" + containerName + "]: " +
                        message);
         } else {
-            log.info("StandardWrapperValve[" + containerName + "]: " +
-                     message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info("StandardWrapperValve[" + containerName + "]: " +
+                         message);
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -1681,9 +1681,11 @@ public class StandardWrapper
             int nRetries = 0;
             while ((nRetries < 21) && (countAllocated > 0)) {
                 if ((nRetries % 10) == 0) {
-                    log.fine(sm.getString("standardWrapper.waiting",
-                                          countAllocated,
-                                          instance.getClass().getName()));
+                    if (log.isLoggable(Level.FINE)) {
+                        log.fine(sm.getString("standardWrapper.waiting",
+                                              countAllocated,
+                                              instance.getClass().getName()));
+                    }
                 }
                 try {
                     Thread.sleep(100);

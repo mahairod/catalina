@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -307,10 +307,12 @@ public final class ExtensionValidator {
                    }
                 } else {
                     // Failure
-                    log.info(sm.getString(
-                        "extensionValidator.extension-not-found-error",
-                        appName, mre.getResourceName(),
-                        requiredExt.getExtensionName()));
+                    if (log.isLoggable(Level.INFO)) {
+                        log.info(sm.getString(
+                            "extensionValidator.extension-not-found-error",
+                            appName, mre.getResourceName(),
+                            requiredExt.getExtensionName()));
+                    }
                     passes = false;
                     failureCount++;
                 }
@@ -318,9 +320,11 @@ public final class ExtensionValidator {
         }
 
         if (!passes) {
-            log.info(sm.getString(
-                     "extensionValidator.extension-validation-error", appName,
-                     failureCount + ""));
+            if (log.isLoggable(Level.INFO)) {
+                log.info(sm.getString(
+                         "extensionValidator.extension-validation-error", appName,
+                         failureCount + ""));
+            }
         }
 
         return passes;

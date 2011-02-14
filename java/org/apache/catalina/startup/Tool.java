@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -250,7 +250,9 @@ public final class Tool {
      */
     private static void usage() {
 
-        log.info("Usage:  java org.apache.catalina.startup.Tool [<options>] <class> [<arguments>]");
+        if (log.isLoggable(Level.INFO)) {
+            log.info("Usage:  java org.apache.catalina.startup.Tool [<options>] <class> [<arguments>]");
+        }
 
     }
 
