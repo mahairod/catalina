@@ -366,7 +366,7 @@ public class StandardPipeline
                 try {
                     ((Contained) oldBasic).setContainer(null);
                 } catch (Throwable t) {
-                    ;
+                    // Ignore
                 }
             }
         }

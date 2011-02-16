@@ -57,7 +57,7 @@ import static org.apache.catalina.InstanceEvent.EventType.AFTER_DISPATCH_EVENT;
 public final class ApplicationDispatcher
     implements RequestDispatcher {
 
-    protected class PrivilegedDispatch implements PrivilegedExceptionAction {
+    protected class PrivilegedDispatch implements PrivilegedExceptionAction<Void> {
 
         private ServletRequest request;
         private ServletResponse response;
@@ -70,13 +70,13 @@ public final class ApplicationDispatcher
             this.dispatcherType = dispatcherType;
         }
 
-        public Object run() throws java.lang.Exception {
+        public Void run() throws java.lang.Exception {
             doDispatch(request, response, dispatcherType);
             return null;
         }
     }
 
-    protected class PrivilegedInclude implements PrivilegedExceptionAction {
+    protected class PrivilegedInclude implements PrivilegedExceptionAction<Void> {
 
         private ServletRequest request;
         private ServletResponse response;
@@ -86,7 +86,7 @@ public final class ApplicationDispatcher
             this.response = response;
         }
 
-        public Object run() throws ServletException, IOException {
+        public Void run() throws ServletException, IOException {
             doInclude(request,response);
             return null;
         }

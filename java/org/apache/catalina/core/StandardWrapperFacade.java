@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -42,7 +42,7 @@ public final class StandardWrapperFacade
     public StandardWrapperFacade(StandardWrapper config) {
 
         super();
-        this.config = (ServletConfig) config;
+        this.config = config;
     }
 
 

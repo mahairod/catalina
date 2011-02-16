@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -144,7 +144,7 @@ public class RequestFacade
         
     
     private final class GetHeadersPrivilegedAction
-            implements PrivilegedAction {
+            implements PrivilegedAction<Enumeration<String>> {
 
         private String name;
 
@@ -152,7 +152,7 @@ public class RequestFacade
             this.name = name;
         }
         
-        public Object run() {       
+        public Enumeration<String> run() {       
             return request.getHeaders(name);
         }           
     }    
@@ -682,7 +682,7 @@ public class RequestFacade
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
-            return (Enumeration<String>)AccessController.doPrivileged(
+            return AccessController.doPrivileged(
                 new GetHeadersPrivilegedAction(name));
         } else {
             return request.getHeaders(name);

@@ -155,7 +155,7 @@ public class StandardService
             try {
                 ((Lifecycle) this.container).start();
             } catch (LifecycleException e) {
-                ;
+                // Ignore
             }
         }
         synchronized (connectors) {
@@ -167,7 +167,7 @@ public class StandardService
             try {
                 ((Lifecycle) oldContainer).stop();
             } catch (LifecycleException e) {
-                ;
+                // Ignore
             }
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -120,7 +120,7 @@ final class ApplicationFilterChain implements FilterChain {
      * Static class array used when the SecurityManager is turned on and 
      * <code>doFilter</code is invoked.
      */
-    private static Class[] classType = new Class[]{ServletRequest.class, 
+    private static Class<?>[] classType = new Class[]{ServletRequest.class, 
                                                    ServletResponse.class,
                                                    FilterChain.class};
                                                    
@@ -128,7 +128,7 @@ final class ApplicationFilterChain implements FilterChain {
      * Static class array used when the SecurityManager is turned on and 
      * <code>service</code is invoked.
      */                                                 
-    private static Class[] classTypeUsedInService = new Class[]{
+    private static Class<?>[] classTypeUsedInService = new Class[]{
                                                          ServletRequest.class,
                                                          ServletResponse.class};
 
@@ -154,8 +154,8 @@ final class ApplicationFilterChain implements FilterChain {
             final ServletResponse res = response;
             try {
                 java.security.AccessController.doPrivileged(
-                    new java.security.PrivilegedExceptionAction() {
-                        public Object run() 
+                    new java.security.PrivilegedExceptionAction<Void>() {
+                        public Void run() 
                             throws ServletException, IOException {
                             internalDoFilter(req,res);
                             return null;
