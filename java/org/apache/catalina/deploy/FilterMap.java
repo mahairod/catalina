@@ -39,7 +39,7 @@ import java.util.Set;
 
 public class FilterMap implements Serializable {
 
-    private static final EnumSet DEFAULT_DISPATCHER =
+    private static final EnumSet<DispatcherType> DEFAULT_DISPATCHER =
         EnumSet.of(DispatcherType.REQUEST);
 
 

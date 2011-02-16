@@ -126,7 +126,7 @@ public class StandardSessionFacade
     /**
      * @deprecated
      */
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         return session.getAttributeNames();
     }
 
