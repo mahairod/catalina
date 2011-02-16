@@ -44,7 +44,7 @@ import java.util.Map;
 public final class ParameterMap extends HashMap {
 */
 // START PWC 6057385
-public final class ParameterMap extends LinkedHashMap {
+public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 // END PWC 6057385
 
     // ----------------------------------------------------------- Constructors
@@ -93,7 +93,7 @@ public final class ParameterMap extends LinkedHashMap {
      *
      * @param map Map whose contents are duplicated in the new map
      */
-    public ParameterMap(Map map) {
+    public ParameterMap(Map<K,V> map) {
 
         super(map);
 
@@ -147,6 +147,7 @@ public final class ParameterMap extends LinkedHashMap {
      *
      * @exception IllegalStateException if this map is currently locked
      */
+    @Override
     public void clear() {
 
         if (locked)
@@ -170,7 +171,8 @@ public final class ParameterMap extends LinkedHashMap {
      *
      * @exception IllegalStateException if this map is currently locked
      */
-    public Object put(Object key, Object value) {
+    @Override
+    public V put(K key, V value) {
 
         if (locked)
             throw new IllegalStateException
@@ -189,7 +191,8 @@ public final class ParameterMap extends LinkedHashMap {
      *
      * @exception IllegalStateException if this map is currently locked
      */
-    public void putAll(Map map) {
+    @Override
+    public void putAll(Map<? extends K,? extends V> map) {
 
         if (locked)
             throw new IllegalStateException
@@ -209,7 +212,8 @@ public final class ParameterMap extends LinkedHashMap {
      *
      * @exception IllegalStateException if this map is currently locked
      */
-    public Object remove(Object key) {
+    @Override
+    public V remove(Object key) {
 
         if (locked)
             throw new IllegalStateException
