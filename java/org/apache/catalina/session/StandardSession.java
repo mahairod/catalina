@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -2247,7 +2247,7 @@ public class StandardSession
 final class StandardSessionContext implements HttpSessionContext {
 
 
-    protected HashMap dummy = new HashMap();
+    protected HashMap<?, String> dummy = new HashMap<String, String>();
 
     /**
      * Return the session identifiers of all sessions defined
@@ -2258,7 +2258,7 @@ final class StandardSessionContext implements HttpSessionContext {
      *  and will be removed in a future version of the API.
      */
     public Enumeration<String> getIds() {
-        return (new Enumerator(dummy));
+        return (new Enumerator<String>(dummy));
     }
 
 

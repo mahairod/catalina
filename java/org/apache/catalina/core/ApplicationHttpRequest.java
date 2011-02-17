@@ -65,7 +65,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The set of attribute names that are special for request dispatchers
      */
-    private static final HashSet<String> specials = new HashSet(15);
+    private static final HashSet<String> specials = new HashSet<String>(15);
 
     static {
         specials.add(RequestDispatcher.INCLUDE_REQUEST_URI);
@@ -113,8 +113,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
                 context.getManager().isSessionVersioningSupported();
             if (isSessionVersioningSupported) {
                 HashMap<String, String> sessionVersions =
-                    (HashMap<String, String>) getAttribute(
-                        Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
+                    getSessionVersions();
                 if (sessionVersions != null) {
                     requestedSessionVersion = sessionVersions.get(
                         context.getPath());
@@ -196,7 +195,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Special attributes.
      */
-    private HashMap specialAttributes = null;
+    private HashMap<String, Object> specialAttributes = null;
 
     private String requestedSessionVersion = null;
 
@@ -832,7 +831,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
                                String servletPath,
                                String pathInfo,
                                String queryString) {
-        specialAttributes = new HashMap(5);
+        specialAttributes = new HashMap<String, Object>(5);
 
         switch (dispatcherType) {
         case INCLUDE:
@@ -962,6 +961,13 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
+    @SuppressWarnings("unchecked")
+    private HashMap<String, String> getSessionVersions() {
+        return (HashMap<String, String>) getAttribute(
+                Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
+    }
+
+
     // ----------------------------------- AttributeNamesEnumerator Inner Class
 
     /**
@@ -1028,8 +1034,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         String versionString = Long.toString(ss.incrementVersion());
-        HashMap<String, String> sessionVersions = (HashMap<String, String>)
-            getAttribute(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
+        HashMap<String, String> sessionVersions = getSessionVersions();
         if (sessionVersions == null) {
             sessionVersions = new HashMap<String, String>();
             setAttribute(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE,

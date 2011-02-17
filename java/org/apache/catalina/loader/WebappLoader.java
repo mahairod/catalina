@@ -216,7 +216,7 @@ public class WebappLoader
      * they belong to a protected namespace (i.e., a namespace that may never
      * be overridden by a webapp)  
      */
-    private ArrayList overridablePackages;
+    private ArrayList<String> overridablePackages;
     // END PE 4985680
 
 
@@ -643,7 +643,7 @@ public class WebappLoader
             if (overridablePackages != null){
                 for (int i = 0; i < overridablePackages.size(); i++) {
                     classLoader.addOverridablePackage(
-                                            (String)overridablePackages.get(i));
+                                            overridablePackages.get(i));
                 }
                 overridablePackages = null;
             }
@@ -1274,7 +1274,7 @@ public class WebappLoader
      */
     public void addOverridablePackage(String packageName){
        if ( overridablePackages == null){
-           overridablePackages = new ArrayList();
+           overridablePackages = new ArrayList<String>();
        }
         
        overridablePackages.add( packageName ); 

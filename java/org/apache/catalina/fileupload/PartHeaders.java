@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -60,7 +60,7 @@ class PartHeaders implements Serializable {
         String nameLower = name.toLowerCase();
         List<String> headerValueList = headerMap.get(nameLower);
         if (null == headerValueList) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return headerValueList;
     }

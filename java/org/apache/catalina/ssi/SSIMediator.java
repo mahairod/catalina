@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -133,7 +133,7 @@ public class SSIMediator {
 
 
     public Collection<String> getVariableNames() {
-        Set<String> variableNames = new HashSet();
+        Set<String> variableNames = new HashSet<String>();
         //These built-in variables are supplied by the mediator ( if not
         // over-written by
         // the user ) and always exist

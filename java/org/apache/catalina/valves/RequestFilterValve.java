@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -220,7 +220,7 @@ public abstract class RequestFilterValve
             return (new Pattern[0]);
         list += ",";
 
-        ArrayList reList = new ArrayList();
+        ArrayList<Pattern> reList = new ArrayList<Pattern>();
         while (list.length() > 0) {
             int comma = list.indexOf(',');
             if (comma < 0)
@@ -238,7 +238,7 @@ public abstract class RequestFilterValve
         }
 
         Pattern reArray[] = new Pattern[reList.size()];
-        return ((Pattern[]) reList.toArray(reArray));
+        return reList.toArray(reArray);
 
     }
 
