@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -397,13 +397,14 @@ public class SecurityConstraint implements Serializable {
      */
     public String toString() {
 
-        StringBuilder sb = new StringBuilder("SecurityConstraint[");
-        for (int i = 0; i < collections.length; i++) {
-            if (i > 0)
-                sb.append(", ");
-            sb.append(collections[i].getName());
+        StringBuilder sb = new StringBuilder("SecurityConstraint: ");
+        for (SecurityCollection collection : collections) {
+            sb.append(" collection: ").append(collection);
         }
-        sb.append("]");
+        for (String authRole : authRoles) {
+            sb.append(" authRole: "+authRole);
+        }
+        sb.append(" userConstraint: ").append(userConstraint);
         return (sb.toString());
 
     }
