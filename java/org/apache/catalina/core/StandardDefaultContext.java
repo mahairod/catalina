@@ -1281,12 +1281,12 @@ public class StandardDefaultContext
 
         if (!context.getPrivileged() && loader != null) {
             ClassLoader parentClassLoader = context.getParent().getParentClassLoader();
-            Class clazz = loader.getClass();
-            Class types[] = { ClassLoader.class };
+            Class<? extends Loader> clazz = loader.getClass();
+            Class<?> types[] = { ClassLoader.class };
             Object args[] = { parentClassLoader };
             try {
-                Constructor constructor = clazz.getDeclaredConstructor(types);
-                Loader context_loader = (Loader) constructor.newInstance(args);
+                Constructor<? extends Loader> constructor = clazz.getDeclaredConstructor(types);
+                Loader context_loader = constructor.newInstance(args);
                 context_loader.setDelegate(loader.getDelegate());
                 context_loader.setReloadable(loader.getReloadable());
                 if (loader instanceof WebappLoader) {
@@ -1456,7 +1456,7 @@ public class StandardDefaultContext
      */
     public String[] getEnvironments() {
         ContextEnvironment[] envs = getNamingResources().findEnvironments();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < envs.length; i++) {
             try {
                 ObjectName oname =
@@ -1469,7 +1469,7 @@ public class StandardDefaultContext
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
@@ -1482,7 +1482,7 @@ public class StandardDefaultContext
     public String[] getResourceNames() {
 
         ContextResource[] resources = getNamingResources().findResources();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < resources.length; i++) {
             try {
                 ObjectName oname =
@@ -1495,7 +1495,7 @@ public class StandardDefaultContext
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
@@ -1507,7 +1507,7 @@ public class StandardDefaultContext
     public String[] getResourceLinks() {
 
         ContextResourceLink[] links = getNamingResources().findResourceLinks();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < links.length; i++) {
             try {
                 ObjectName oname =
@@ -1520,7 +1520,7 @@ public class StandardDefaultContext
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
