@@ -155,7 +155,7 @@ public class Embedded  extends StandardService implements Lifecycle {
     /**
      * Custom mappings of login methods to authenticators
      */
-    protected HashMap authenticators;
+    protected HashMap<String, Authenticator> authenticators;
 
 
     /**
@@ -813,7 +813,7 @@ public class Embedded  extends StandardService implements Lifecycle {
         if (authenticators == null) {
             synchronized (this) {
                 if (authenticators == null) {
-                    authenticators = new HashMap();
+                    authenticators = new HashMap<String, Authenticator>();
                 }
             }
         }
