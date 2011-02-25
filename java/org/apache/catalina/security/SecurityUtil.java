@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -279,8 +279,9 @@ public final class SecurityUtil{
        
         try{   
             Subject subject = null;
-            PrivilegedExceptionAction pea = new PrivilegedExceptionAction(){
-                    public Object run() throws Exception{
+            PrivilegedExceptionAction<Void> pea =
+                new PrivilegedExceptionAction<Void>(){
+                    public Void run() throws Exception{
                        method.invoke(targetObject, targetArguments);
                        return null;
                     }
