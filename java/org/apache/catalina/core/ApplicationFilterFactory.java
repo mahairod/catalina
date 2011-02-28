@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -147,7 +147,7 @@ public final class ApplicationFilterFactory {
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
                 context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
-                ;       // FIXME - log configuration problem
+                // FIXME - log configuration problem
                 continue;
             }
             // START IASRI 4665318
@@ -172,7 +172,7 @@ public final class ApplicationFilterFactory {
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
                 context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
-                ;       // FIXME - log configuration problem
+                // FIXME - log configuration problem
                 continue;
             }
             // START IASRI 4665318

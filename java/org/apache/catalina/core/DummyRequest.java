@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -162,7 +162,7 @@ public class DummyRequest implements HttpRequest, HttpServletRequest {
     }
     public void finishRequest() throws IOException {}
     public Object getNote(String name) { return null; }
-    public Iterator getNoteNames() { return null; }
+    public Iterator<String> getNoteNames() { return null; }
     public void removeNote(String name) {}
     public void setContentType(String type) {}
     public void setNote(String name, Object value) {}

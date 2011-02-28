@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -60,7 +60,7 @@ public class ProcessEnvironment {
     private String servletPath = null;
 
     /** derived process environment */
-    protected Hashtable env = null;
+    protected Hashtable<String, String> env = null;
 
     /** command to be invoked */
     protected String command = null;
@@ -148,13 +148,13 @@ public class ProcessEnvironment {
         sb.append(isValid());
         sb.append("</td></tr>");
         if (isValid()) {
-            Enumeration envk = env.keys();
+            Enumeration<String> envk = env.keys();
             while (envk.hasMoreElements()) {
-                String s = (String)envk.nextElement();
+                String s = envk.nextElement();
                 sb.append("<tr><td>");
                 sb.append(s);
                 sb.append("</td><td>");
-                sb.append(blanksToString((String)env.get(s),
+                sb.append(blanksToString(env.get(s),
                     "[will be set to blank]"));
                     sb.append("</td></tr>");
             }
@@ -205,7 +205,7 @@ public class ProcessEnvironment {
      * Gets process' environment
      * @return   process' environment
      */
-    public Hashtable getEnvironment() {
+    public Hashtable<String, String> getEnvironment() {
         return env;
     }
 
@@ -215,7 +215,7 @@ public class ProcessEnvironment {
      * @param   env  process' environment
      * @return  Hashtable to which the process' environment was set
      */
-    public Hashtable setEnvironment(Hashtable env) {
+    public Hashtable<String, String> setEnvironment(Hashtable<String, String> env) {
         this.env = env;
         return this.env;
     }
@@ -287,7 +287,7 @@ public class ProcessEnvironment {
      */
     protected boolean deriveProcessEnvironment(HttpServletRequest req) {
 
-        Hashtable envp = new Hashtable();
+        Hashtable<String, String> envp = new Hashtable<String, String>();
         command = getCommand();
         if (command != null) {
             workingDirectory = new

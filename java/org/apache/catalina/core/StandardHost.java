@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -399,28 +399,6 @@ public class StandardHost
 
         this.deployXML = deployXML;
 
-    }
-
-
-    /**
-     * Return the value of the live deploy flag.  If true, it indicates that 
-     * a background thread should be started that looks for web application
-     * context files, WAR files, or unpacked directories being dropped in to
-     * the <code>appBase</code> directory, and deploys new ones as they are
-     * encountered.
-     */
-    public boolean getLiveDeploy() {
-        return (this.autoDeploy);
-    }
-
-
-    /**
-     * Set the live deploy flag value for this host.
-     * 
-     * @param liveDeploy The new live deploy flag
-     */
-    public void setLiveDeploy(boolean liveDeploy) {
-        setAutoDeploy(liveDeploy);
     }
 
 
@@ -965,9 +943,13 @@ public class StandardHost
         // START SJSAS_PE 8.1 5034793
         if (log.isLoggable(Level.FINE)) {
             if (xmlValidation) {
-                log.fine(sm.getString("standardHost.validationEnabled"));
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine(sm.getString("standardHost.validationEnabled"));
+                }
             } else {
-                log.fine(sm.getString("standardHost.validationDisabled"));
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine(sm.getString("standardHost.validationDisabled"));
+                }
             }
         }
         // END SJSAS_PE 8.1 5034793 
@@ -1218,7 +1200,9 @@ public class StandardHost
     public Deployer getDeployer() {
         if( deployer!= null )
             return deployer;
-        log.info( "Create Host deployer for direct deployment ( non-jmx ) ");
+        if (log.isLoggable(Level.INFO)) {
+            log.info( "Create Host deployer for direct deployment ( non-jmx ) ");
+        }
         try {
             Class c=Class.forName( STANDARD_HOST_DEPLOYER );
             deployer=(Deployer)c.newInstance();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -51,13 +51,13 @@ public class ResourceParams implements Serializable {
         this.name = name;
     }
 
-    private Hashtable resourceParams = new Hashtable();
+    private Hashtable<String, String> resourceParams = new Hashtable<String, String>();
 
     public void addParameter(String name, String value) {
         resourceParams.put(name, value);
     }
 
-    public Hashtable getParameters() {
+    public Hashtable<String, String> getParameters() {
         return resourceParams;
     }
 

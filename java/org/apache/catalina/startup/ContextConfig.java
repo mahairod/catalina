@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -75,7 +75,7 @@ public class ContextConfig
      */
     //START SJSAS 6202703
     //private Map customAuthenticators;
-    protected Map customAuthenticators;
+    protected Map<String, Authenticator> customAuthenticators;
     //END SJSAS 6202703
 
 
@@ -271,7 +271,7 @@ public class ContextConfig
      * @param customAuthenticators Custom mappings of login methods to
      * authenticators
      */
-    public void setCustomAuthenticators(Map customAuthenticators) {
+    public void setCustomAuthenticators(Map<String, Authenticator> customAuthenticators) {
         this.customAuthenticators = customAuthenticators;
     }
 
@@ -377,7 +377,9 @@ public class ContextConfig
                     webDigester.push(context);
                     webDigester.parse(is);
                 } else {
-                    log.info("No web.xml, using defaults " + context);
+                    if (log.isLoggable(Level.INFO)) {
+                        log.info("No web.xml, using defaults " + context);
+                    }
                 }
             } catch (SAXParseException e) {
                 throw new LifecycleException(
@@ -501,7 +503,7 @@ public class ContextConfig
             String loginMethod = loginConfig.getAuthMethod();
             if (loginMethod != null
                     && customAuthenticators.containsKey(loginMethod)) {
-                authenticator = (GlassFishValve) customAuthenticators.get(loginMethod);
+                authenticator = getGlassFishValveAuthenticator(loginMethod);
                 if (authenticator == null) {
                     throw new LifecycleException(
                         sm.getString("contextConfig.authenticatorMissing",
@@ -558,6 +560,11 @@ public class ContextConfig
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private GlassFishValve getGlassFishValveAuthenticator(String loginMethod) {
+        return (GlassFishValve) customAuthenticators.get(loginMethod);
     }
 
     /**
@@ -659,7 +666,9 @@ public class ContextConfig
                 }
 
                 if( stream== null ) {
-                    log.info("No default web.xml");
+                    if (log.isLoggable(Level.INFO)) {
+                        log.info("No default web.xml");
+                    }
                     // no default web.xml
                     return;
                 }
@@ -710,7 +719,7 @@ public class ContextConfig
         webRuleSet.recycle();
         
         long t2=System.currentTimeMillis();
-        if( (t2-t1) > 200 )
+        if( (t2-t1) > 200 && log.isLoggable(Level.FINE) )
             log.fine("Processed default web.xml " + file + " "  + ( t2-t1));
     }
 
@@ -1209,8 +1218,10 @@ public class ContextConfig
             for (String role : iter.next().findAuthRoles()) {
                 if (!"*".equals(role) &&
                         !context.hasSecurityRole(role)) {
-                    log.info(sm.getString("contextConfig.role.auth", 
-                                          role, context.getName()));
+                    if (log.isLoggable(Level.INFO)) {
+                        log.info(sm.getString("contextConfig.role.auth", 
+                                              role, context.getName()));
+                    }
                     context.addSecurityRole(role);
                 }
             }
@@ -1222,18 +1233,22 @@ public class ContextConfig
             Wrapper wrapper = (Wrapper) wrappers[i];
             String runAs = wrapper.getRunAs();
             if ((runAs != null) && !context.hasSecurityRole(runAs)) {
-                log.info( sm.getString("contextConfig.role.runas", 
-                                       runAs,
-                                       context.getName()) );
+                if (log.isLoggable(Level.INFO)) {
+                    log.info( sm.getString("contextConfig.role.runas", 
+                                           runAs,
+                                           context.getName()) );
+                }
                 context.addSecurityRole(runAs);
             }
             String names[] = wrapper.findSecurityReferences();
             for (int j = 0; j < names.length; j++) {
                 String link = wrapper.findSecurityReference(names[j]);
                 if ((link != null) && !context.hasSecurityRole(link)) {
-                    log.info( sm.getString("contextConfig.role.link", 
-                                           link,
-                                           context.getName()) );
+                    if (log.isLoggable(Level.INFO)) {
+                        log.info( sm.getString("contextConfig.role.link", 
+                                               link,
+                                               context.getName()) );
+                    }
                     context.addSecurityRole(link);
                 }
             }

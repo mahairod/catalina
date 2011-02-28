@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -155,7 +155,7 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
     protected ServerSocketFactory socketFactory;
     protected SSLImplementation sslImplementation;
     // socket factory attriubtes ( XXX replace with normal setters ) 
-    protected Hashtable attributes = new Hashtable();
+    protected Hashtable<String, Object> attributes = new Hashtable<String, Object>();
     protected String socketFactoryName=null;
     protected String sslImplementationName=null;
 

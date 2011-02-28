@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -26,6 +26,7 @@ import org.apache.catalina.util.StringManager;
 
 import java.io.File;
 import java.util.Enumeration;
+import java.util.logging.Level;
 
 /**
  * Startup event listener for a <b>Host</b> that configures Contexts (web
@@ -318,10 +319,14 @@ public final class UserConfig
             if (logger != null) {
                 logger.log("UserConfig[" + host.getName() + "]: " + message);
             } else {
-                log.info("UserConfig[" + host.getName() + "]: " + message);
+                if (log.isLoggable(Level.INFO)) {
+                    log.info("UserConfig[" + host.getName() + "]: " + message);
+                }
             }
         } else {
-            log.info("UserConfig[null]: " + message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info("UserConfig[null]: " + message);
+            }
         }
     }
 
@@ -340,11 +345,11 @@ public final class UserConfig
                 logger.log("UserConfig[" + host.getName() + "] "
                         + message, t, Logger.WARNING);
             } else {
-                log.log(java.util.logging.Level.WARNING,
+                log.log(Level.WARNING,
                         "UserConfig[" + host.getName() + "]: " + message, t);
             }
         } else {
-            log.log(java.util.logging.Level.WARNING,
+            log.log(Level.WARNING,
                         "UserConfig[null]: " + message, t);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -140,7 +140,7 @@ public class HostConfig
     /**
      * Last modified dates of the source WAR files, keyed by WAR name.
      */
-    private HashMap warLastModified = new HashMap();
+    private HashMap<String, Long> warLastModified = new HashMap<String, Long>();
 
 
     /**
@@ -461,7 +461,9 @@ public class HostConfig
                 }
 
                 // Assume this is a configuration descriptor and deploy it
-                log.fine(sm.getString("hostConfig.deployDescriptor", files[i]));
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine(sm.getString("hostConfig.deployDescriptor", files[i]));
+                }
                 try {
                     if (host.findChild(contextPath) != null) {
                         if ((deployed.contains(file))
@@ -596,7 +598,9 @@ public class HostConfig
                 if (isUnpackWARs()) {
 
                     // Expand and deploy this application as a directory
-                    log.fine(sm.getString("hostConfig.expand", files[i]));
+                    if (log.isLoggable(Level.FINE)) {
+                        log.fine(sm.getString("hostConfig.expand", files[i]));
+                    }
                     URL url = null;
                     String path = null;
                     try {
@@ -630,7 +634,9 @@ public class HostConfig
                 } else {
 
                     // Deploy the application in this WAR file
-                    log.info(sm.getString("hostConfig.deployJar", files[i]));
+                    if (log.isLoggable(Level.INFO)) {
+                        log.info(sm.getString("hostConfig.deployJar", files[i]));
+                    }
                     try {
                         URL url = new URL("file", null,
                                           dir.getCanonicalPath());
@@ -696,7 +702,7 @@ public class HostConfig
                             t);
                 }
                 long t2=System.currentTimeMillis();
-                if( (t2-t1) > 200 )
+                if( (t2-t1) > 200 && log.isLoggable(Level.FINE) ) 
                     log.fine("Deployed " + files[i] + " " + (t2-t1));
             }
 
@@ -845,7 +851,7 @@ public class HostConfig
             for (int i = 0; i < files.length; i++) {
                 if (files[i].endsWith(".war")) {
                     File dir = new File(appBase, files[i]);
-                    Long lastModified = (Long) warLastModified.get(files[i]);
+                    Long lastModified = warLastModified.get(files[i]);
                     long dirLastModified = dir.lastModified();
                     if (lastModified == null) {
                         warLastModified.put
@@ -895,7 +901,9 @@ public class HostConfig
 
     protected boolean restartContext(Context context) {
         boolean result = true;
-        log.info("restartContext(" + context.getName() + ")");
+        if (log.isLoggable(Level.INFO)) {
+            log.info("restartContext(" + context.getName() + ")");
+        }
 
         /*
         try {

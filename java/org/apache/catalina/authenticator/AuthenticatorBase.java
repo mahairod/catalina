@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -739,8 +739,10 @@ public abstract class AuthenticatorBase
             logger.log("Authenticator[" + context.getPath() + "]: " +
                     message);
         } else {
-            log.info("Authenticator[" + context.getPath() +
-                     "]: " + message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info("Authenticator[" + context.getPath() +
+                         "]: " + message);
+            }
         }
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -117,7 +117,7 @@ public class DigestAuthenticator
     /**
      * No once hashtable.
      */
-    protected Hashtable nOnceTokens = new Hashtable();
+    protected Hashtable<String, Long> nOnceTokens = new Hashtable<String, Long>();
 
     /**
      * No once expiration (in millisecond). A shorter amount would mean a

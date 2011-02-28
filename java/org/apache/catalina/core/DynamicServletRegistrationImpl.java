@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  */
 
@@ -47,7 +47,8 @@ public class DynamicServletRegistrationImpl
     }
 
     public Set<String> setServletSecurity(ServletSecurityElement constraint) {
-        return Collections.unmodifiableSet(Collections.EMPTY_SET);
+        Set<String> emptySet = Collections.emptySet();
+        return Collections.unmodifiableSet(emptySet);
     }
 
     public void setMultipartConfig(MultipartConfigElement mpConfig) {

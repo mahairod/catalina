@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -463,7 +463,9 @@ final class StandardHostValve
         if (logger != null) {
             logger.log(this.toString() + ": " + message);
         } else {
-            log.info(this.toString() + ": " + message);
+            if (log.isLoggable(Level.INFO)) {
+                log.info(this.toString() + ": " + message);
+            }
         }
     }
 

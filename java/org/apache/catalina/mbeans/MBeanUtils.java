@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -725,9 +725,9 @@ public class MBeanUtils {
 
     }
 
-    static Hashtable seq=new Hashtable();
+    static Hashtable<String, int[]> seq=new Hashtable<String, int[]>();
     static int getSeq( String key ) {
-        int i[]=(int [])seq.get( key );
+        int i[]=seq.get( key );
         if (i == null ) {
             i=new int[1];
             i[0]=0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -88,7 +88,7 @@ public final class FileStore extends StoreBase {
     * Our write-through cache of session objects
     * HERCULES: addition
     */
-    protected Hashtable sessions = new Hashtable();     
+    protected Hashtable<String, Session> sessions = new Hashtable<String, Session>();     
 
 
     // ------------------------------------------------------------- Properties
@@ -235,7 +235,7 @@ public final class FileStore extends StoreBase {
             
         //HERCULES:addition
         // Check to see if it's in our cache first
-        Session sess = (Session)sessions.get(id);
+        Session sess = sessions.get(id);
         if ( sess != null ) {
             return sess;
         }

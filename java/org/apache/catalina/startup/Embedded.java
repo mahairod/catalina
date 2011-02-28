@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -155,7 +155,7 @@ public class Embedded  extends StandardService implements Lifecycle {
     /**
      * Custom mappings of login methods to authenticators
      */
-    protected HashMap authenticators;
+    protected HashMap<String, Authenticator> authenticators;
 
 
     /**
@@ -813,7 +813,7 @@ public class Embedded  extends StandardService implements Lifecycle {
         if (authenticators == null) {
             synchronized (this) {
                 if (authenticators == null) {
-                    authenticators = new HashMap();
+                    authenticators = new HashMap<String, Authenticator>();
                 }
             }
         }
@@ -959,7 +959,9 @@ public class Embedded  extends StandardService implements Lifecycle {
         if (!useNaming) {
             // START SJSAS 5031700
             //log.info( "Catalina naming disabled");
-            log.fine("Catalina naming disabled");
+            if (log.isLoggable(Level.FINE)) {
+                log.fine("Catalina naming disabled");
+            }
             // END SJSAS 5031700
             System.setProperty("catalina.useNaming", "false");
         } else {
@@ -980,7 +982,9 @@ public class Embedded  extends StandardService implements Lifecycle {
                     (javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                      "org.apache.naming.java.javaURLContextFactory");
             } else {
-                log.fine( "INITIAL_CONTEXT_FACTORY alread set " + value );
+                if (log.isLoggable(Level.FINE)) {
+                    log.fine( "INITIAL_CONTEXT_FACTORY alread set " + value );
+                }
             }
         }
     }

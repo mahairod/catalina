@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -400,13 +400,18 @@ public class SecurityCollection implements Serializable {
      */
     public String toString() {
 
-        StringBuilder sb = new StringBuilder("SecurityCollection[");
-        sb.append(name);
-        if (description != null) {
-            sb.append(", ");
-            sb.append(description);
+        StringBuilder sb = new StringBuilder("SecurityCollection: ");
+        sb.append(" name: ").append(name);
+        sb.append(" description ").append(description);
+        for (String method : methods) {
+            sb.append(" method: ").append(method);
         }
-        sb.append("]");
+        for (String methodOmission : methodOmissions) {
+            sb.append(" methodOmission ").append(methodOmission);
+        }
+        for (String pattern : patterns) {
+            sb.append(" pattern ").append(pattern);
+        }
         return (sb.toString());
 
     }

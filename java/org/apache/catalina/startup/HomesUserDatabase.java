@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -58,7 +58,7 @@ public final class HomesUserDatabase
     /**
      * The set of home directories for all defined users, keyed by username.
      */
-    private Hashtable homes = new Hashtable();
+    private Hashtable<String, String> homes = new Hashtable<String, String>();
 
 
     /**
@@ -103,7 +103,7 @@ public final class HomesUserDatabase
      */
     public String getHome(String user) {
 
-        return ((String) homes.get(user));
+        return homes.get(user);
 
     }
 
@@ -111,7 +111,7 @@ public final class HomesUserDatabase
     /**
      * Return an enumeration of the usernames defined on this server.
      */
-    public Enumeration getUsers() {
+    public Enumeration<String> getUsers() {
 
         return (homes.keys());
 

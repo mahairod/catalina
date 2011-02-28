@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -35,12 +35,12 @@ public class ExpressionParseTree {
      * Contains the current set of completed nodes. This is a workspace for the
      * parser.
      */
-    private LinkedList<Node> nodeStack = new LinkedList();
+    private LinkedList<Node> nodeStack = new LinkedList<Node>();
     /**
      * Contains operator nodes that don't yet have values. This is a workspace
      * for the parser.
      */
-    private LinkedList<OppNode> oppStack = new LinkedList();
+    private LinkedList<OppNode> oppStack = new LinkedList<OppNode>();
     /**
      * The root node after the expression has been parsed.
      */

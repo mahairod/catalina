@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -78,8 +78,10 @@ public class GenericParser{
                 parser.setProperty(JAXP_SCHEMA_SOURCE, schemaLocation);
             }
         } catch (SAXNotRecognizedException e){
-            log.log(Level.INFO, parser.getClass().getName() + ": "  
-                                        + e.getMessage() + " not supported."); 
+            if (log.isLoggable(Level.INFO)) {
+                log.log(Level.INFO, parser.getClass().getName() + ": "  
+                                            + e.getMessage() + " not supported."); 
+            }
         }
         return parser;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -92,7 +92,7 @@ public final class Enumerator<T> implements Enumeration<T> {
         if (!clone) {
             this.iterator = iterator;
         } else {
-            List list = new ArrayList();
+            List<T> list = new ArrayList<T>();
             while (iterator.hasNext()) {
                 list.add(iterator.next());
             }

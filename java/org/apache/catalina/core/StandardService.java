@@ -155,7 +155,7 @@ public class StandardService
             try {
                 ((Lifecycle) this.container).start();
             } catch (LifecycleException e) {
-                ;
+                // Ignore
             }
         }
         synchronized (connectors) {
@@ -167,7 +167,7 @@ public class StandardService
             try {
                 ((Lifecycle) oldContainer).stop();
             } catch (LifecycleException e) {
-                ;
+                // Ignore
             }
         }
 
@@ -478,7 +478,9 @@ public class StandardService
 
         // Validate and update our current component state
         if (started) {
-            log.info(sm.getString("standardService.start.started"));
+            if (log.isLoggable(Level.INFO)) {
+                log.info(sm.getString("standardService.start.started"));
+            }
         }
         
         if( ! initialized )
@@ -487,7 +489,9 @@ public class StandardService
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
 
-        log.info(sm.getString("standardService.start.name", this.name));
+        if (log.isLoggable(Level.INFO)) {
+            log.info(sm.getString("standardService.start.name", this.name));
+        }
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
 
@@ -535,7 +539,9 @@ public class StandardService
 
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
 
-        log.info(sm.getString("standardService.stop.name", this.name));
+        if (log.isLoggable(Level.INFO)) {
+            log.info(sm.getString("standardService.stop.name", this.name));
+        }
         started = false;
 
         // Stop our defined Connectors first
@@ -579,7 +585,9 @@ public class StandardService
     {
         // Service shouldn't be used with embedded, so it doesn't matter
         if (initialized) {
-            log.info(sm.getString("standardService.initialize.initialized"));
+            if (log.isLoggable(Level.INFO)) {
+                log.info(sm.getString("standardService.initialize.initialized"));
+            }
             return;
         }
         initialized = true;

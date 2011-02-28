@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -276,7 +276,7 @@ final class CreateLoaderRule extends Rule {
             if (value != null)
                 className = value;
         }
-        Class clazz = Class.forName(className);
+        Class<?> clazz = Class.forName(className);
         Class types[] = { ClassLoader.class };
         Object args[] = { parentClassLoader };
         Constructor constructor = clazz.getDeclaredConstructor(types);

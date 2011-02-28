@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -121,7 +121,7 @@ public class JAASRealm
     /**
      * The list of role class names, split out for easy processing.
      */
-    protected ArrayList roleClasses = new ArrayList();
+    protected ArrayList<String> roleClasses = new ArrayList<String>();
 
 
     /**
@@ -134,7 +134,7 @@ public class JAASRealm
     /**
      * The set of user class names, split out for easy processing.
      */
-    protected ArrayList userClasses = new ArrayList();
+    protected ArrayList<String> userClasses = new ArrayList<String>();
 
 
     // ------------------------------------------------------------- Properties
@@ -160,7 +160,9 @@ public class JAASRealm
         String name=container.getName();
         if( appName==null  ) {
             appName=name;
-            log.info("Setting JAAS app name " + appName);
+            if (log.isLoggable(Level.INFO)) {
+                log.info("Setting JAAS app name " + appName);
+            }
         }
     }
 
@@ -263,10 +265,12 @@ public class JAASRealm
                 (appName, new JAASCallbackHandler(this, username,
                                                   credentials));
         } catch (Throwable e) {
-            log.fine("Error initializing JAAS: " +  e.toString());
+            if (log.isLoggable(Level.FINE)) {
+                log.fine("Error initializing JAAS: " +  e.toString());
 
-            log.log(Level.FINE,
-                    sm.getString("jaasRealm.loginException", username), e);
+                log.log(Level.FINE,
+                        sm.getString("jaasRealm.loginException", username), e);
+            }
             return (null);
         } finally {
             Thread.currentThread().setContextClassLoader(ocl);
@@ -312,7 +316,9 @@ public class JAASRealm
         // Return the appropriate Principal for this authenticated Subject
         Principal principal = createPrincipal(username, subject);
         if (principal == null) {
-            log.fine(sm.getString("jaasRealm.authenticateFailure", username));
+            if (log.isLoggable(Level.FINE)) {
+                log.fine(sm.getString("jaasRealm.authenticateFailure", username));
+            }
             return (null);
         }
         if (log.isLoggable(Level.FINE)) {
@@ -373,7 +379,7 @@ public class JAASRealm
     protected Principal createPrincipal(String username, Subject subject) {
         // Prepare to scan the Principals for this Subject
         char[] password = null; // Will not be carried forward
-        ArrayList roles = new ArrayList();
+        ArrayList<String> roles = new ArrayList<String>();
 
         // Scan the Principals for this Subject
         Iterator principals = subject.getPrincipals().iterator();

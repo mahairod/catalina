@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -39,7 +39,7 @@ import java.util.Set;
 
 public class FilterMap implements Serializable {
 
-    private static final EnumSet DEFAULT_DISPATCHER =
+    private static final EnumSet<DispatcherType> DEFAULT_DISPATCHER =
         EnumSet.of(DispatcherType.REQUEST);
 
 

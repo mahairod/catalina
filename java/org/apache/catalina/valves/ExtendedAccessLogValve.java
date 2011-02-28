@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -1166,7 +1166,7 @@ public final class ExtendedAccessLogValve
         if (log.isLoggable(Level.FINE))
             log.fine("decodePattern, fields=" + fields);
 
-        LinkedList list = new LinkedList();
+        LinkedList<FieldInfo> list = new LinkedList<FieldInfo>();
 
         //Ignore leading whitespace.
         int i=0;
@@ -1272,8 +1272,8 @@ public final class ExtendedAccessLogValve
 
         i=0;
         FieldInfo[] f = new FieldInfo[list.size()];
-        for (Iterator k = list.iterator(); k.hasNext();)
-             f[i++] = (FieldInfo)k.next();
+        for (Iterator<FieldInfo> k = list.iterator(); k.hasNext();)
+             f[i++] = k.next();
 
         if (log.isLoggable(Level.FINE))
             log.fine("finished decoding with length of: " + i);

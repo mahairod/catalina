@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -101,7 +101,9 @@ public class MbeansDescriptorsSerSource extends ModelerSource
                     ex);
             throw ex;
         }
-        long t2=System.currentTimeMillis();
-        log.log(Level.INFO, "Reading descriptors ( ser ) " + (t2-t1));
+        if (log.isLoggable(Level.INFO)) {
+            long t2=System.currentTimeMillis();
+            log.log(Level.INFO, "Reading descriptors ( ser ) " + (t2-t1));
+        }
     }
 }
