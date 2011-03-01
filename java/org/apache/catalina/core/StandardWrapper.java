@@ -1373,7 +1373,12 @@ public class StandardWrapper
                 (sm.getString("standardWrapper.missingClass", actualClass));
         }
 
-        servletClass = clazz;
+        servletClass = castToServletClass(clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends Servlet> castToServletClass(Class<?> clazz) {
+        return (Class<? extends Servlet>)clazz;
     }
 
 

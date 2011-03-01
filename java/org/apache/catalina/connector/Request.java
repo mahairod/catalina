@@ -4166,8 +4166,7 @@ public class Request
 
         String versionString = Long.toString(ss.incrementVersion());
 
-        HashMap<String, String> sessionVersions = (HashMap<String, String>)
-            getAttribute(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
+        Map<String, String> sessionVersions = getSessionVersionsRequestAttribute();
         if (sessionVersions == null) {
             sessionVersions = new HashMap<String, String>();
             setAttribute(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE,
@@ -4178,6 +4177,12 @@ public class Request
             path = "/";
         }
         sessionVersions.put(path, versionString);
+    }
+
+    @SuppressWarnings("unchecked")
+    Map<String, String> getSessionVersionsRequestAttribute() {
+        return (Map<String, String>) getAttribute(
+                Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
     }
 
     private boolean isSessionVersioningSupported() {
