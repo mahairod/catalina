@@ -1813,7 +1813,7 @@ public class Request
                         Boolean ret = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                             public Boolean run() {
                                 try {
-                                    return new Boolean(realm.invokeAuthenticateDelegate(req, (HttpResponse) getResponse(), context, (AuthenticatorBase) authBase, true));
+                                    return Boolean.valueOf(realm.invokeAuthenticateDelegate(req, (HttpResponse) getResponse(), context, (AuthenticatorBase) authBase, true));
                                 } catch (IOException ex) {
                                     throw new RuntimeException("Exception thrown while attempting to authenticate", ex);
                                 }
@@ -2782,10 +2782,7 @@ public class Request
         }
 
         // Return the requested session if it exists and is valid
-        Manager manager = null;
-        if (context != null) {
-            manager = context.getManager();
-        }
+        Manager manager = context.getManager();
         if (manager == null) {
             return (null);      // Sessions are not supported
         }
@@ -3283,7 +3280,7 @@ public class Request
 
             // Add a new Locale to the list of Locales for this quality level
             Locale locale = new Locale(language, country, variant);
-            Double key = new Double(-quality);  // Reverse the order
+            Double key = Double.valueOf(-quality);  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
                 values = new ArrayList<Locale>();
@@ -3295,10 +3292,7 @@ public class Request
 
         // Process the quality values in highest->lowest order (due to
         // negating the Double value when creating the key)
-        Iterator<Double> keys = locales.keySet().iterator();
-        while (keys.hasNext()) {
-            Double key = keys.next();
-            ArrayList<Locale> list = locales.get(key);
+        for (ArrayList<Locale> list : locales.values()) {
             Iterator<Locale> values = list.iterator();
             while (values.hasNext()) {
                 Locale locale = values.next();
@@ -3512,14 +3506,13 @@ public class Request
      */
     private void removeParameterFromRequestURI(String parameter) {
 
-        int start, end, parameterStart, semicolon, semicolon2;
+        int start, end, semicolon, semicolon2;
 
         ByteChunk uriBC = coyoteRequest.requestURI().getByteChunk();
         start = uriBC.getStart();
         end = uriBC.getEnd();
         semicolon = uriBC.indexOf(parameter, 0, parameter.length(), 0);
         if (semicolon > 0) {
-            parameterStart = start + semicolon;
             semicolon2 = uriBC.indexOf(';', semicolon + parameter.length());
             uriBC.setEnd(start + semicolon);
             byte[] buf = uriBC.getBuffer();
