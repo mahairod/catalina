@@ -85,7 +85,7 @@ public class DefaultServlet
     /**
      * Should we generate directory listings?
      */
-    protected boolean listings = false;
+    protected volatile boolean listings = false;
 
 
     /**
@@ -133,7 +133,7 @@ public class DefaultServlet
     /**
      * Proxy directory context.
      */
-    protected ProxyDirContext resources = null;
+    protected transient ProxyDirContext resources = null;
 
 
     /**
@@ -323,14 +323,6 @@ public class DefaultServlet
     }
 
 
-    /**
-     * Sets the sorting mechanism for directory listings.
-     */
-    public void setSortedBy(String sortedByString) {
-        this.sortedBy = Enum.valueOf(SortedBy.class, sortedByString);
-    }
-
-
     // ------------------------------------------------------ Protected Methods
 
 
@@ -513,9 +505,6 @@ public class DefaultServlet
             contentFile.deleteOnExit();
         }
 
-        RandomAccessFile randAccessContentFile =
-            new RandomAccessFile(contentFile, "rw");
-
         Resource oldResource = null;
         try {
             Object obj = resources.lookup(path);
@@ -525,34 +514,51 @@ public class DefaultServlet
             // Ignore
         }
 
-        // Copy data in oldRevisionContent to contentFile
-        if (oldResource != null) {
-            BufferedInputStream bufOldRevStream =
-                new BufferedInputStream(oldResource.streamContent(),
-                                        BUFFER_SIZE);
+        RandomAccessFile randAccessContentFile =
+            new RandomAccessFile(contentFile, "rw");
+        try {
+            // Copy data in oldRevisionContent to contentFile
+            if (oldResource != null) {
+                BufferedInputStream bufOldRevStream = null;
+                try {
+                    bufOldRevStream = 
+                        new BufferedInputStream(oldResource.streamContent(),
+                                                BUFFER_SIZE);
 
-            int numBytesRead;
-            byte[] copyBuffer = new byte[BUFFER_SIZE];
-            while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
-                randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+                    int numBytesRead;
+                    byte[] copyBuffer = new byte[BUFFER_SIZE];
+                    while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
+                        randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+                    }
+                } finally {
+                    if (bufOldRevStream != null) {
+                        bufOldRevStream.close();
+                    }
+                }
             }
 
-            bufOldRevStream.close();
-        }
+            randAccessContentFile.setLength(range.length);
 
-        randAccessContentFile.setLength(range.length);
+            // Append data in request input stream to contentFile
+            randAccessContentFile.seek(range.start);
+            int numBytesRead;
+            byte[] transferBuffer = new byte[BUFFER_SIZE];
+            BufferedInputStream requestBufInStream = null;
+            try {
+                requestBufInStream =
+                    new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);
 
-        // Append data in request input stream to contentFile
-        randAccessContentFile.seek(range.start);
-        int numBytesRead;
-        byte[] transferBuffer = new byte[BUFFER_SIZE];
-        BufferedInputStream requestBufInStream =
-            new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);
-        while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
-            randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+                while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
+                    randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+                }
+            } finally {
+                if (requestBufInStream != null) {
+                    requestBufInStream.close();
+                }
+            }
+        } finally {
+            randAccessContentFile.close();
         }
-        randAccessContentFile.close();
-        requestBufInStream.close();
 
         return contentFile;
 
@@ -758,9 +764,12 @@ public class DefaultServlet
             // missing resource name in the error
             String requestUri = (String) request.getAttribute(
                 RequestDispatcher.INCLUDE_REQUEST_URI);
+            /* IASRI 4878272 
             if (requestUri == null) {
                 requestUri = request.getRequestURI();
             } else {
+            */
+            if (requestUri != null) {
                 /*
                  * We're included, and the response.sendError() below is going
                  * to be ignored by the including resource (see SRV.8.3,
@@ -786,6 +795,7 @@ public class DefaultServlet
         // ends with "/" or "\", return NOT FOUND
         if (cacheEntry.context == null) {
             if (path.endsWith("/") || (path.endsWith("\\"))) {
+                /* IASRI 4878272
                 // Check if we're included so we can return the appropriate 
                 // missing resource name in the error
                 String requestUri = (String) request.getAttribute(
@@ -793,7 +803,6 @@ public class DefaultServlet
                 if (requestUri == null) {
                     requestUri = request.getRequestURI();
                 }
-                /* IASRI 4878272
                  response.sendError(HttpServletResponse.SC_NOT_FOUND,
                                     requestUri);
                 */
@@ -1392,12 +1401,14 @@ public class DefaultServlet
             throws IOException, ServletException {
         String name = cacheEntry.name;
 
+        /*
         // Number of characters to trim from the beginnings of filenames
         int trim = name.length();
         if (!name.endsWith("/"))
             trim += 1;
         if (name.equals("/"))
             trim = 1;
+        */
 
         // Prepare a writer to a buffered area
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -1689,11 +1700,11 @@ public class DefaultServlet
             && (response.getClass().getName().equals("org.apache.catalina.connector.ResponseFacade"))) {
             request.setAttribute("org.apache.tomcat.sendfile.filename", entry.attributes.getCanonicalPath());
             if (range == null) {
-                request.setAttribute("org.apache.tomcat.sendfile.start", new Long(0L));
-                request.setAttribute("org.apache.tomcat.sendfile.end", new Long(length));
+                request.setAttribute("org.apache.tomcat.sendfile.start", Long.valueOf(0L));
+                request.setAttribute("org.apache.tomcat.sendfile.end", Long.valueOf(length));
             } else {
-                request.setAttribute("org.apache.tomcat.sendfile.start", new Long(range.start));
-                request.setAttribute("org.apache.tomcat.sendfile.end", new Long(range.end + 1));
+                request.setAttribute("org.apache.tomcat.sendfile.start", Long.valueOf(range.start));
+                request.setAttribute("org.apache.tomcat.sendfile.end", Long.valueOf(range.end + 1));
             }
             request.setAttribute("org.apache.tomcat.sendfile.token", this);
             return true;
@@ -1911,11 +1922,13 @@ public class DefaultServlet
         InputStream istream = new BufferedInputStream
             (resourceInputStream, input);
 
-        // Copy the input stream to the output stream
-        exception = copyRange(istream, ostream);
-
-        // Clean up the input stream
-        istream.close();
+        try {
+            // Copy the input stream to the output stream
+            exception = copyRange(istream, ostream);
+        } finally {
+            // Clean up the input stream
+            istream.close();
+        }
 
         // Rethrow any exception that has occurred
         if (exception != null)
@@ -1987,10 +2000,12 @@ public class DefaultServlet
         InputStream resourceInputStream = cacheEntry.resource.streamContent();
         InputStream istream =
             new BufferedInputStream(resourceInputStream, input);
-        exception = copyRange(istream, ostream, range.start, range.end);
-
-        // Clean up the input stream
-        istream.close();
+        try {
+            exception = copyRange(istream, ostream, range.start, range.end);
+        } finally {
+            // Clean up the input stream
+            istream.close();
+        }
 
         // Rethrow any exception that has occurred
         if (exception != null)
@@ -2057,27 +2072,32 @@ public class DefaultServlet
         while ( (exception == null) && (ranges.hasNext()) ) {
 
             InputStream resourceInputStream = cacheEntry.resource.streamContent();
-            InputStream istream =
-                new BufferedInputStream(resourceInputStream, input);
+            InputStream istream = null;
+            try {
+                istream = 
+                    new BufferedInputStream(resourceInputStream, input);
 
-            Range currentRange = ranges.next();
+                Range currentRange = ranges.next();
 
-            // Writing MIME header.
-            ostream.println();
-            ostream.println("--" + mimeSeparation);
-            if (contentType != null)
-                ostream.println("Content-Type: " + contentType);
-            ostream.println("Content-Range: bytes " + currentRange.start
-                           + "-" + currentRange.end + "/"
-                           + currentRange.length);
-            ostream.println();
+                // Writing MIME header.
+                ostream.println();
+                ostream.println("--" + mimeSeparation);
+                if (contentType != null)
+                    ostream.println("Content-Type: " + contentType);
+                ostream.println("Content-Range: bytes " + currentRange.start
+                               + "-" + currentRange.end + "/"
+                               + currentRange.length);
+                ostream.println();
 
-            // Printing content
-            exception = copyRange(istream, ostream, currentRange.start,
-                                  currentRange.end);
+                // Printing content
+                exception = copyRange(istream, ostream, currentRange.start,
+                                      currentRange.end);
 
-            istream.close();
-
+            } finally {
+                if (istream != null) {
+                    istream.close();
+                }
+            }
         }
 
         ostream.println();
@@ -2162,7 +2182,7 @@ public class DefaultServlet
         // Copy the input stream to the output stream
         IOException exception = null;
         byte buffer[] = new byte[input];
-        int len = buffer.length;
+        int len;
         while (true) {
             try {
                 len = istream.read(buffer);
@@ -2171,7 +2191,6 @@ public class DefaultServlet
                 ostream.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
-                len = -1;
                 break;
             }
         }
@@ -2193,7 +2212,7 @@ public class DefaultServlet
         // Copy the input stream to the output stream
         IOException exception = null;
         char buffer[] = new char[input];
-        int len = buffer.length;
+        int len;
         while (true) {
             try {
                 len = reader.read(buffer);
@@ -2202,7 +2221,6 @@ public class DefaultServlet
                 writer.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
-                len = -1;
                 break;
             }
         }
@@ -2228,10 +2246,15 @@ public class DefaultServlet
         if (debug > 10)
             log("Serving bytes:" + start + "-" + end);
 
+        long skipped = 0;
         try {
-            istream.skip(start);
+            skipped = istream.skip(start);
         } catch (IOException e) {
             return e;
+        }
+        if (skipped < start) {
+            return new IOException(sm.getString("defaultservlet.skipfail",
+                    Long.valueOf(skipped), Long.valueOf(start)));
         }
 
         IOException exception = null;
@@ -2276,11 +2299,16 @@ public class DefaultServlet
     protected IOException copyRange(Reader reader, PrintWriter writer,
                                     long start, long end) {
 
+        long skipped = 0;
         try {
-            reader.skip(start);
+            skipped = reader.skip(start);
         } catch (IOException e) {
             return e;
         }
+        if (skipped < start) {
+            return new IOException(sm.getString("defaultservlet.skipfail",
+                    Long.valueOf(skipped), Long.valueOf(start)));
+        } 
 
         IOException exception = null;
         long bytesToRead = end - start + 1;
@@ -2310,51 +2338,9 @@ public class DefaultServlet
     }
 
 
-    /**
-     * Copies the contents of the given resource URL to the given response.
-     */
-    private void copy(HttpServletResponse response, URL resourceUrl)
-            throws IOException {
-
-        IOException ioe = null;
-
-        try {
-            ServletOutputStream outStream = response.getOutputStream();
-            InputStream inStream = resourceUrl.openStream();
-            try {
-                ioe = copyRange(inStream, outStream); 
-            } finally {
-                if (inStream != null) {
-                    inStream.close();
-                }
-            }
-        } catch (IllegalStateException e) {
-            // Try to get a Writer instead if we're serving a text file
-            if (resourceUrl.getPath().endsWith("text") ||
-                    resourceUrl.getPath().endsWith("xml")) {
-                Reader reader = new BufferedReader(new InputStreamReader(
-                        resourceUrl.openStream()));
-                try {
-                    ioe = copyRange(reader, response.getWriter());
-                } finally {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                }
-            } else {
-                throw e;
-            }
-        }
-
-        if (ioe != null) {
-            throw ioe;
-        }
-    }
-
-
     // ------------------------------------------------------ Inner Classes
 
-    protected class Range {
+    protected static class Range {
 
         public long start;
         public long end;
@@ -2368,12 +2354,6 @@ public class DefaultServlet
                 end = length - 1;
             return ( (start >= 0) && (end >= 0) && (start <= end)
                      && (length > 0) );
-        }
-
-        public void recycle() {
-            start = 0;
-            end = 0;
-            length = 0;
         }
     }
 
@@ -2390,7 +2370,7 @@ public class DefaultServlet
      * Comparator which sorts directory listings by their creation
      * or lastModified date
      */
-    private class LastModifiedComparator
+    private static class LastModifiedComparator
             implements Comparator<NameClassPair> {
 
         private ProxyDirContext resources;
@@ -2423,7 +2403,7 @@ public class DefaultServlet
     /**
      * Comparator which sorts directory listings by their file size
      */
-    private class SizeComparator
+    private static class SizeComparator
             implements Comparator<NameClassPair> {
 
         private ProxyDirContext resources;
