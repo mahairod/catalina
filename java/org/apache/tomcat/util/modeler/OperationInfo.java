@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -36,7 +36,7 @@ import java.util.Locale;
  * @version $Revision: 1.6 $ $Date: 2003/07/20 07:35:13 $
  */
 
-public class OperationInfo extends FeatureInfo implements Serializable {
+public class OperationInfo extends FeatureInfo {
     static final long serialVersionUID = 4418342922072614875L;
     // ----------------------------------------------------------- Constructors
 
