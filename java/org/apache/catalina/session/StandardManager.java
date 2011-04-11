@@ -398,9 +398,7 @@ public class StandardManager
                 // ignore
             }
             // Delete the persistent storage file
-            if (file != null && file.exists()) {
-                file.delete();
-            }
+            file.delete();
         }
     }
 

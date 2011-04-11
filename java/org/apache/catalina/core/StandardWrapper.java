@@ -1938,7 +1938,7 @@ public class StandardWrapper
         Method[] parentMethods = getAllDeclaredMethods(c.getSuperclass());
 
         Method[] thisMethods = c.getDeclaredMethods();
-        if (thisMethods == null) {
+        if (thisMethods.length == 0) {
             return parentMethods;
         }
 
