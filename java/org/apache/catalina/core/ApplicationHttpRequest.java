@@ -871,6 +871,8 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
             specialAttributes.put(AsyncContext.ASYNC_QUERY_STRING,
                                   queryString);
             break;
+        default: // REQUEST
+            break;
         }
     }
 
