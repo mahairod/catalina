@@ -1436,7 +1436,6 @@ public class StandardWrapper
                     SecurityUtil.doAsPrivilege("service", servlet,
                                                classTypeUsedInService,
                                                serviceType);
-                    serviceType = null;
                 } else {
                     servlet.service(req, res);
                 }
@@ -1496,7 +1495,6 @@ public class StandardWrapper
                                                classTypeUsedInService, 
                                                serviceType,
                                                principal);                                                   
-                    serviceType = null;
                 } else {  
                     serv.service((HttpServletRequest) request,
                                  (HttpServletResponse) response);
