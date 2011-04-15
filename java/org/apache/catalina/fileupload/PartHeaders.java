@@ -41,7 +41,7 @@ class PartHeaders implements Serializable {
     private Set<String> headerNames = null;
 
     public String getHeader(String name) {
-        String nameLower = name.toLowerCase();
+        String nameLower = name.toLowerCase(Locale.ENGLISH);
         List<String> headerValueList = headerMap.get(nameLower);
         if (null == headerValueList) {
             return null;
@@ -57,7 +57,7 @@ class PartHeaders implements Serializable {
     }
 
     public List<String> getHeaders(String name) {
-        String nameLower = name.toLowerCase();
+        String nameLower = name.toLowerCase(Locale.ENGLISH);
         List<String> headerValueList = headerMap.get(nameLower);
         if (null == headerValueList) {
             return Collections.emptyList();
@@ -72,7 +72,7 @@ class PartHeaders implements Serializable {
      * @param value value of this header
      */
     public synchronized void addHeader(String name, String value) {
-        String nameLower = name.toLowerCase();
+        String nameLower = name.toLowerCase(Locale.ENGLISH);
         List<String> headerValueList = headerMap.get(nameLower);
         if (null == headerValueList) {
             headerValueList = new ArrayList<String>();

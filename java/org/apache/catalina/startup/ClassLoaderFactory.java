@@ -24,8 +24,9 @@ import org.apache.catalina.loader.StandardClassLoader;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -144,7 +145,7 @@ public final class ClassLoaderFactory {
             log.fine("Creating new class loader");
 
         // Construct the "class path" for this class loader
-        ArrayList<String> list = new ArrayList<String>();
+        Set<URL> set = new LinkedHashSet<URL>();
 
         // Add unpacked directories
         if (unpacked != null) {
@@ -157,7 +158,7 @@ public final class ClassLoaderFactory {
                              + file.getAbsolutePath());
                 URL url = new URL("file", null,
                                   file.getCanonicalPath() + File.separator);
-                list.add(url.toString());
+                set.add(url);
             }
         }
 
@@ -179,7 +180,7 @@ public final class ClassLoaderFactory {
                                  file.getAbsolutePath());
                     URL url = new URL("file", null,
                                       file.getCanonicalPath());
-                    list.add(url.toString());
+                    set.add(url);
                 }
             }
         }
@@ -187,12 +188,12 @@ public final class ClassLoaderFactory {
         // Add remote URLs
         if (urls != null) {
             for (int i = 0; i < urls.length; i++) {
-                list.add(urls[i].toString());
+                set.add(urls[i]);
             }
         }
 
         // Construct the class loader itself
-        String array[] = list.toArray(new String[list.size()]);
+        URL array[] = set.toArray(new URL[set.size()]);
         StandardClassLoader classLoader = null;
         if (parent == null)
             classLoader = new StandardClassLoader(array);

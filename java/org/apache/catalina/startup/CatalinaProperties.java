@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -115,9 +115,13 @@ public class CatalinaProperties {
             try {
                 properties = new Properties();
                 properties.load(is);
-                is.close();
             } catch (Throwable t) {
                 error = t;
+            } finally {
+                try {
+                    is.close();
+                } catch(Throwable t2) {
+                }
             }
         }
 
