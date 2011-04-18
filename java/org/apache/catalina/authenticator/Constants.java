@@ -43,6 +43,7 @@ public class Constants {
 
     // Cookie name for single sign on support
     public static final String SINGLE_SIGN_ON_COOKIE = "JSESSIONIDSSO";
+    public static final String SINGLE_SIGN_ON_VERSION_COOKIE = "JSESSIONIDSSOVERSION";
 
 
     // --------------------------------------------------------- Request Notes
@@ -90,6 +91,12 @@ public class Constants {
     public static final String REQ_SSOID_NOTE =
       "org.apache.catalina.request.SSOID";
 
+    /**
+     * The notes key to track the single-sign-on version with which this
+     * request is associated.
+     */
+    public static final String REQ_SSO_VERSION_NOTE =
+      "org.apache.catalina.request.SSOVersion";
 
     // ---------------------------------------------------------- Session Notes
 
