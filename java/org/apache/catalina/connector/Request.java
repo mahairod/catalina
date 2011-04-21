@@ -1851,7 +1851,7 @@ public class Request
                         Boolean ret = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                             public Boolean run() {
                                 try {
-                                    return new Boolean(realm.invokeAuthenticateDelegate(req, (HttpResponse) getResponse(), context, (AuthenticatorBase) authBase, true));
+                                    return Boolean.valueOf(realm.invokeAuthenticateDelegate(req, (HttpResponse) getResponse(), context, (AuthenticatorBase) authBase, true));
                                 } catch (IOException ex) {
                                     throw new RuntimeException("Exception thrown while attempting to authenticate", ex);
                                 }
@@ -2820,10 +2820,7 @@ public class Request
         }
 
         // Return the requested session if it exists and is valid
-        Manager manager = null;
-        if (context != null) {
-            manager = context.getManager();
-        }
+        Manager manager = context.getManager();
         if (manager == null) {
             return (null);      // Sessions are not supported
         }
@@ -2909,7 +2906,13 @@ public class Request
                 String ssoId = (String) getNote(
                         org.apache.catalina.authenticator.Constants.REQ_SSOID_NOTE);
                 if (ssoId != null) {
-                    sso.associate(ssoId, session);
+                    long ssoVersion = 0L;
+                    Long ssoVersionObj = (Long)getNote(
+                            org.apache.catalina.authenticator.Constants.REQ_SSO_VERSION_NOTE);
+                    if (ssoVersionObj != null) {
+                        ssoVersion = ssoVersionObj.longValue();
+                    }
+                    sso.associate(ssoId, ssoVersion, session);
                     removeNote(
                             org.apache.catalina.authenticator.Constants.REQ_SSOID_NOTE);
                 }
@@ -3321,7 +3324,7 @@ public class Request
 
             // Add a new Locale to the list of Locales for this quality level
             Locale locale = new Locale(language, country, variant);
-            Double key = new Double(-quality);  // Reverse the order
+            Double key = Double.valueOf(-quality);  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
                 values = new ArrayList<Locale>();
@@ -3333,10 +3336,7 @@ public class Request
 
         // Process the quality values in highest->lowest order (due to
         // negating the Double value when creating the key)
-        Iterator<Double> keys = locales.keySet().iterator();
-        while (keys.hasNext()) {
-            Double key = keys.next();
-            ArrayList<Locale> list = locales.get(key);
+        for (ArrayList<Locale> list : locales.values()) {
             Iterator<Locale> values = list.iterator();
             while (values.hasNext()) {
                 Locale locale = values.next();
@@ -3550,14 +3550,13 @@ public class Request
      */
     private void removeParameterFromRequestURI(String parameter) {
 
-        int start, end, parameterStart, semicolon, semicolon2;
+        int start, end, semicolon, semicolon2;
 
         ByteChunk uriBC = coyoteRequest.requestURI().getByteChunk();
         start = uriBC.getStart();
         end = uriBC.getEnd();
         semicolon = uriBC.indexOf(parameter, 0, parameter.length(), 0);
         if (semicolon > 0) {
-            parameterStart = start + semicolon;
             semicolon2 = uriBC.indexOf(';', semicolon + parameter.length());
             uriBC.setEnd(start + semicolon);
             byte[] buf = uriBC.getBuffer();
@@ -4204,8 +4203,7 @@ public class Request
 
         String versionString = Long.toString(ss.incrementVersion());
 
-        HashMap<String, String> sessionVersions = (HashMap<String, String>)
-            getAttribute(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
+        Map<String, String> sessionVersions = getSessionVersionsRequestAttribute();
         if (sessionVersions == null) {
             sessionVersions = new HashMap<String, String>();
             setAttribute(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE,
@@ -4216,6 +4214,12 @@ public class Request
             path = "/";
         }
         sessionVersions.put(path, versionString);
+    }
+
+    @SuppressWarnings("unchecked")
+    Map<String, String> getSessionVersionsRequestAttribute() {
+        return (Map<String, String>) getAttribute(
+                Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
     }
 
     private boolean isSessionVersioningSupported() {
