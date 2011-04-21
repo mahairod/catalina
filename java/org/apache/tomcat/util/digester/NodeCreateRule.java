@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -418,7 +418,7 @@ public class NodeCreateRule extends Rule {
      */
     public void end() throws Exception {
 
-        Object top = digester.pop();
+        digester.pop();
 
     }
 

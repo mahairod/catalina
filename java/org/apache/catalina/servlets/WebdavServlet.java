@@ -208,7 +208,16 @@ public class WebdavServlet
      /**
      * MD5 message digest provider.
      */
-    protected static MessageDigest md5Helper;
+    protected static final MessageDigest md5Helper;
+
+    static {
+        // Load the MD5 helper used to calculate signatures.
+        try {
+            md5Helper = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("No MD5");
+        }
+    }
 
 
     /**
@@ -270,13 +279,6 @@ public class WebdavServlet
 
         if (getServletConfig().getInitParameter("secret") != null)
             secret = getServletConfig().getInitParameter("secret");
-
-        // Load the MD5 helper used to calculate signatures.
-        try {
-            md5Helper = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnavailableException("No MD5");
-        }
 
     }
 
@@ -493,6 +495,8 @@ public class WebdavServlet
                             type = FIND_ALL_PROP;
                         }
                         break;
+                    default:
+                        break;
                     }
                 }
             } catch (SAXException e) {
@@ -522,6 +526,8 @@ public class WebdavServlet
                     }
                     // href is a live property which is handled differently
                     properties.addElement(propertyName);
+                    break;
+                default:
                     break;
                 }
             }
@@ -979,6 +985,8 @@ public class WebdavServlet
                         lockOwnerNode = currentNode;
                     }
                     break;
+                default:
+                    break;
                 }
             }
 
@@ -998,6 +1006,8 @@ public class WebdavServlet
                         } else {
                             lock.scope = tempScope;
                         }
+                        break;
+                    default:
                         break;
                     }
                 }
@@ -1029,6 +1039,8 @@ public class WebdavServlet
                             lock.type = tempType;
                         }
                         break;
+                    default:
+                        break;
                     }
                 }
 
@@ -1058,6 +1070,8 @@ public class WebdavServlet
                         domWriter.print(currentNode);
                         lock.owner += strWriter.toString();
                         break;
+                    default:
+                        break;
                     }
                 }
 
@@ -1067,7 +1081,7 @@ public class WebdavServlet
                 }
 
             } else {
-                lock.owner = new String();
+                lock.owner = "";
             }
 
         }
@@ -1094,8 +1108,12 @@ public class WebdavServlet
                 + lock.depth + "-" + lock.owner + "-" + lock.tokens + "-"
                 + lock.expiresAt + "-" + System.currentTimeMillis() + "-"
                 + secret;
-            String lockToken =
-                new String(md5Encoder.encode(md5Helper.digest(lockTokenStr.getBytes())));
+            
+            byte[] digestBytes = null;
+            synchronized(md5Helper) {
+                digestBytes = md5Helper.digest(lockTokenStr.getBytes());
+            }
+            String lockToken = new String(md5Encoder.encode(digestBytes));
 
             if ( (exists) && (object instanceof DirContext) &&
                  (lock.depth == INFINITY) ) {
@@ -1711,7 +1729,7 @@ public class WebdavServlet
                 resources.createSubcontext(dest);
             } catch (NamingException e) {
                 errorList.put
-                    (dest, new Integer(WebdavStatus.SC_CONFLICT));
+                    (dest, Integer.valueOf(WebdavStatus.SC_CONFLICT));
                 return false;
             }
 
@@ -1731,7 +1749,7 @@ public class WebdavServlet
                 }
             } catch (NamingException e) {
                 errorList.put
-                    (dest, new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                    (dest, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 return false;
             }
 
@@ -1743,13 +1761,13 @@ public class WebdavServlet
                 } catch (NamingException e) {
                     errorList.put
                         (source,
-                         new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                         Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                     return false;
                 }
             } else {
                 errorList.put
                     (source,
-                     new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                     Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 return false;
             }
 
@@ -1841,7 +1859,7 @@ public class WebdavServlet
             try {
                 resources.unbind(path);
             } catch (NamingException e) {
-                errorList.put(path, new Integer
+                errorList.put(path, Integer.valueOf
                     (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             }
 
@@ -1878,7 +1896,7 @@ public class WebdavServlet
 
         if ((path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")) ||
             (path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"))) {
-            errorList.put(path, new Integer(WebdavStatus.SC_FORBIDDEN));
+            errorList.put(path, Integer.valueOf(WebdavStatus.SC_FORBIDDEN));
             return;
         }
 
@@ -1894,7 +1912,7 @@ public class WebdavServlet
         try {
             enumeration = resources.list(path);
         } catch (NamingException e) {
-            errorList.put(path, new Integer
+            errorList.put(path, Integer.valueOf
                 (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             return;
         }
@@ -1908,7 +1926,7 @@ public class WebdavServlet
 
             if (isLocked(childName, ifHeader + lockTokenHeader)) {
 
-                errorList.put(childName, new Integer(WebdavStatus.SC_LOCKED));
+                errorList.put(childName, Integer.valueOf(WebdavStatus.SC_LOCKED));
 
             } else {
 
@@ -1925,13 +1943,13 @@ public class WebdavServlet
                             // If it's not a collection, then it's an unknown
                             // error
                             errorList.put
-                                (childName, new Integer
+                                (childName, Integer.valueOf
                                     (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                         }
                     }
                 } catch (NamingException e) {
                     errorList.put
-                        (childName, new Integer
+                        (childName, Integer.valueOf
                             (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 }
             }
@@ -2277,6 +2295,8 @@ public class WebdavServlet
 
             break;
 
+        default: // not possible
+            break;
         }
 
         generatedXML.writeElement(null, "response", XMLWriter.CLOSING);
@@ -2525,6 +2545,8 @@ public class WebdavServlet
 
             break;
 
+        default: // not possible
+            break;
         }
 
         generatedXML.writeElement(null, "response", XMLWriter.CLOSING);
@@ -2648,7 +2670,7 @@ public class WebdavServlet
     /**
      * Holds a lock information.
      */
-    private class LockInfo {
+    private static class LockInfo {
 
 
         // -------------------------------------------------------- Constructor
@@ -2683,17 +2705,18 @@ public class WebdavServlet
          */
         public String toString() {
 
-            String result =  "Type:" + type + "\n";
-            result += "Scope:" + scope + "\n";
-            result += "Depth:" + depth + "\n";
-            result += "Owner:" + owner + "\n";
-            result += "Expiration:"
-                + FastHttpDateFormat.formatDate(expiresAt, null) + "\n";
+            StringBuilder result =  new StringBuilder("Type:");
+            result.append(type).append("\n");
+            result.append("Scope:").append(scope).append("\n");
+            result.append("Depth:").append(depth).append("\n");
+            result.append("Owner:").append(owner).append("\n");
+            result.append("Expiration:").append(
+                FastHttpDateFormat.formatDate(expiresAt, null)).append("\n");
             Enumeration<String> tokensList = tokens.elements();
             while (tokensList.hasMoreElements()) {
-                result += "Token:" + tokensList.nextElement() + "\n";
+                result.append("Token:").append(tokensList.nextElement()).append("\n");
             }
-            return result;
+            return result.toString();
 
         }
 
@@ -2773,7 +2796,7 @@ public class WebdavServlet
      * {@link DocumentBuilderFactory#setExpandEntityReferences(false)}. External
      * references are filtered out for security reasons. See CVE-2007-5461.
      */
-    private class WebdavResolver implements EntityResolver {
+    private static class WebdavResolver implements EntityResolver {
         private ServletContext context;
         
         public WebdavResolver(ServletContext theContext) {
@@ -3083,7 +3106,7 @@ class WebdavStatus {
      *                  HTTP status code (e.g., "OK").
      */
     public static String getStatusText(int nHttpStatusCode) {
-        Integer intKey = new Integer(nHttpStatusCode);
+        Integer intKey = Integer.valueOf(nHttpStatusCode);
 
         if (!mapStatusCodes.containsKey(intKey)) {
             return "";
@@ -3104,7 +3127,7 @@ class WebdavStatus {
      * @param   strVal  [IN] HTTP status text
      */
     private static void addStatusCodeMap(int nKey, String strVal) {
-        mapStatusCodes.put(new Integer(nKey), strVal);
+        mapStatusCodes.put(Integer.valueOf(nKey), strVal);
     }
 
 }

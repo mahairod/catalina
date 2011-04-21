@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -75,10 +75,10 @@ public class SSIExec implements SSICommand {
                 ssiMediator.log("Couldn't exec file: " + substitutedValue, e);
                 writer.write(configErrMsg);
             } catch (IOException e) {
-                if (!foundProgram) {
+                //if (!foundProgram) {
                     //apache doesn't output an error message if it can't find
                     // a program
-                }
+                //}
                 ssiMediator.log("Couldn't exec file: " + substitutedValue, e);
             }
         }

@@ -54,7 +54,7 @@ import java.util.logging.Logger;
 public class CoyoteAdapter
     implements Adapter 
  {
-    private static Logger log = Logger.getLogger(CoyoteAdapter.class.getName());
+    private static final Logger log = Logger.getLogger(CoyoteAdapter.class.getName());
 
     // -------------------------------------------------------------- Constants
 
@@ -91,6 +91,10 @@ public class CoyoteAdapter
     // Make sure this value is always aligned with {@link ContainerMapper}
     // (@see com.sun.enterprise.v3.service.impl.ContainerMapper)
     private final static int MAPPING_DATA = 12;
+
+    // Make sure this value is always aligned with {@link ContainerMapper}
+    // (@see com.sun.enterprise.v3.service.impl.ContainerMapper)
+    private final static int MESSAGE_BYTES = 17;
     
     // ----------------------------------------------------------- Constructors
 
@@ -328,9 +332,7 @@ public class CoyoteAdapter
                 response.finishResponse();
                 req.action( ActionCode.ACTION_POST_REQUEST , null);
             } else {
-                if (request != null) {
-                    request.onAfterService();
-                }
+                request.onAfterService();
             }
         } catch (Throwable t) {
             log.log(Level.SEVERE, sm.getString("coyoteAdapter.service"), t);
@@ -455,7 +457,16 @@ public class CoyoteAdapter
  
         if (compatWithTomcat || !v3Enabled) {
             /*mod_jk*/
-            connector.getMapper().map(req.serverName(), decodedURI, 
+            MessageBytes localDecodedURI = decodedURI;
+            if (semicolon > 0) {
+                localDecodedURI = (MessageBytes)req.getNote(MESSAGE_BYTES);
+                if (localDecodedURI == null) {
+                    localDecodedURI = MessageBytes.newInstance();
+                    req.setNote(MESSAGE_BYTES, localDecodedURI);
+                }
+                localDecodedURI.duplicate(decodedURI);
+            }
+            connector.getMapper().map(req.serverName(), localDecodedURI, 
                                   request.getMappingData());
             MappingData md = request.getMappingData();
             req.setNote(MAPPING_DATA, md);

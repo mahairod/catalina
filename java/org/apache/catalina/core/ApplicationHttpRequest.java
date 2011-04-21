@@ -112,7 +112,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
             isSessionVersioningSupported =
                 context.getManager().isSessionVersioningSupported();
             if (isSessionVersioningSupported) {
-                HashMap<String, String> sessionVersions =
+                Map<String, String> sessionVersions =
                     getSessionVersions();
                 if (sessionVersions != null) {
                     requestedSessionVersion = sessionVersions.get(
@@ -871,6 +871,8 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
             specialAttributes.put(AsyncContext.ASYNC_QUERY_STRING,
                                   queryString);
             break;
+        default: // REQUEST
+            break;
         }
     }
 
@@ -950,11 +952,10 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
             }
             // Add any query parameters whose names are not present in the
             // original parameter map
-            keys = queryParameters.keySet().iterator();
-            while (keys.hasNext()) {
-                String key = keys.next();
+            for (Map.Entry<String, String[]> e : queryParameters.entrySet()) {
+                String key = e.getKey();
                 if (parameters.get(key) == null) {
-                    parameters.put(key, queryParameters.get(key));
+                    parameters.put(key, e.getValue());
                 }
             }
         }
@@ -962,8 +963,8 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     @SuppressWarnings("unchecked")
-    private HashMap<String, String> getSessionVersions() {
-        return (HashMap<String, String>) getAttribute(
+    private Map<String, String> getSessionVersions() {
+        return (Map<String, String>) getAttribute(
                 Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE);
     }
 
@@ -1034,7 +1035,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         String versionString = Long.toString(ss.incrementVersion());
-        HashMap<String, String> sessionVersions = getSessionVersions();
+        Map<String, String> sessionVersions = getSessionVersions();
         if (sessionVersions == null) {
             sessionVersions = new HashMap<String, String>();
             setAttribute(Globals.SESSION_VERSIONS_REQUEST_ATTRIBUTE,

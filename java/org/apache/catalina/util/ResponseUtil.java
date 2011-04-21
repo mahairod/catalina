@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -42,7 +42,7 @@ public final class ResponseUtil {
 
         IOException exception = null;
         byte buffer[] = new byte[2048];
-        int len = buffer.length;
+        int len;
         while (true) {
             try {
                 len = istream.read(buffer);
@@ -73,7 +73,7 @@ public final class ResponseUtil {
 
         IOException exception = null;
         char buffer[] = new char[2048];
-        int len = buffer.length;
+        int len;
         while (true) {
             try {
                 len = reader.read(buffer);

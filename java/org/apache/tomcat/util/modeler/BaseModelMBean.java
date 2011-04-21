@@ -234,9 +234,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             ModelMBeanAttributeInfo attrInfo = info.getAttribute(name);
             if (attrInfo == null)
                 throw new AttributeNotFoundException(" Cannot find attribute " + name);
+            // DescriptorRead.getDescriptor() is never null.
             Descriptor attrDesc = attrInfo.getDescriptor();
-            if (attrDesc == null)
-                throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
             String getMethod = (String) attrDesc.getFieldValue("getMethod");
 
             if (getMethod == null)
@@ -541,9 +540,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         if (attrInfo == null)
             throw new AttributeNotFoundException("Cannot find attribute " + name);
 
+        // DescriptorRead.getDescriptor() is never null.
         Descriptor attrDesc=attrInfo.getDescriptor();
-        if (attrDesc == null)
-            throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
 
         try {
             // XXX Is it before or after ?
@@ -595,12 +593,11 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             setAttMap.put( name, m );
         }
 
-        Object result = null;
         try {
             if( m.getDeclaringClass().isAssignableFrom( this.getClass()) ) {
-                result = m.invoke(this, new Object[] { value });
+                m.invoke(this, new Object[] { value });
             } else {
-                result = m.invoke(resource, new Object[] { value });
+                m.invoke(resource, new Object[] { value });
             }
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();

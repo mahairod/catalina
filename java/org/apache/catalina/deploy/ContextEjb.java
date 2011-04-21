@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -32,7 +32,7 @@ import java.io.Serializable;
  * @version $Revision: 1.2 $ $Date: 2005/12/08 01:27:39 $
  */
 
-public class ContextEjb extends ResourceBase implements Serializable {
+public class ContextEjb extends ResourceBase {
 
 
     // ------------------------------------------------------------- Properties

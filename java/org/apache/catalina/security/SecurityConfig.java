@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * @author Jean-Francois Arcand
  */
 public final class SecurityConfig{
-    private static SecurityConfig singleton = null;
+    private static volatile SecurityConfig singleton = null;
 
     private static Logger log = Logger.getLogger(SecurityConfig.class.getName());
 

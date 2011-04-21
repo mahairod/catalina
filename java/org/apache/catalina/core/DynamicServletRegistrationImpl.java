@@ -19,7 +19,7 @@ public class DynamicServletRegistrationImpl
     /**
      * Constructor
      */
-    protected DynamicServletRegistrationImpl(StandardWrapper wrapper,
+    public DynamicServletRegistrationImpl(StandardWrapper wrapper,
             StandardContext ctx) {
         super(wrapper, ctx);
     }

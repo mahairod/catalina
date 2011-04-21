@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
  * @version $Revision: 1.7 $ $Date: 2003/07/20 07:35:12 $
  */
 
-public class AttributeInfo extends FeatureInfo implements Serializable {
+public class AttributeInfo extends FeatureInfo {
     static final long serialVersionUID = -2511626862303972143L;
 
     // ----------------------------------------------------- Instance Variables

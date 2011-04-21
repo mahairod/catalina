@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  */
 
@@ -23,7 +23,7 @@ public class ServletRegistrationImpl implements ServletRegistration {
     /**
      * Constructor
      */
-    protected ServletRegistrationImpl(StandardWrapper wrapper,
+    public ServletRegistrationImpl(StandardWrapper wrapper,
                                       StandardContext ctx) {
         this.wrapper = wrapper;
         this.ctx = ctx;

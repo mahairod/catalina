@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -572,7 +572,6 @@ final class SetPublicIdRule extends Rule {
 
     public void begin(Attributes attributes) throws Exception {
 
-        Context context = (Context) digester.peek(digester.getCount() - 1);
         Object top = digester.peek();
         Class paramClasses[] = new Class[1];
         paramClasses[0] = "String".getClass();

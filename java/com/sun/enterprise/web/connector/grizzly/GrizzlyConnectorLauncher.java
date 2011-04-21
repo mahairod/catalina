@@ -897,7 +897,7 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
     /**
      * JMX Wrapper around a JMX implementation.
      */
-    class ModelerManagement implements Management{
+    static class ModelerManagement implements Management{
 
         @SuppressWarnings("deprecation")
         public void registerComponent(Object bean, ObjectName oname, String type) 
@@ -929,14 +929,4 @@ public class GrizzlyConnectorLauncher extends CoyoteConnectorLauncher {
     public void setProxiedProtocols(String proxiedProtocols) {
         this.proxiedProtocols = proxiedProtocols;
     }
-
-    
-    /**
-     * Configure the domain.xml proxied protocols.
-     */
-    private void configureProxiedProtocols() {
-        //TO: Do we need to implement Port Unification here or directly
-        // When hk2 boot Grizzly?
-    }
 }
-

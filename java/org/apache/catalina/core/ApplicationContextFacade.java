@@ -743,8 +743,6 @@ public final class ApplicationContextFacade
             return invokeMethod(context, methodName, params);
         }catch(Throwable t){
             throw new RuntimeException(t.getMessage());
-        } finally {
-            params = null;
         }
     }
 
@@ -774,8 +772,6 @@ public final class ApplicationContextFacade
         } catch (Exception ex){
             handleException(ex, methodName);
             return null;
-        } finally {
-            params = null;
         }
     }
     
@@ -801,8 +797,6 @@ public final class ApplicationContextFacade
                 throw new RuntimeException(t.getMessage());
             }
             return null;
-        } finally {
-            params = null;
         }
     }
     

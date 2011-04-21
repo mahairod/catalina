@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -161,7 +161,6 @@ public final class InstanceEvent
     public InstanceEvent(Wrapper wrapper, Filter filter, EventType type) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = filter;
       this.servlet = null;
       this.type = type;
@@ -182,7 +181,6 @@ public final class InstanceEvent
                          Throwable exception) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = filter;
       this.servlet = null;
       this.type = type;
@@ -205,7 +203,6 @@ public final class InstanceEvent
                          ServletRequest request, ServletResponse response) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = filter;
       this.servlet = null;
       this.type = type;
@@ -231,7 +228,6 @@ public final class InstanceEvent
                          Throwable exception) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = filter;
       this.servlet = null;
       this.type = type;
@@ -253,7 +249,6 @@ public final class InstanceEvent
     public InstanceEvent(Wrapper wrapper, Servlet servlet, EventType type) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = null;
       this.servlet = servlet;
       this.type = type;
@@ -274,7 +269,6 @@ public final class InstanceEvent
                          Throwable exception) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = null;
       this.servlet = servlet;
       this.type = type;
@@ -297,7 +291,6 @@ public final class InstanceEvent
                          ServletRequest request, ServletResponse response) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = null;
       this.servlet = servlet;
       this.type = type;
@@ -323,7 +316,6 @@ public final class InstanceEvent
                          Throwable exception) {
 
       super(wrapper);
-      this.wrapper = wrapper;
       this.filter = null;
       this.servlet = servlet;
       this.type = type;
@@ -349,40 +341,34 @@ public final class InstanceEvent
      * The Filter instance for which this event occurred (BEFORE_FILTER_EVENT
      * and AFTER_FILTER_EVENT only).
      */
-    private Filter filter = null;
+    private transient Filter filter = null;
 
 
     /**
      * The servlet request being processed (BEFORE_FILTER_EVENT,
      * AFTER_FILTER_EVENT, BEFORE_SERVICE_EVENT, and AFTER_SERVICE_EVENT).
      */
-    private ServletRequest request = null;
+    private transient ServletRequest request = null;
 
 
     /**
      * The servlet response being processed (BEFORE_FILTER_EVENT,
      * AFTER_FILTER_EVENT, BEFORE_SERVICE_EVENT, and AFTER_SERVICE_EVENT).
      */
-    private ServletResponse response = null;
+    private transient ServletResponse response = null;
 
 
     /**
      * The Servlet instance for which this event occurred (not present on
      * BEFORE_FILTER_EVENT or AFTER_FILTER_EVENT events).
      */
-    private Servlet servlet = null;
+    private transient Servlet servlet = null;
 
 
     /**
      * The event type this instance represents.
      */
     private EventType type = null;
-
-
-    /**
-     * The Wrapper managing the servlet instance for which this event occurred.
-     */
-    private Wrapper wrapper = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -455,7 +441,7 @@ public final class InstanceEvent
      */
     public Wrapper getWrapper() {
 
-        return (this.wrapper);
+        return (Wrapper)getSource();
 
     }
 

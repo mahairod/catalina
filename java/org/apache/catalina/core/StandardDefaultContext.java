@@ -118,13 +118,6 @@ public class StandardDefaultContext
 
 
     /**
-     * The Java class name of the default Mapper class for this Container.
-     */
-    private String mapperClass =
-        "org.apache.catalina.core.StandardContextMapper";
-
-
-    /**
      * The associated naming resources.
      */
     private NamingResources namingResources = new NamingResources();
@@ -383,7 +376,6 @@ public class StandardDefaultContext
      * @param cookies The new flag
      */
     public void setCookies(boolean cookies) {
-        boolean oldCookies = this.cookies;
         this.cookies = cookies;
 
     }
@@ -405,7 +397,6 @@ public class StandardDefaultContext
      * @param crossContext The new cross contexts flag
      */
     public void setCrossContext(boolean crossContext) {
-        boolean oldCrossContext = this.crossContext;
         this.crossContext = crossContext;
 
     }
@@ -439,7 +430,6 @@ public class StandardDefaultContext
      * @param reloadable The new reloadable flag
      */
     public void setReloadable(boolean reloadable) {
-        boolean oldReloadable = this.reloadable;
         this.reloadable = reloadable;
 
     }

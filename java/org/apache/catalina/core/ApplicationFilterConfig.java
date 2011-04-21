@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -197,7 +197,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
         }
 
         if (filter == null) {
-            Class clazz = filterDef.getFilterClass();
+            Class<? extends Filter> clazz = filterDef.getFilterClass();
             if (clazz == null) {
                 // Identify the class loader we will be using
                 ClassLoader classLoader = null;
@@ -207,11 +207,9 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
                 } else {
                     classLoader = context.getLoader().getClassLoader();
                 }
-                ClassLoader oldCtxClassLoader =
-                    Thread.currentThread().getContextClassLoader();
 
                 // Instantiate a new instance of this filter and return it
-                clazz = classLoader.loadClass(filterClassName);
+                clazz = loadFilterClass(classLoader, filterClassName);
             }
 
             this.filter = context.createFilterInstance(clazz);
@@ -236,6 +234,12 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
         // END PWC 1.2
 
         return (this.filter);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends Filter> loadFilterClass(ClassLoader classLoader,
+            String filterClassName) throws ClassNotFoundException {
+        return (Class<? extends Filter>)classLoader.loadClass(filterClassName);
     }
 
 

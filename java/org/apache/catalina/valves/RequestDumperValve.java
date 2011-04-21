@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -102,8 +102,6 @@ public class RequestDumperValve extends ValveBase {
         HttpResponse hresponse = (HttpResponse) response;
         HttpServletRequest hreq =
             (HttpServletRequest) hrequest.getRequest();
-        HttpServletResponse hres =
-            (HttpServletResponse) hresponse.getResponse();
 
         // Log pre-service information
         log("REQUEST URI       =" + hreq.getRequestURI());

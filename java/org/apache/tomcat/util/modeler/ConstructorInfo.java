@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -35,7 +35,7 @@ import java.io.Serializable;
  * @version $Revision: 1.6 $ $Date: 2003/07/20 07:35:12 $
  */
 
-public class ConstructorInfo extends FeatureInfo implements Serializable {
+public class ConstructorInfo extends FeatureInfo {
     static final long serialVersionUID = -5735336213417238238L;
 
     // ----------------------------------------------------- Instance Variables
