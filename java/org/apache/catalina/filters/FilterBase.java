@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,14 +41,15 @@
  * This file incorporates work covered by the following copyright and
  * permission notice:
  *
- * Copyright 2004 The Apache Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,53 +57,48 @@
  * limitations under the License.
  */
 
-package org.apache.catalina.startup;
+package org.apache.catalina.filters;
 
-import com.sun.grizzly.util.IntrospectionUtils;
-import org.apache.tomcat.util.digester.Rule;
-import org.xml.sax.Attributes;
+import java.util.Enumeration;
+import java.util.logging.Logger;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+
+import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.catalina.util.StringManager;
 
 /**
- * Rule that uses the introspection utils to set properties of a context 
- * (everything except "path").
+ * Base class for filters that provides generic initialisation and a simple
+ * no-op destruction. 
  * 
- * @author Remy Maucherat
+ * @author xxd
+ *
  */
-public class SetContextPropertiesRule extends Rule {
+public abstract class FilterBase implements Filter {
+    
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
-
-    // ----------------------------------------------------------- Constructors
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Handle the beginning of an XML element.
-     *
-     * @param attributes The attributes of this element
-     *
-     * @exception Exception if a processing error occurs
-     */
-    public void begin(String namespace, String nameX, Attributes attributes)
-        throws Exception {
-
-        for (int i = 0; i < attributes.getLength(); i++) {
-            String name = attributes.getLocalName(i);
-            if ("".equals(name)) {
-                name = attributes.getQName(i);
+    protected abstract Logger getLogger();
+    
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        Enumeration<String> paramNames = filterConfig.getInitParameterNames();
+        while (paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement();
+            if (!IntrospectionUtils.setProperty(this, paramName,
+                    filterConfig.getInitParameter(paramName))) {
+                getLogger().warning(sm.getString("filterbase.noSuchProperty",
+                        paramName, this.getClass().getName()));
             }
-            if ("path".equals(name)) { 
-                continue;
-            }
-            String value = attributes.getValue(i);
-            IntrospectionUtils.setProperty(digester.peek(), name, value);
-        }
-
+        }    
     }
 
+    @Override
+    public void destroy() {
+        // NOOP
+    }
 
 }
