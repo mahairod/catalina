@@ -2868,7 +2868,13 @@ public class Request
                 String ssoId = (String) getNote(
                         org.apache.catalina.authenticator.Constants.REQ_SSOID_NOTE);
                 if (ssoId != null) {
-                    sso.associate(ssoId, session);
+                    long ssoVersion = 0L;
+                    Long ssoVersionObj = (Long)getNote(
+                            org.apache.catalina.authenticator.Constants.REQ_SSO_VERSION_NOTE);
+                    if (ssoVersionObj != null) {
+                        ssoVersion = ssoVersionObj.longValue();
+                    }
+                    sso.associate(ssoId, ssoVersion, session);
                     removeNote(
                             org.apache.catalina.authenticator.Constants.REQ_SSOID_NOTE);
                 }
@@ -3812,7 +3818,9 @@ public class Request
                     sm.getString("request.startAsync.notSupported"));
         }
 
-        if (asyncContext != null) {
+        final AsyncContextImpl asyncContextLocal = asyncContext;
+
+        if (asyncContextLocal != null) {
             if (isAsyncStarted()) {
                 throw new IllegalStateException(
                         sm.getString("request.startAsync.alreadyCalled"));
@@ -3821,18 +3829,22 @@ public class Request
                 throw new IllegalStateException(
                         sm.getString("request.startAsync.alreadyComplete"));
             }
-            if (!asyncContext.isStartAsyncInScope()) {
+            if (!asyncContextLocal.isStartAsyncInScope()) {
                 throw new IllegalStateException(
                         sm.getString("request.startAsync.notInScope"));
             }
 
             // Reinitialize existing AsyncContext
-            asyncContext.reinitialize(servletRequest, servletResponse,
+            asyncContextLocal.reinitialize(servletRequest, servletResponse,
                     isOriginalRequestAndResponse);
         } else {
-            asyncContext = new AsyncContextImpl(this, servletRequest,
-                    (Response) getResponse(), servletResponse,
-                    isOriginalRequestAndResponse);
+            final AsyncContextImpl asyncContextFinal =
+                    new AsyncContextImpl(this,
+                                         servletRequest,
+                                         (Response) getResponse(),
+                                         servletResponse,
+                                         isOriginalRequestAndResponse);
+            asyncContext = asyncContextFinal;
 
             CompletionHandler requestCompletionHandler =
                 new CompletionHandler<Request>() {

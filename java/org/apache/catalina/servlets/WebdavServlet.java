@@ -495,6 +495,8 @@ public class WebdavServlet
                             type = FIND_ALL_PROP;
                         }
                         break;
+                    default:
+                        break;
                     }
                 }
             } catch (SAXException e) {
@@ -524,6 +526,8 @@ public class WebdavServlet
                     }
                     // href is a live property which is handled differently
                     properties.addElement(propertyName);
+                    break;
+                default:
                     break;
                 }
             }
@@ -981,6 +985,8 @@ public class WebdavServlet
                         lockOwnerNode = currentNode;
                     }
                     break;
+                default:
+                    break;
                 }
             }
 
@@ -1000,6 +1006,8 @@ public class WebdavServlet
                         } else {
                             lock.scope = tempScope;
                         }
+                        break;
+                    default:
                         break;
                     }
                 }
@@ -1031,6 +1039,8 @@ public class WebdavServlet
                             lock.type = tempType;
                         }
                         break;
+                    default:
+                        break;
                     }
                 }
 
@@ -1059,6 +1069,8 @@ public class WebdavServlet
                         domWriter.setQualifiedNames(false);
                         domWriter.print(currentNode);
                         lock.owner += strWriter.toString();
+                        break;
+                    default:
                         break;
                     }
                 }
@@ -2283,6 +2295,8 @@ public class WebdavServlet
 
             break;
 
+        default: // not possible
+            break;
         }
 
         generatedXML.writeElement(null, "response", XMLWriter.CLOSING);
@@ -2531,6 +2545,8 @@ public class WebdavServlet
 
             break;
 
+        default: // not possible
+            break;
         }
 
         generatedXML.writeElement(null, "response", XMLWriter.CLOSING);

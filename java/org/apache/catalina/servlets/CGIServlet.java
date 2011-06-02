@@ -1973,14 +1973,14 @@ public final class CGIServlet extends HttpServlet {
                 // LF
                 switch(state) {
                     case STATE_CHARACTER:
-                        state = STATE_FIRST_LF;
-                        break;
                     case STATE_FIRST_CR:
                         state = STATE_FIRST_LF;
                         break;
                     case STATE_FIRST_LF:
                     case STATE_SECOND_CR:
                         state = STATE_HEADER_END;
+                        break;
+                    default:
                         break;
                 }
 
@@ -1995,6 +1995,8 @@ public final class CGIServlet extends HttpServlet {
                         break;
                     case STATE_FIRST_LF:
                         state = STATE_SECOND_CR;
+                        break;
+                    default:
                         break;
                 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -325,6 +325,18 @@ public interface Session {
      * Set the single sign on id.
      */
     public void setSsoId(String ssoId);
+
+
+    /**
+     * Return the single sign on version.
+     */
+    public long getSsoVersion();
+
+
+    /**
+     * Set the single sign on version.
+     */
+    public void setSsoVersion(long ssoVersion);
 
 
     /**

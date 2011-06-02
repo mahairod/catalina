@@ -902,7 +902,7 @@ public class HostConfig
     protected boolean restartContext(Context context) {
         boolean result = true;
         if (log.isLoggable(Level.INFO)) {
-            log.info("restartContext(" + context.getName() + ")");
+            log.info(sm.getString("hostConfig.restartContext", context.getName())); 
         }
 
         /*
@@ -918,7 +918,7 @@ public class HostConfig
             ((Lifecycle) context).stop();
         } catch( Exception ex ) {
             log.log(Level.WARNING,
-                    "Erorr stopping context " + context.getName(),
+                    sm.getString("hostConfig.context.stop", context.getName()), 
                     ex);
         }
         // if the context was not started ( for example an error in web.xml)
@@ -927,7 +927,7 @@ public class HostConfig
             ((Lifecycle) context).start();
         } catch (Exception e) {
             log.log(Level.WARNING,
-                    "Error restarting context " + context.getName(),
+                    sm.getString("hostConfig.context.restart", context.getName()), 
                     e);
             result = false;
         }

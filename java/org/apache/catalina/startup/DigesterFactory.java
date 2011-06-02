@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -132,8 +132,8 @@ public class DigesterFactory {
      * Turn on DTD and/or validation (based on the parser implementation)
      */
     protected void turnOnValidation(Digester digester){
-        URL url = getClass().getResource(Constants.WebSchemaResourcePath_24);
-        digester.setSchema(url.toString());     
+        URL url = DigesterFactory.class.getResource(Constants.WebSchemaResourcePath_24);
+        digester.setSchema(url.toString());
     }
 
 
