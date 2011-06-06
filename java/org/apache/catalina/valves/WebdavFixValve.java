@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -64,22 +64,6 @@ public class WebdavFixValve
             return END_PIPELINE;
         } else {
             return INVOKE_NEXT;
-        }
-    }
-
-    /**
-     * Check for the broken MS WebDAV client and if detected issue a re-direct
-     * that hopefully will cause the non-broken client to be used.
-     */
-    public void invoke(org.apache.catalina.connector.Request request,
-                       org.apache.catalina.connector.Response response)
-        throws IOException, ServletException {
-
-        String ua = request.getHeader("User-Agent");
-        if (ua != null && ua.contains("MiniRedir")) {
-            response.sendRedirect(buildRedirect(request));
-        } else {
-            getNext().invoke(request, response);
         }
     }
 
