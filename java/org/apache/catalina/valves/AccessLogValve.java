@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -161,6 +161,8 @@ public final class AccessLogValve
     protected LifecycleSupport lifecycle = new LifecycleSupport(this);
     */
 
+    private static final String REQUEST_START_TIME_NOTE =
+        "org.apache.catalina.valves.AccessLogValve.requestStartTime";
 
     /**
      * The set of month abbreviations for log messages.
@@ -351,8 +353,6 @@ public final class AccessLogValve
      * Date format to place in log file name. Use at your own risk!
      */
     private String fileDateFormat = null;
-
-    private long t1;
 
 
     // ------------------------------------------------------------- Properties
@@ -572,7 +572,7 @@ public final class AccessLogValve
          throws IOException, ServletException {
 
         // Pass this request on to the next valve in our pipeline
-        t1 = System.currentTimeMillis();
+        request.setNote(REQUEST_START_TIME_NOTE, Long.valueOf(System.currentTimeMillis()));
 
         return INVOKE_NEXT;
     }
@@ -581,7 +581,13 @@ public final class AccessLogValve
     public void postInvoke(Request request, Response response){
 
         long t2 = System.currentTimeMillis();
-        long time = t2 - t1;
+        Object startTimeObj = request.getNote(REQUEST_START_TIME_NOTE);
+        if (!(startTimeObj instanceof Long)) {
+            // should not happen
+            return;
+        }
+
+        long time = t2 - ((Long)startTimeObj).longValue();
 
         if (condition!=null &&
                 null!=request.getRequest().getAttribute(condition)) {
