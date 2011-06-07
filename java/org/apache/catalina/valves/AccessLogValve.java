@@ -150,7 +150,7 @@ public final class AccessLogValve
     /**
      * The descriptive information about this implementation.
      */
-    protected static final String info =
+    private static final String info =
         "org.apache.catalina.valves.AccessLogValve/1.0";
 
 
@@ -167,7 +167,7 @@ public final class AccessLogValve
     /**
      * The set of month abbreviations for log messages.
      */
-    protected static final String months[] =
+    private static final String months[] =
     { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
@@ -208,7 +208,7 @@ public final class AccessLogValve
     /**
      * The string manager for this package.
      */
-    private StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
 
