@@ -25,6 +25,13 @@ import javax.management.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.management.ListenerNotFoundException;
+import javax.management.MBeanNotificationInfo;
+import javax.management.Notification;
+import javax.management.NotificationBroadcaster;
+import javax.management.NotificationFilter;
+import javax.management.NotificationListener;
+
 
 /**
  * <p>Implementation of <code>NotificationBroadcaster</code> for attribute
@@ -49,8 +56,8 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * The set of registered <code>BaseNotificationBroadcasterEntry</code>
      * entries.
      */
-    protected ArrayList<BaseNotificationBroadcasterEntry> entries = 
-            new ArrayList<BaseNotificationBroadcasterEntry>();
+    protected ArrayList<BaseNotificationBroadcasterEntry> entries =
+        new ArrayList<BaseNotificationBroadcasterEntry>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -67,6 +74,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      *
      * @exception IllegalArgumentException if the listener parameter is null
      */
+    @Override
     public void addNotificationListener(NotificationListener listener,
                                         NotificationFilter filter,
                                         Object handback)
@@ -77,7 +85,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
             // Optimization to coalesce attribute name filters
             if (filter instanceof BaseAttributeFilter) {
                 BaseAttributeFilter newFilter = (BaseAttributeFilter) filter;
-                Iterator<BaseNotificationBroadcasterEntry> items = 
+                Iterator<BaseNotificationBroadcasterEntry> items =
                     entries.iterator();
                 while (items.hasNext()) {
                     BaseNotificationBroadcasterEntry item = items.next();
@@ -114,6 +122,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * Return an <code>MBeanNotificationInfo</code> object describing the
      * notifications sent by this MBean.
      */
+    @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
 
         return (new MBeanNotificationInfo[0]);
@@ -130,11 +139,12 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * @exception ListenerNotFoundException if this listener is not
      *  registered in the MBean
      */
+    @Override
     public void removeNotificationListener(NotificationListener listener)
         throws ListenerNotFoundException {
 
         synchronized (entries) {
-            Iterator<BaseNotificationBroadcasterEntry> items = 
+            Iterator<BaseNotificationBroadcasterEntry> items =
                 entries.iterator();
             while (items.hasNext()) {
                 BaseNotificationBroadcasterEntry item = items.next();
@@ -197,7 +207,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
     public void sendNotification(Notification notification) {
 
         synchronized (entries) {
-            Iterator<BaseNotificationBroadcasterEntry> items = 
+            Iterator<BaseNotificationBroadcasterEntry> items =
                 entries.iterator();
             while (items.hasNext()) {
                 BaseNotificationBroadcasterEntry item = items.next();
@@ -208,32 +218,6 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
             }
         }
 
-    }
-
-
-    // -------------------- Internal Extensions   --------------------
-
-    // Fast access. First index is the hook type
-    // ( FixedNotificationFilter.getType() ).
-    NotificationListener hooks[][]=new NotificationListener[20][];
-    int hookCount[]=new int[20];
-
-    private synchronized void registerNotifications( FixedNotificationFilter filter ) {
-        String names[]=filter.getNames();
-        Registry reg=Registry.getRegistry(null, null);
-        for( int i=0; i<names.length; i++ ) {
-            int code=reg.getId(null, names[i]);
-            if( hooks.length < code ) {
-                // XXX reallocate
-                throw new RuntimeException( "Too many hooks " + code );
-            }
-            NotificationListener listeners[]=hooks[code];
-            if( listeners== null ) {
-
-            }
-
-
-        }
     }
 
 }
