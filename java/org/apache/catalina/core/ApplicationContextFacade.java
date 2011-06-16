@@ -57,20 +57,31 @@ public final class ApplicationContextFacade
     
     static {
         Class<?>[] clazz = new Class[]{String.class};
+        classCache.put("addFilter", new Class[]{String.class, String.class});
+        classCache.put("addListener", clazz);
+        classCache.put("addServlet", new Class[]{String.class, String.class});
+        classCache.put("createFilter", new Class[]{Class.class});
+        classCache.put("createListener", new Class[]{Class.class});
+        classCache.put("createServlet", new Class[]{Class.class});
+        classCache.put("declareRoles", new Class<?>[] {(new String[0]).getClass()});
+        classCache.put("getAttribute", clazz);
         classCache.put("getContext", clazz);
+        classCache.put("getFilterRegistration", clazz);
+        classCache.put("getInitParameter", clazz);
         classCache.put("getMimeType", clazz);
+        classCache.put("getNamedDispatcher", clazz);
+        classCache.put("getRealPath", clazz);
         classCache.put("getResourcePaths", clazz);
         classCache.put("getResource", clazz);
         classCache.put("getResourceAsStream", clazz);
         classCache.put("getRequestDispatcher", clazz);
-        classCache.put("getNamedDispatcher", clazz);
         classCache.put("getServlet", clazz);
-        classCache.put("getInitParameter", clazz);
-        classCache.put("setAttribute", new Class[]{String.class, Object.class});
-        classCache.put("removeAttribute", clazz);
-        classCache.put("getRealPath", clazz);
-        classCache.put("getAttribute", clazz);
+        classCache.put("getServletRegistration", clazz);
         classCache.put("log", clazz);        
+        classCache.put("removeAttribute", clazz);
+        classCache.put("setAttribute", new Class[]{String.class, Object.class});
+        classCache.put("setInitParameter", new Class[]{String.class, String.class});
+        classCache.put("setSessionTrackingModes", new Class[]{Set.class});
     }
     
     /**
@@ -112,11 +123,17 @@ public final class ApplicationContextFacade
 
     // ------------------------------------------------- ServletContext Methods
 
+    @Override
     public String getContextPath() {
-        return context.getContextPath();
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (String) doPrivileged("getContextPath", null);
+        } else {
+            return context.getContextPath();
+        }
     }
 
 
+    @Override
     public ServletContext getContext(String uripath) {
         ServletContext theContext = null;
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -132,16 +149,14 @@ public final class ApplicationContextFacade
         return (theContext);
     }
 
-    public ApplicationContext getApplicationContext() {
-        return context;
-    }
 
-
+    @Override
     public int getMajorVersion() {
         return context.getMajorVersion();
     }
 
 
+    @Override
     public int getMinorVersion() {
         return context.getMinorVersion();
     }
@@ -151,6 +166,7 @@ public final class ApplicationContextFacade
      * Gets the major version of the Servlet specification that the
      * application represented by this ServletContext is based on.
      */
+    @Override
     public int getEffectiveMajorVersion() {
         return context.getEffectiveMajorVersion();
     }
@@ -160,11 +176,13 @@ public final class ApplicationContextFacade
      * Gets the minor version of the Servlet specification that the
      * application represented by this ServletContext is based on.
      */
+    @Override
     public int getEffectiveMinorVersion() {
         return context.getEffectiveMinorVersion();
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public String getMimeType(String file) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -175,6 +193,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Set<String> getResourcePaths(String path) {
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -186,6 +205,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     public URL getResource(String path)
         throws MalformedURLException {
         if (Globals.IS_SECURITY_ENABLED) {
@@ -204,6 +224,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public InputStream getResourceAsStream(String path) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -215,6 +236,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public RequestDispatcher getRequestDispatcher(final String path) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -226,6 +248,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public RequestDispatcher getNamedDispatcher(String name) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -237,6 +260,11 @@ public final class ApplicationContextFacade
     }
 
 
+    /**
+     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
+     */
+    @Override
+    @Deprecated
     public Servlet getServlet(String name)
         throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -255,7 +283,12 @@ public final class ApplicationContextFacade
     }
 
 
+    /**
+     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
+     */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    @Deprecated
     public Enumeration<Servlet> getServlets() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Enumeration<Servlet>) doPrivileged("getServlets", null);
@@ -265,7 +298,12 @@ public final class ApplicationContextFacade
     }
 
 
+    /**
+     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
+     */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    @Deprecated
     public Enumeration<String> getServletNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (Enumeration<String>) doPrivileged("getServletNames", null);
@@ -275,7 +313,7 @@ public final class ApplicationContextFacade
    }
 
 
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    @Override
     public void log(String msg) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Object[]{msg} );
@@ -285,7 +323,12 @@ public final class ApplicationContextFacade
     }
 
 
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    /**
+     * @deprecated As of Java Servlet API 2.1, use
+     *  <code>log(String, Throwable)</code> instead
+     */
+    @Override
+    @Deprecated
     public void log(Exception exception, String msg) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Class[]{Exception.class, String.class}, 
@@ -296,7 +339,7 @@ public final class ApplicationContextFacade
     }
 
 
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    @Override
     public void log(String message, Throwable throwable) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Class[]{String.class, Throwable.class}, 
@@ -307,6 +350,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public String getRealPath(String path) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -317,6 +361,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public String getServerInfo() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -327,6 +372,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public String getInitParameter(String name) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -338,6 +384,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Enumeration<String> getInitParameterNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -354,6 +401,7 @@ public final class ApplicationContextFacade
      * if it was not set because this ServletContext already contains a
      * context initialization parameter with a matching name
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public boolean setInitParameter(String name, String value) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -365,7 +413,7 @@ public final class ApplicationContextFacade
     }
 
 
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    @Override
     public Object getAttribute(String name) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return doPrivileged("getAttribute", new Object[]{name});
@@ -375,6 +423,7 @@ public final class ApplicationContextFacade
      }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Enumeration<String> getAttributeNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -386,7 +435,7 @@ public final class ApplicationContextFacade
     }
 
 
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    @Override
     public void setAttribute(String name, Object object) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("setAttribute", new Object[]{name,object});
@@ -396,7 +445,7 @@ public final class ApplicationContextFacade
     }
 
 
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
+    @Override
     public void removeAttribute(String name) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("removeAttribute", new Object[]{name});
@@ -406,6 +455,7 @@ public final class ApplicationContextFacade
     }
 
 
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public String getServletContextName() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -420,6 +470,7 @@ public final class ApplicationContextFacade
      * Adds the servlet with the given name and class name to this
      * servlet context.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public ServletRegistration.Dynamic addServlet(
             String servletName, String className) {
@@ -436,12 +487,14 @@ public final class ApplicationContextFacade
      * Registers the given servlet instance with this ServletContext
      * under the given <tt>servletName</tt>.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public ServletRegistration.Dynamic addServlet(
             String servletName, Servlet servlet) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged(
-                "addServlet", new Object[] {servletName, servlet});
+                "addServlet", new Class[]{String.class, Servlet.class},
+                new Object[] {servletName, servlet});
         } else {
             return context.addServlet(servletName, servlet);
         }
@@ -452,12 +505,14 @@ public final class ApplicationContextFacade
      * Adds the servlet with the given name and class type to this
      * servlet context.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public ServletRegistration.Dynamic addServlet(String servletName,
             Class <? extends Servlet> servletClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged(
-                "addServlet", new Object[] {servletName, servletClass});
+                "addServlet", new Class[]{String.class, Class.class},
+                new Object[] {servletName, servletClass});
         } else {
             return context.addServlet(servletName, servletClass);
         }
@@ -469,6 +524,7 @@ public final class ApplicationContextFacade
      * resource injection into the new Servlet instance before returning
      * it.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public <T extends Servlet> T createServlet(Class<T> clazz)
             throws ServletException {
@@ -485,6 +541,7 @@ public final class ApplicationContextFacade
      * Gets the ServletRegistration corresponding to the servlet with the
      * given <tt>servletName</tt>.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public ServletRegistration getServletRegistration(String servletName) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -500,6 +557,7 @@ public final class ApplicationContextFacade
      * Gets a Map of the ServletRegistration objects corresponding to all
      * currently registered servlets.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -515,6 +573,7 @@ public final class ApplicationContextFacade
      * Adds the filter with the given name and class name to this servlet
      * context.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public FilterRegistration.Dynamic addFilter(
             String filterName, String className) {
@@ -531,12 +590,14 @@ public final class ApplicationContextFacade
      * Registers the given filter instance with this ServletContext
      * under the given <tt>filterName</tt>.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public FilterRegistration.Dynamic addFilter(
             String filterName, Filter filter) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (FilterRegistration.Dynamic) doPrivileged(
-                "addFilter", new Object[] {filterName, filter});
+                "addFilter", new Class[]{String.class, Filter.class},
+                new Object[] {filterName, filter});
         } else {
             return context.addFilter(filterName, filter);
         }
@@ -547,12 +608,14 @@ public final class ApplicationContextFacade
      * Adds the filter with the given name and class type to this servlet
      * context.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public FilterRegistration.Dynamic addFilter(String filterName,
             Class <? extends Filter> filterClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (FilterRegistration.Dynamic) doPrivileged(
-                "addFilter", new Object[] {filterName, filterClass});
+                "addFilter", new Class[]{String.class, Class.class},
+                new Object[] {filterName, filterClass});
         } else {
             return context.addFilter(filterName, filterClass);
         }
@@ -564,6 +627,7 @@ public final class ApplicationContextFacade
      * resource injection into the new Filter instance before returning
      * it.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public <T extends Filter> T createFilter(Class<T> clazz)
             throws ServletException {
@@ -580,6 +644,7 @@ public final class ApplicationContextFacade
      * Gets the FilterRegistration corresponding to the filter with the
      * given <tt>filterName</tt>.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public FilterRegistration getFilterRegistration(String filterName) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -595,6 +660,7 @@ public final class ApplicationContextFacade
      * Gets a Map of the FilterRegistration objects corresponding to all
      * currently registered filters.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -611,6 +677,7 @@ public final class ApplicationContextFacade
      * properties of the session tracking cookies created on behalf of this
      * <tt>ServletContext</tt> may be configured.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public SessionCookieConfig getSessionCookieConfig() {        
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -626,8 +693,14 @@ public final class ApplicationContextFacade
      * Sets the session tracking modes that are to become effective for this
      * <tt>ServletContext</tt>.
      */
+    @Override
     public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
-        context.setSessionTrackingModes(sessionTrackingModes);
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("setSessionTrackingModes",
+                    new Object[]{sessionTrackingModes});
+        } else {
+            context.setSessionTrackingModes(sessionTrackingModes);
+        }
     }
 
 
@@ -638,8 +711,15 @@ public final class ApplicationContextFacade
      * @return set of the session tracking modes supported by default for
      * this <tt>ServletContext</tt>
      */
+    @Override
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
-        return context.getDefaultSessionTrackingModes();
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (Set<SessionTrackingMode>)
+                doPrivileged("getDefaultSessionTrackingModes", null);
+        } else {
+            return context.getDefaultSessionTrackingModes();
+        }
     }
 
 
@@ -650,32 +730,59 @@ public final class ApplicationContextFacade
      * @return set of the session tracking modes in effect for this
      * <tt>ServletContext</tt>
      */
+    @Override
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-        return context.getEffectiveSessionTrackingModes();
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (Set<SessionTrackingMode>)
+                doPrivileged("getEffectiveSessionTrackingModes", null);
+        } else {
+            return context.getEffectiveSessionTrackingModes();
+        }
     }
 
 
     /**
      * Adds the listener with the given class name to this ServletContext.
      */
+    @Override
     public void addListener(String className) {
-        context.addListener(className);
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addListener",
+                    new Object[]{className});
+        } else {
+            context.addListener(className);
+        }
     }
 
 
     /**
      * Adds the given listener to this ServletContext.
      */
+    @Override
     public <T extends EventListener> void addListener(T t) {
-        context.addListener(t);
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addListener",
+                    new Class[]{EventListener.class},
+                    new Object[]{t.getClass().getName()});
+        } else {
+            context.addListener(t);
+        }
     }
 
 
     /**
      * Adds a listener of the given class type to this ServletContext.
      */
+    @Override
     public void addListener(Class <? extends EventListener> listenerClass) {
-        context.addListener(listenerClass);
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addListener",
+                    new Class[]{Class.class},
+                    new Object[]{listenerClass.getName()});
+        } else {
+            context.addListener(listenerClass);
+        }
     }
 
 
@@ -684,6 +791,7 @@ public final class ApplicationContextFacade
      * required resource injection into the new EventListener instance
      * before returning it.
      */
+    @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public <T extends EventListener> T createListener(Class<T> clazz)
             throws ServletException {
@@ -702,19 +810,36 @@ public final class ApplicationContextFacade
      * <code>web-fragment.xml</code> descriptor files of the web application
      * represented by this ServletContext.
      */
+    @Override
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public JspConfigDescriptor getJspConfigDescriptor() {
-        return context.getJspConfigDescriptor();
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (JspConfigDescriptor) doPrivileged("getJspConfigDescriptor",
+                    null);
+        } else {
+            return context.getJspConfigDescriptor();
+        }
     }
 
 
+    @Override
+    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
     public ClassLoader getClassLoader() {
-        return context.getClassLoader();
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (ClassLoader) doPrivileged("getClassLoader", null);
+        } else {
+            return context.getClassLoader();
+        }
     }
 
 
     @Override
     public void declareRoles(String... roleNames) {
-        // TBD
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("declareRoles", roleNames);
+        } else {
+            context.declareRoles(roleNames);
+        }
     }
 
 
@@ -725,9 +850,11 @@ public final class ApplicationContextFacade
      *
      * @return The underlying StandardContext
      */
+    /*
     public StandardContext getUnwrappedContext() {
         return context.getUnwrappedContext();
     }
+    */
     // END PWC 1.2
 
        
@@ -778,9 +905,8 @@ public final class ApplicationContextFacade
     /**
      * Use reflection to invoke the requested method. Cache the method object 
      * to speed up the process
-     * @param appContext The AppliationContext object on which the method
-     *                   will be invoked
      * @param methodName The method to call.
+     * @param clazz The list of argument classes for the given method
      * @param params The arguments passed to the called method.
      */    
     private Object doPrivileged(final String methodName, 
