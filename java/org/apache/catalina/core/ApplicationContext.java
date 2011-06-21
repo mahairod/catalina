@@ -153,6 +153,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param name Name of the context attribute to return
      */
+    @Override
     public Object getAttribute(String name) {
         return attributes.get(name);
     }
@@ -161,6 +162,7 @@ public class ApplicationContext implements ServletContext {
      * Return an enumeration of the names of the context attributes
      * associated with this context.
      */
+    @Override
     public Enumeration<String> getAttributeNames() {
         return new Enumerator<String>(attributes.keySet(), true);
     }
@@ -184,6 +186,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @see javax.servlet.http.HttpServletRequest#getContextPath()
      */
+    @Override
     public String getContextPath() {
         return context.getPath();
     }
@@ -198,6 +201,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param uri Absolute URI of a resource on the server
      */
+    @Override
     public ServletContext getContext(String uri) {
         return context.getContext(uri);
     }
@@ -208,6 +212,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param name Name of the initialization parameter to retrieve
      */
+    @Override
     public String getInitParameter(final String name) {
         mergeParameters();
         return parameters.get(name);
@@ -217,6 +222,7 @@ public class ApplicationContext implements ServletContext {
      * Return the names of the context's initialization parameters, or an
      * empty enumeration if the context has no initialization parameters.
      */
+    @Override
     public Enumeration<String> getInitParameterNames() {
         mergeParameters();
         return (new Enumerator<String>(parameters.keySet()));
@@ -249,6 +255,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Return the major version of the Java Servlet API that we implement.
      */
+    @Override
     public int getMajorVersion() {
         return (Constants.MAJOR_VERSION);
     }
@@ -256,6 +263,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Return the minor version of the Java Servlet API that we implement.
      */
+    @Override
     public int getMinorVersion() {
         return (Constants.MINOR_VERSION);
     }
@@ -292,6 +300,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param file Filename for which to identify a MIME type
      */
+    @Override
     public String getMimeType(String file) {
         return context.getMimeType(file);
     }
@@ -302,6 +311,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param name Name of the servlet for which a dispatcher is requested
      */
+    @Override
     public RequestDispatcher getNamedDispatcher(String name) {
         return context.getNamedDispatcher(name);
     }
@@ -313,6 +323,7 @@ public class ApplicationContext implements ServletContext {
      * <code>null</code> if the container was unable to perform the
      * translation
      */
+    @Override
     public String getRealPath(String path) {
         return context.getRealPath(path);
     }
@@ -325,6 +336,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param path The path to the desired resource.
      */
+    @Override
     public RequestDispatcher getRequestDispatcher(String path) {
         return context.getRequestDispatcher(path);
     }
@@ -339,6 +351,7 @@ public class ApplicationContext implements ServletContext {
      * @exception MalformedURLException if the path is not given
      *  in the correct form
      */
+    @Override
     public URL getResource(String path)
         throws MalformedURLException {
         return context.getResource(path);
@@ -352,6 +365,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param path The path to the desired resource.
      */
+    @Override
     public InputStream getResourceAsStream(String path) {
         return context.getResourceAsStream(path);
     }
@@ -363,6 +377,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param path Collection path
      */
+    @Override
     public Set<String> getResourcePaths(String path) {
         return context.getResourcePaths(path);
     }
@@ -370,6 +385,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Return the name and version of the servlet container.
      */
+    @Override
     public String getServerInfo() {
         return (ServerInfo.getServerInfo());
     }
@@ -377,6 +393,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Override
     public Servlet getServlet(String name) {
         return (null);
     }
@@ -384,6 +401,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Return the display name of this web application.
      */
+    @Override
     public String getServletContextName() {
         return (context.getDisplayName());
     }
@@ -391,6 +409,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Override
     public Enumeration<String> getServletNames() {
         return (new Enumerator<String>(emptyString));
     }
@@ -398,6 +417,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
+    @Override
     public Enumeration<Servlet> getServlets() {
         return (new Enumerator<Servlet>(emptyServlet));
     }
@@ -407,6 +427,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param message Message to be written
      */
+    @Override
     public void log(String message) {
         context.log(message);
     }
@@ -420,6 +441,7 @@ public class ApplicationContext implements ServletContext {
      * @deprecated As of Java Servlet API 2.1, use
      *  <code>log(String, Throwable)</code> instead
      */
+    @Override
     public void log(Exception exception, String message) {   
         context.log(exception, message);
     }
@@ -430,6 +452,7 @@ public class ApplicationContext implements ServletContext {
      * @param message Message to be written
      * @param throwable Exception to be reported
      */
+    @Override
     public void log(String message, Throwable throwable) {
         context.log(message, throwable);
     }
@@ -439,6 +462,7 @@ public class ApplicationContext implements ServletContext {
      *
      * @param name Name of the context attribute to be removed
      */
+    @Override
     public void removeAttribute(String name) {
         Object value = null;
         boolean found = false;
@@ -500,6 +524,7 @@ public class ApplicationContext implements ServletContext {
      * @param name Attribute name to be bound
      * @param value New attribute value to be bound
      */
+    @Override
     public void setAttribute(String name, Object value) {
 
         // Name cannot be null
