@@ -479,7 +479,6 @@ public class DigestAuthenticator
         private boolean validateUri = true;
 
         private String userName = null;
-        private String method = null;
         private String uri = null;
         private String response = null;
         private String nonce = null;
@@ -513,7 +512,6 @@ public class DigestAuthenticator
             // Bugzilla 37132: http://issues.apache.org/bugzilla/show_bug.cgi?id=37132
             String[] tokens = authorization.split(",(?=(?:[^\"]*\"[^\"]*\")+$)");
 
-            method = request.getMethod();
             String opaque_client = null;
 
             for (int i = 0; i < tokens.length; i++) {
