@@ -58,6 +58,7 @@
 
 package org.apache.catalina.connector;
 
+import java.io.File;
 import com.sun.appserv.ProxyHandler;
 import com.sun.enterprise.security.integration.RealmInitializer;
 import com.sun.grizzly.tcp.ActionCode;
