@@ -20,37 +20,46 @@
 
 package org.apache.catalina.connector;
 
-import com.sun.appserv.ProxyHandler;
-import com.sun.grizzly.util.buf.CharChunk;
-import com.sun.grizzly.util.buf.UEncoder;
-import com.sun.grizzly.util.http.FastHttpDateFormat;
-import com.sun.grizzly.util.http.MimeHeaders;
-import com.sun.grizzly.util.http.ServerCookie;
-import com.sun.grizzly.util.net.URL;
-import org.apache.catalina.Connector;
-import org.apache.catalina.*;
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.CharsetMapper;
-import org.apache.catalina.util.RequestUtil;
-import org.apache.catalina.util.StringManager;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
+import com.sun.appserv.ProxyHandler;
+import java.util.ArrayList;
+import java.util.Map;
+import org.apache.catalina.Connector;
+import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
+import org.apache.catalina.HttpResponse;
+import org.apache.catalina.Session;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.CharsetMapper;
+import org.apache.catalina.util.RequestUtil;
+import org.apache.catalina.util.StringManager;
+import org.glassfish.grizzly.http.util.CharChunk;
+import org.glassfish.grizzly.http.util.CookieSerializerUtils;
+import org.glassfish.grizzly.http.util.CookieUtils;
+import org.glassfish.grizzly.http.util.FastHttpDateFormat;
+import org.glassfish.grizzly.http.util.MimeHeaders;
+import org.glassfish.grizzly.http.util.UEncoder;
 // START S1AS 6170450
 
 // END S1AS 6170450
@@ -151,7 +160,7 @@ public class Response
      * Return the Connector through which this Request was received.
      */
     public Connector getConnector() {
-        return (this.connector);
+        return this.connector;
     }
 
     /**
@@ -167,14 +176,14 @@ public class Response
     /**
      * Coyote response.
      */
-    protected com.sun.grizzly.tcp.Response coyoteResponse;
+    protected org.glassfish.grizzly.http.server.Response coyoteResponse;
 
     /**
      * Set the Coyote response.
      * 
      * @param coyoteResponse The Coyote response
      */
-    public void setCoyoteResponse(com.sun.grizzly.tcp.Response coyoteResponse) {
+    public void setCoyoteResponse(org.glassfish.grizzly.http.server.Response coyoteResponse) {
         this.coyoteResponse = coyoteResponse;
         outputBuffer.setCoyoteResponse(this);
     }
@@ -182,8 +191,8 @@ public class Response
     /**
      * Get the Coyote response.
      */
-    public com.sun.grizzly.tcp.Response getCoyoteResponse() {
-        return (coyoteResponse);
+    public org.glassfish.grizzly.http.server.Response getCoyoteResponse() {
+        return coyoteResponse;
     }
 
 
@@ -363,9 +372,9 @@ public class Response
      * Application commit flag accessor.
      */
     public boolean isAppCommitted() {
-        return (this.appCommitted || isCommitted() || isSuspended()
-                || ((getContentLength() > 0) 
-                    && (getContentCount() >= getContentLength())));
+        return this.appCommitted || isCommitted() || isSuspended()
+                || getContentLength() > 0
+                    && getContentCount() >= getContentLength();
     }
 
 
@@ -394,7 +403,7 @@ public class Response
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     public String getInfo() {
-        return (info);
+        return info;
     }
 
 
@@ -407,7 +416,7 @@ public class Response
      * Return the Request with which this Response is associated.
      */
     public org.apache.catalina.Request getRequest() {
-        return (this.request);
+        return this.request;
     }
 
     /**
@@ -433,7 +442,7 @@ public class Response
         if (facade == null) {
             facade = new ResponseFacade(this);
         }
-        return (facade);
+        return facade;
     }
 
 
@@ -554,7 +563,7 @@ public class Response
      * Return the content length that was set or calculated for this Response.
      */
     public int getContentLength() {
-        return (coyoteResponse.getContentLength());
+        return coyoteResponse.getContentLength();
     }
 
 
@@ -563,7 +572,7 @@ public class Response
      * or <code>null</code> if no content type was set.
      */
     public String getContentType() {
-        return (coyoteResponse.getContentType());
+        return coyoteResponse.getContentType();
     }
 
 
@@ -618,10 +627,36 @@ public class Response
      * Return the character encoding used for this Response.
      */
     public String getCharacterEncoding() {
-        return (coyoteResponse.getCharacterEncoding());
+        return coyoteResponse.getCharacterEncoding();
     }
 
+    
+    /*
+     * Overrides the name of the character encoding used in the body
+     * of the request. This method must be called prior to reading
+     * request parameters or reading input using getReader().
+     *
+     * @param charset String containing the name of the character encoding.
+     */
+    public void setCharacterEncoding(String charset) {
 
+        if (isCommitted())
+            return;
+
+        // Ignore any call from an included servlet
+        if (included)
+            return;
+
+        // Ignore any call made after the getWriter has been invoked
+        // The default should be used
+        if (usingWriter)
+            return;
+
+        coyoteResponse.setCharacterEncoding(charset);
+        isCharacterEncodingSet = true;
+    }
+
+    
     /**
      * Return the servlet output stream associated with this Response.
      *
@@ -649,7 +684,7 @@ public class Response
      * Return the Locale assigned to this response.
      */
     public Locale getLocale() {
-        return (coyoteResponse.getLocale());
+        return coyoteResponse.getLocale();
     }
 
 
@@ -695,7 +730,7 @@ public class Response
      * Has the output of this response already been committed?
      */
     public boolean isCommitted() {
-        return (coyoteResponse.isCommitted());
+        return coyoteResponse.isCommitted();
     }
 
 
@@ -848,33 +883,6 @@ public class Response
     }
 
 
-    /*
-     * Overrides the name of the character encoding used in the body
-     * of the request. This method must be called prior to reading
-     * request parameters or reading input using getReader().
-     *
-     * @param charset String containing the name of the character encoding.
-     */
-    public void setCharacterEncoding(String charset) {
-
-        if (isCommitted())
-            return;
-        
-        // Ignore any call from an included servlet
-        if (included)
-            return;     
-        
-        // Ignore any call made after the getWriter has been invoked
-        // The default should be used
-        if (usingWriter)
-            return;
-
-        coyoteResponse.setCharacterEncoding(charset);
-        isCharacterEncodingSet = true;
-    }
-
-    
-    
     /**
      * Set the Locale that is appropriate for this response, including
      * setting the appropriate character encoding.
@@ -922,7 +930,7 @@ public class Response
      * @param name Header name to look up
      */
     public String getHeader(String name) {
-        return coyoteResponse.getMimeHeaders().getHeader(name);
+        return coyoteResponse.getHeader(name);
     }
 
 
@@ -931,7 +939,12 @@ public class Response
      * of the headers of this response
      */
     public Collection<String> getHeaderNames() {
-        return Collections.list(coyoteResponse.getMimeHeaders().names());
+        final Collection<String> result = new ArrayList<String>();
+        for (final String headerName : coyoteResponse.getResponse().getHeaders().names()) {
+            result.add(headerName);
+        }
+
+        return result;
     }
 
 
@@ -942,7 +955,12 @@ public class Response
      * of the response header with the given name
      */
     public Collection<String> getHeaders(String name) {
-        return Collections.list(coyoteResponse.getMimeHeaders().values(name));
+        final Collection<String> result = new ArrayList<String>();
+        for (final String headerValue : coyoteResponse.getResponse().getHeaders().values(name)) {
+            result.add(headerValue);
+        }
+
+        return result;
     }
 
 
@@ -1043,7 +1061,7 @@ public class Response
         final String startsWith = name + "=";
         final String cookieString = getCookieString(cookie);
         boolean set = false;
-        MimeHeaders headers = coyoteResponse.getMimeHeaders();
+        MimeHeaders headers = coyoteResponse.getResponse().getHeaders();
         int n = headers.size();
         for (int i = 0; i < n; i++) {
             if (headers.getName(i).toString().equals(headername)) {
@@ -1164,11 +1182,11 @@ public class Response
                 sessionVersion = RequestUtil.createSessionVersionString(
                     sessionVersions);
             }
-            return (toEncoded(url,
+            return toEncoded(url,
                               request.getSessionInternal().getIdInternal(),
-                              sessionVersion));
+                              sessionVersion);
         } else {
-            return (url);
+            return url;
         }
     }
 
@@ -1183,7 +1201,7 @@ public class Response
      *  <code>encodeRedirectURL()</code> instead.
      */
     public String encodeRedirectUrl(String url) {
-        return (encodeRedirectURL(url));
+        return encodeRedirectURL(url);
     }
 
 
@@ -1207,11 +1225,11 @@ public class Response
                 sessionVersion = RequestUtil.createSessionVersionString(
                     sessionVersions);
             }
-            return (toEncoded(url,
+            return toEncoded(url,
                               request.getSessionInternal().getIdInternal(),
-                              sessionVersion));
+                              sessionVersion);
         } else {
-            return (url);
+            return url;
         }
     }
 
@@ -1226,7 +1244,7 @@ public class Response
      *  <code>encodeURL()</code> instead.
      */
     public String encodeUrl(String url) {
-        return (encodeURL(url));
+        return encodeURL(url);
     }
 
 
@@ -1256,7 +1274,7 @@ public class Response
         if (included)
             return; 
 
-        coyoteResponse.acknowledge();
+        coyoteResponse.sendAcknowledgement();
 
     }
 
@@ -1302,7 +1320,7 @@ public class Response
         setError();
 
         coyoteResponse.setStatus(status);
-        coyoteResponse.setMessage(message);
+        coyoteResponse.setDetailMessage(message);
 
         // Clear any data content that has been buffered
         resetBuffer();
@@ -1519,7 +1537,7 @@ public class Response
             return;
 
         coyoteResponse.setStatus(status);
-        coyoteResponse.setMessage(message);
+        coyoteResponse.setDetailMessage(message);
     }
 
 
@@ -1542,20 +1560,20 @@ public class Response
     protected boolean isEncodeable(final String location) {
 
         if (location == null)
-            return (false);
+            return false;
 
         // Is this an intra-document reference?
         if (location.startsWith("#"))
-            return (false);
+            return false;
 
         // Are we in a valid session that is not using cookies?
         final Request hreq = request;
         final Session session = hreq.getSessionInternal(false);
         if (session == null) {
-            return (false);
+            return false;
         }
         if (hreq.isRequestedSessionIdFromCookie() ||
-                (getContext() != null && !getContext().isEnableURLRewriting())) {
+            getContext() != null && !getContext().isEnableURLRewriting()) {
             return false;
         }
 
@@ -1580,14 +1598,14 @@ public class Response
         try {
             url = new URL(location);
         } catch (MalformedURLException e) {
-            return (false);
+            return false;
         }
 
         // Does this URL match down to (and including) the context path?
         if (!hreq.getScheme().equalsIgnoreCase(url.getProtocol()))
-            return (false);
+            return false;
         if (!hreq.getServerName().equalsIgnoreCase(url.getHost()))
-            return (false);
+            return false;
         int serverPort = hreq.getServerPort();
         if (serverPort == -1) {
             if ("https".equals(hreq.getScheme()))
@@ -1603,26 +1621,25 @@ public class Response
                 urlPort = 80;
         }
         if (serverPort != urlPort)
-            return (false);
+            return false;
 
         Context ctx = getContext();
         if (ctx != null) {
             String contextPath = ctx.getPath();
             if (contextPath != null) {
                 String file = url.getFile();
-                if ((file == null) || !file.startsWith(contextPath)) {
+                if (file == null || !file.startsWith(contextPath)) {
                     return false;
                 }
                 String sessionParamName = ctx.getSessionParameterName();
-                if (file.indexOf(";" + sessionParamName + "=" +
-                        session.getIdInternal()) >= 0) {
+                if (file.contains(";" + sessionParamName + "=" + session.getIdInternal())) {
                     return false;
                 }
             }
         }
 
         // This URL belongs to our web application, so it is encodeable
-        return (true);
+        return true;
 
     }
 
@@ -1640,7 +1657,7 @@ public class Response
     protected String toAbsolute(String location) {
 
         if (location == null)
-            return (location);
+            return location;
 
         boolean leadingSlash = location.startsWith("/");
 
@@ -1668,8 +1685,8 @@ public class Response
                 redirectURLCC.append(scheme, 0, scheme.length());
                 redirectURLCC.append("://", 0, 3);
                 redirectURLCC.append(name, 0, name.length());
-                if ((scheme.equals("http") && port != 80)
-                    || (scheme.equals("https") && port != 443)) {
+                if (scheme.equals("http") && port != 80
+                    || scheme.equals("https") && port != 443) {
                     redirectURLCC.append(':');
                     String portS = port + "";
                     redirectURLCC.append(portS, 0, portS.length());
@@ -1715,7 +1732,7 @@ public class Response
 
         } else {
 
-            return (location);
+            return location;
 
         }
 
@@ -1744,8 +1761,8 @@ public class Response
      */
     private String toEncoded(String url, String sessionId,
                              String sessionVersion) {
-        if ((url == null) || (sessionId == null))
-            return (url);
+        if (url == null || sessionId == null)
+            return url;
 
         String path = url;
         String query = "";
@@ -1765,7 +1782,7 @@ public class Response
         if( sb.length() > 0 ) { // jsessionid can't be first.
             StandardContext ctx = (StandardContext) getContext();
             String sessionParamName =
-                (ctx != null) ? ctx.getSessionParameterName() :
+                ctx != null ? ctx.getSessionParameterName() :
                     Globals.SESSION_PARAMETER_NAME;
             sb.append(";" + sessionParamName + "=");
             sb.append(sessionId);
@@ -1799,7 +1816,7 @@ public class Response
 
         sb.append(anchor);
         sb.append(query);
-        return (sb.toString());
+        return sb.toString();
 
     }
 
@@ -1820,26 +1837,31 @@ public class Response
      */
     protected String getCookieString(final Cookie cookie) {
         String cookieValue = null;
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
+        // TODO:  default these values for now.  update later.
+        final boolean versionOneStrictCompliance = CookieUtils.COOKIE_VERSION_ONE_STRICT_COMPLIANCE;
+        final boolean alwaysAddExpires = CookieUtils.ALWAYS_ADD_EXPIRES;
         if (SecurityUtil.isPackageProtectionEnabled()) {
             cookieValue = AccessController.doPrivileged(
                 new PrivilegedAction<String>() {
                     public String run(){
-                        ServerCookie.appendCookieValue
-                            (sb, cookie.getVersion(), cookie.getName(), 
-                             cookie.getValue(), cookie.getPath(), 
-                             cookie.getDomain(), cookie.getComment(), 
-                             cookie.getMaxAge(), cookie.getSecure(),
-                             cookie.isHttpOnly());
+                        CookieSerializerUtils.serializeServerCookie(
+                            sb, versionOneStrictCompliance, alwaysAddExpires, cookie.getName(),
+                            cookie.getValue(), cookie.getVersion(), cookie.getPath(),
+                            cookie.getDomain(), cookie.getComment(),
+                            cookie.getMaxAge(), cookie.getSecure(),
+                            cookie.isHttpOnly());
                         return sb.toString();
                     }
                 });
         } else {
-            ServerCookie.appendCookieValue
-                (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
-                 cookie.getPath(), cookie.getDomain(), cookie.getComment(), 
-                 cookie.getMaxAge(), cookie.getSecure(), cookie.isHttpOnly());
+            CookieSerializerUtils.serializeServerCookie(
+                sb, versionOneStrictCompliance, alwaysAddExpires, cookie.getName(),
+                cookie.getValue(), cookie.getVersion(), cookie.getPath(),
+                cookie.getDomain(), cookie.getComment(),
+                cookie.getMaxAge(), cookie.getSecure(),
+                cookie.isHttpOnly());
             cookieValue = sb.toString();
         }
 
@@ -1855,10 +1877,10 @@ public class Response
      */
     public void removeSessionCookies() {
         String matchExpression = "^" + getContext().getSessionCookieName() + "=.*";
-        coyoteResponse.getMimeHeaders().removeHeader("Set-Cookie", matchExpression);
+        coyoteResponse.getResponse().getHeaders().removeHeaderMatches("Set-Cookie", matchExpression);
         matchExpression = "^" +
             org.apache.catalina.authenticator.Constants.SINGLE_SIGN_ON_COOKIE + "=.*";
-        coyoteResponse.getMimeHeaders().removeHeader("Set-Cookie", matchExpression);
+        coyoteResponse.getResponse().getHeaders().removeHeaderMatches("Set-Cookie", matchExpression);
     }
     // END GlassFish 896
 

@@ -20,31 +20,38 @@
 
 package org.apache.catalina.connector;
 
-import com.sun.appserv.ProxyHandler;
-import com.sun.grizzly.tcp.Adapter;
-import com.sun.grizzly.tcp.ProtocolHandler;
-import com.sun.grizzly.util.IntrospectionUtils;
-import com.sun.grizzly.util.http.mapper.Mapper;
-import org.apache.catalina.*;
-import org.apache.catalina.core.StandardEngine;
-import org.apache.catalina.net.ServerSocketFactory;
-import org.apache.catalina.util.LifecycleSupport;
-import org.apache.catalina.util.StringManager;
-import org.apache.tomcat.util.modeler.Registry;
-
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;
 import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.servlet.http.HttpServletRequest;
+
+import com.sun.appserv.ProxyHandler;
+import org.apache.catalina.Container;
+import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
+import org.apache.catalina.Host;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Service;
+import org.apache.catalina.core.StandardEngine;
+import org.apache.catalina.net.ServerSocketFactory;
+import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.modeler.Registry;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.util.IntrospectionUtils;
+import org.glassfish.grizzly.http.server.util.Mapper;
 
 /**
  * Implementation of a Coyote connector for Tomcat 5.x.
@@ -75,7 +82,7 @@ public class Connector
     /**
      * Holder for our configured properties.
      */
-    private HashMap<String, String> properties = new HashMap<String, String>();
+    private Map<String, String> properties = new HashMap<String, String>();
 
     /**
      * The <code>Service</code> we are associated with (if any).
@@ -244,7 +251,7 @@ public class Connector
     /**
      * The string manager for this package.
      */
-    protected StringManager sm =
+    protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
     /**
@@ -310,10 +317,7 @@ public class Connector
      */
     private String name;
 
-    /**
-     * Coyote adapter.
-     */
-    private Adapter adapter = null;
+    private HttpHandler handler = null;
 
     /**
      * Mapper.
@@ -381,6 +385,7 @@ public class Connector
     /**
      * Return the <code>Service</code> with which we are associated (if any).
      */
+    @Override
     public Service getService() {
         return service;
     }
@@ -390,6 +395,7 @@ public class Connector
      *
      * @param service The service that owns this Engine
      */
+    @Override
     public void setService(Service service) {
         this.service = service;
     }
@@ -559,6 +565,7 @@ public class Connector
      * Return the Container used for processing requests received by this
      * Connector.
      */
+    @Override
     public Container getContainer() {
         if( container==null ) {
             // Lazy - maybe it was added later
@@ -573,6 +580,7 @@ public class Connector
      *
      * @param container The new Container to use
      */
+    @Override
     public void setContainer(Container container) {
         this.container = container;
     }
@@ -596,6 +604,7 @@ public class Connector
     /**
      * Return the "enable DNS lookups" flag.
      */
+    @Override
     public boolean getEnableLookups() {
         return enableLookups;
     }
@@ -605,6 +614,7 @@ public class Connector
      *
      * @param enableLookups The new "enable DNS lookups" flag value
      */
+    @Override
     public void setEnableLookups(boolean enableLookups) {
         this.enableLookups = enableLookups;
         setProperty("enableLookups", String.valueOf(enableLookups));
@@ -613,6 +623,7 @@ public class Connector
     /**
      * Return the server socket factory used by this Container.
      */
+    @Override
     public ServerSocketFactory getFactory() {
         return factory;
     }
@@ -622,6 +633,7 @@ public class Connector
      *
      * @param factory The new server socket factory
      */
+    @Override
     public void setFactory(ServerSocketFactory factory) {
         this.factory = factory;
     }
@@ -629,6 +641,7 @@ public class Connector
     /**
      * Return descriptive information about this Connector implementation.
      */
+    @Override
     public String getInfo() {
         return info;
     }
@@ -729,6 +742,7 @@ public class Connector
     /**
      * Gets the name of this Connector.
      */
+    @Override
     public String getName(){
         return name;
     }
@@ -750,7 +764,7 @@ public class Connector
      * Return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-        if ("com.sun.grizzly.tcp.http11.Http11Protocol".equals
+        if ("org.glassfish.grizzly.tcp.http11.Http11Protocol".equals
             (getProtocolHandlerClassName())) {
             return "HTTP/1.1";
         } else if ("org.apache.jk.server.JkCoyoteHandler".equals
@@ -768,7 +782,7 @@ public class Connector
     public void setProtocol(String protocol) {
         if (protocol.equals("HTTP/1.1")) {
             setProtocolHandlerClassName
-                ("com.sun.grizzly.tcp.http11.Http11Protocol");
+                ("org.glassfish.grizzly.tcp.http11.Http11Protocol");
         } else if (protocol.equals("AJP/1.3")) {
             setProtocolHandlerClassName
                 ("org.apache.jk.server.JkCoyoteHandler");
@@ -845,6 +859,7 @@ public class Connector
      * it comes in on a non-SSL port and is subject to a security constraint
      * with a transport guarantee that requires SSL.
      */
+    @Override
     public int getRedirectPort() {
         return redirectPort;
     }
@@ -854,6 +869,7 @@ public class Connector
      *
      * @param redirectPort The redirect port number (non-SSL to SSL)
      */
+    @Override
     public void setRedirectPort(int redirectPort) {
         this.redirectPort = redirectPort;
         setProperty("redirectPort", String.valueOf(redirectPort));
@@ -929,6 +945,7 @@ public class Connector
      * Return the scheme that will be assigned to requests received
      * through this connector.  Default value is "http".
      */
+    @Override
     public String getScheme() {
         return scheme;
     }
@@ -939,6 +956,7 @@ public class Connector
      *
      * @param scheme The new scheme
      */
+    @Override
     public void setScheme(String scheme) {
         this.scheme = scheme;
         setProperty("scheme", scheme);
@@ -948,6 +966,7 @@ public class Connector
      * Return the secure connection flag that will be assigned to requests
      * received through this connector.  Default value is "false".
      */
+    @Override
     public boolean getSecure() {
         return secure;
     }
@@ -958,6 +977,7 @@ public class Connector
      *
      * @param secure The new secure connection flag
      */
+    @Override
     public void setSecure(boolean secure) {
         this.secure = secure;
         setProperty("secure", String.valueOf(secure));
@@ -1014,6 +1034,7 @@ public class Connector
     /**
      * Return the character encoding to be used for the URI.
      */
+    @Override
     public String getURIEncoding() {
         return uriEncoding;
     }
@@ -1023,6 +1044,7 @@ public class Connector
      *
      * @param uriEncoding The new URI character encoding.
      */
+    @Override
     public void setURIEncoding(String uriEncoding) {
         this.uriEncoding = uriEncoding;
         setProperty("uRIEncoding", uriEncoding);
@@ -1058,6 +1080,7 @@ public class Connector
      *
      * @param defaultHost The default host for this Connector
      */
+    @Override
     public void setDefaultHost(String defaultHost) {
         this.defaultHost = defaultHost;
     }
@@ -1067,6 +1090,7 @@ public class Connector
      *
      * @return The default host of this Connector
      */
+    @Override
     public String getDefaultHost() {
         return defaultHost;
     }
@@ -1079,6 +1103,7 @@ public class Connector
      * @return true if this connector is receiving its requests from
      * a trusted intermediate server, false otherwise
      */
+    @Override
     public boolean getAuthPassthroughEnabled() {
         return authPassthroughEnabled;
     }
@@ -1089,6 +1114,7 @@ public class Connector
      * @param authPassthroughEnabled true if this connector is receiving its
      * requests from a trusted intermediate server, false otherwise
      */
+    @Override
     public void setAuthPassthroughEnabled(boolean authPassthroughEnabled) {
         this.authPassthroughEnabled = authPassthroughEnabled;
     }
@@ -1099,6 +1125,7 @@ public class Connector
      * @return ProxyHandler instance associated with this CoyoteConnector,
      * or null
      */
+    @Override
     public ProxyHandler getProxyHandler() {
         return proxyHandler;
     }
@@ -1108,6 +1135,7 @@ public class Connector
      * 
      * @param proxyHandler ProxyHandler instance to use
      */
+    @Override
     public void setProxyHandler(ProxyHandler proxyHandler) {
         this.proxyHandler = proxyHandler;
     }
@@ -1131,6 +1159,7 @@ public class Connector
      * Create (or allocate) and return a Request object suitable for
      * specifying the contents of a Request to the responsible Container.
      */
+    @Override
     public org.apache.catalina.Request createRequest() {
         Request request = new Request();
         request.setConnector(this);
@@ -1141,6 +1170,7 @@ public class Connector
      * Create (or allocate) and return a Response object suitable for
      * receiving the contents of a Response from the responsible Container.
      */
+    @Override
     public org.apache.catalina.Response createResponse() {
         Response response = new Response();
         response.setConnector(this);
@@ -1185,6 +1215,7 @@ public class Connector
      *
      * @param listener The listener to add
      */
+    @Override
     public void addLifecycleListener(LifecycleListener listener) {
         lifecycle.addLifecycleListener(listener);
     }
@@ -1193,6 +1224,7 @@ public class Connector
      * Gets the (possibly empty) list of lifecycle listeners
      * associated with this Connector.
      */
+    @Override
     public List<LifecycleListener> findLifecycleListeners() {
         return lifecycle.findLifecycleListeners();
     }
@@ -1202,6 +1234,7 @@ public class Connector
      *
      * @param listener The listener to add
      */
+    @Override
     public void removeLifecycleListener(LifecycleListener listener) {
         lifecycle.removeLifecycleListener(listener);
     }
@@ -1222,6 +1255,7 @@ public class Connector
     /**
      * Initialize this connector (create ServerSocket here!)
      */
+    @Override
     public void initialize()
         throws LifecycleException
     {
@@ -1287,10 +1321,9 @@ public class Connector
 
                 // use no-arg constructor for JkCoyoteHandler
                 if (protocolHandlerClassName.equals("org.apache.jk.server.JkCoyoteHandler")) {
-                    protocolHandler = 
-                            (com.sun.grizzly.tcp.ProtocolHandler) clazz.newInstance();
+                    protocolHandler = (ProtocolHandler) clazz.newInstance();
                     if (adapter instanceof CoyoteAdapter){
-                        ((CoyoteAdapter)adapter).setCompatWithTomcat(true);
+                        ((CoyoteAdapter) adapter).setCompatWithTomcat(true);
                     } else {
                         throw new IllegalStateException
                           (sm.getString
@@ -1371,7 +1404,7 @@ public class Connector
 	    String trnName = translateAttributeName(name);
             IntrospectionUtils.setProperty(protocolHandler, trnName, value);
         }
-        
+
 
         try {
             protocolHandler.init();
@@ -1412,6 +1445,7 @@ public class Connector
      *
      * @exception LifecycleException if a fatal startup error occurs
      */
+    @Override
     public void start() throws LifecycleException {
         if( !initialized )
             initialize();
@@ -1484,6 +1518,7 @@ public class Connector
      *
      * @exception LifecycleException if a fatal shutdown error occurs
      */
+    @Override
     public void stop() throws LifecycleException {
 
         // Validate and update our current state
@@ -1760,6 +1795,7 @@ public class Connector
     /**
      * Get the underlying WebContainer certificate for the request
      */
+    @Override
     public X509Certificate[] getCertificates(org.apache.catalina.Request request) {
         
         Request cRequest = null;
@@ -1810,6 +1846,7 @@ public class Connector
         this.domain = domain;
     }
     
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
         oname=name;
@@ -1818,12 +1855,15 @@ public class Connector
         return name;
     }
 
+    @Override
     public void postRegister(Boolean registrationDone) {
     }
 
+    @Override
     public void preDeregister() throws Exception {
     }
 
+    @Override
     public void postDeregister() {
         try {
             if( started ) {

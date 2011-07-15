@@ -281,7 +281,7 @@ public class AsyncContextImpl implements AsyncContext {
                 STRING_MANAGER.getString("async.setTimeoutIllegalState"));
         }
         asyncTimeoutMillis = timeout;
-        origRequest.setAsyncTimeout(timeout);
+//        origRequest.setAsyncTimeout(timeout);
     }
 
     @Override
@@ -318,6 +318,15 @@ public class AsyncContextImpl implements AsyncContext {
             log.warning("Unable to determine target of " +
                         "zero-argument dispatch");
         }
+    }
+
+    /**
+     * @return value true if calls to AsyncContext#addListener and
+     * AsyncContext#setTimeout will be accepted, and false if these
+     * calls will result in an IllegalStateException
+     */
+    boolean isOkToConfigure() {
+        return isOkToConfigure.get();
     }
 
     /**
@@ -380,6 +389,9 @@ public class AsyncContextImpl implements AsyncContext {
                 if (asyncContext.startAsyncCounter.compareAndSet(
                         startAsyncCurrent, startAsyncCurrent)) {
                     asyncContext.complete();
+                } else {
+                    // Reset async timeout
+                    origRequest.setAsyncTimeout(asyncContext.getTimeout());
                 }
             } catch (Throwable t) {
                 asyncContext.notifyAsyncListeners(AsyncEventType.ERROR, t);

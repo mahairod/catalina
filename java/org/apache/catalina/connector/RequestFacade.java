@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import org.apache.catalina.util.Enumerator;
 
 
 /**

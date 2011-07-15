@@ -111,7 +111,7 @@ public final class SecurityClassLoad {
 
     private final static void loadHttp11Package(ClassLoader loader)
         throws Exception {
-        String basePackage = "com.sun.grizzly.tcp.http11.";
+        String basePackage = "org.glassfish.grizzly.tcp.http11.";
         loader.loadClass(basePackage + "Http11Processor$1");
         loader.loadClass(basePackage + "InternalOutputBuffer$1");
         loader.loadClass(basePackage + "InternalOutputBuffer$2");
@@ -200,7 +200,7 @@ public final class SecurityClassLoad {
 
     private final static void loadTomcatPackage(ClassLoader loader)
         throws Exception {
-        String basePackage = "com.sun.grizzly.";
+        String basePackage = "org.glassfish.grizzly.";
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
     }
 }

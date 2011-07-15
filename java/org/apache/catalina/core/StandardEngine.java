@@ -22,7 +22,6 @@ package org.apache.catalina.core;
 
 import org.apache.catalina.*;
 import org.apache.catalina.realm.JAASRealm;
-import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.modeler.modules.MbeansSource;
 

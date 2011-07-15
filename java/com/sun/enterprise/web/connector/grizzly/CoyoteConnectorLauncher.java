@@ -20,20 +20,20 @@
 
 package com.sun.enterprise.web.connector.grizzly;
 
-import com.sun.grizzly.tcp.Adapter;
-import com.sun.grizzly.tcp.ProtocolHandler;
-import com.sun.grizzly.tcp.http11.Constants;
-import com.sun.grizzly.util.net.SSLImplementation;
-import com.sun.grizzly.util.net.ServerSocketFactory;
-import com.sun.grizzly.util.res.StringManager;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.catalina.connector.ProtocolHandler;
+import org.glassfish.grizzly.config.ssl.SSLImplementation;
+import org.glassfish.grizzly.config.ssl.ServerSocketFactory;
+import org.glassfish.grizzly.http.server.Constants;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.util.StringManager;
 
 /**
  * Abstract the protocol implementation, including threading, etc.
@@ -90,10 +90,12 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
 
     /** Pass config info
      */
+    @Override
     public void setAttribute( String name, Object value ) {
-        if( log.isLoggable(Level.FINEST))
+        if (log.isLoggable(Level.FINEST)) {
             log.finest(sm.getString("http11protocol.setattribute", name,
-                                    value));
+                value));
+        }
         attributes.put(name, value);
 /*
         if ("maxKeepAliveRequests".equals(name)) {
@@ -104,6 +106,7 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
 */
     }
 
+    @Override
     public Object getAttribute( String key ) {
         return attributes.get(key);
     }
@@ -124,27 +127,32 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
 
     /** The adapter, used to call the connector 
      */
-    public void setAdapter(Adapter adapter) {
+    @Override
+    public void setHandler(HttpHandler adapter) {
         this.adapter=adapter;
     }
 
-    public Adapter getAdapter() {
+    @Override
+    public HttpHandler getHandler() {
         return adapter;
     }
 
     
     /** Start the protocol
      */
+    @Override
     public void init() throws Exception {
     }
     
     ObjectName tpOname;
     ObjectName rgOname;
     
+    @Override
     public void start() throws Exception {
 
     }
 
+    @Override
     public void destroy() throws Exception {
 
     }
@@ -154,8 +162,8 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
     
     protected ServerSocketFactory socketFactory;
     protected SSLImplementation sslImplementation;
-    // socket factory attriubtes ( XXX replace with normal setters ) 
-    protected Hashtable<String, Object> attributes = new Hashtable<String, Object>();
+    // socket factory attributes ( XXX replace with normal setters )
+    protected Map<String, Object> attributes = new HashMap<String, Object>();
     protected String socketFactoryName=null;
     protected String sslImplementationName=null;
 
@@ -166,7 +174,7 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
     private String reportedname;
     protected int socketCloseDelay=-1;
     protected boolean disableUploadTimeout = true;
-    protected Adapter adapter;
+    protected HttpHandler adapter;
     
     // START OF SJSAS PE 8.1 6172948
     /**
@@ -391,6 +399,7 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
         return domain;
     }
 
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
         oname=name;
@@ -399,12 +408,15 @@ public class CoyoteConnectorLauncher implements ProtocolHandler, MBeanRegistrati
         return name;
     }
 
+    @Override
     public void postRegister(Boolean registrationDone) {
     }
 
+    @Override
     public void preDeregister() throws Exception {
     }
 
+    @Override
     public void postDeregister() {
     }
     

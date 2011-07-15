@@ -21,15 +21,11 @@
 package org.apache.catalina.startup;
 
 import com.sun.logging.LogDomains;
-
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 import org.jvnet.hk2.annotations.Inject;
 import org.jvnet.hk2.annotations.Service;
 import org.xml.sax.EntityResolver;
-import org.apache.catalina.util.SchemaResolver;
-import org.apache.catalina.util.StringManager;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
