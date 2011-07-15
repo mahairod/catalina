@@ -59,16 +59,6 @@
 package org.apache.catalina.valves;
 
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.catalina.Container;
-import org.apache.catalina.Globals;
-import org.apache.catalina.HttpRequest;
 import org.apache.catalina.HttpResponse;
 import org.apache.catalina.Logger;
 import org.apache.catalina.Request;
@@ -209,7 +199,7 @@ public class ErrorReportValve
              * locale (see 6412710)
              */
             if (responseCharEnc != null && !responseCharEnc.equals(
-                    com.sun.grizzly.tcp.Constants.DEFAULT_CHARACTER_ENCODING)) {
+                    org.glassfish.grizzly.http.server.Constants.DEFAULT_CHARACTER_ENCODING)) {
                 sresp.setCharacterEncoding(responseCharEnc);
             }
             // END PWC 6254469

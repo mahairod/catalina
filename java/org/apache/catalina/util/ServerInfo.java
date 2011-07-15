@@ -59,10 +59,6 @@
 package org.apache.catalina.util;
 
 
-import java.io.InputStream;
-import java.util.Properties;
-
-
 /**
  * Simple utility module to make it easy to plug in the server identifier
  * when integrating Tomcat.

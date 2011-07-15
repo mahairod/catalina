@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007-2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -55,49 +55,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.catalina.connector;
 
-package org.apache.catalina.startup;
-
-import org.glassfish.grizzly.http.server.util.IntrospectionUtils;
-import org.apache.tomcat.util.digester.Rule;
-import org.xml.sax.Attributes;
+import org.glassfish.grizzly.http.server.HttpHandler;
 
 /**
- * Rule that uses the introspection utils to set properties.
- * 
+ * Abstract the protocol implementation, including threading, etc.
+ * Processor is single threaded and specific to stream-based protocols,
+ * will not fit Jk protocols like JNI.
+ * <p/>
+ * This is the main interface to be implemented by a coyote connector.
+ * (In contrast, Adapter is the main interface to be implemented by a
+ * coyote servlet container.)
+ *
  * @author Remy Maucherat
+ * @author Costin Manolache
+ * @see HttpHandler
  */
-public class SetAllPropertiesRule extends Rule {
+public interface ProtocolHandler {
+    /**
+     * Pass config info.
+     */
+    void setAttribute(String name, Object value);
 
-
-    // ----------------------------------------------------------- Constructors
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // --------------------------------------------------------- Public Methods
-
+    Object getAttribute(String name);
 
     /**
-     * Handle the beginning of an XML element.
-     *
-     * @param attributes The attributes of this element
-     *
-     * @exception Exception if a processing error occurs
+     * The adapter, used to call the connector.
      */
-    public void begin(Attributes attributes) throws Exception {
+    void setHandler(HttpHandler handler);
 
-        for (int i = 0; i < attributes.getLength(); i++) {
-            String name = attributes.getLocalName(i);
-            if ("".equals(name)) {
-                name = attributes.getQName(i);
-            }
-            String value = attributes.getValue(i);
-            IntrospectionUtils.setProperty(digester.peek(), name, value);
-        }
+    HttpHandler getHandler();
 
-    }
+    /**
+     * Init the protocol.
+     */
+    void init() throws Exception;
 
+    /**
+     * Start the protocol.
+     */
+    void start() throws Exception;
 
+    void destroy() throws Exception;
 }
