@@ -99,7 +99,6 @@ public class RequestDumperValve extends ValveBase {
         }
 
         HttpRequest hrequest = (HttpRequest) request;
-        HttpResponse hresponse = (HttpResponse) response;
         HttpServletRequest hreq =
             (HttpServletRequest) hrequest.getRequest();
 
