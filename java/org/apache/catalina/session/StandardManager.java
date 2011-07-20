@@ -865,7 +865,7 @@ public class StandardManager
         }
 
         // Require a new random number generator if we are restarted
-        this.random = null;
+        resetRandom();
 
         if( initialized ) {
             destroy();

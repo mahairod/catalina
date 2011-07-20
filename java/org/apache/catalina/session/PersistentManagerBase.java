@@ -1237,7 +1237,7 @@ public abstract class PersistentManagerBase
             ((Lifecycle)getStore()).stop();
 
         // Require a new random number generator if we are restarted
-        this.random = null;
+        resetRandom();
 
         if( initialized )
             destroy();
