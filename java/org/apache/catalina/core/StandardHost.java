@@ -1320,7 +1320,7 @@ public class StandardHost
     // ------------------------------------------------------ Private Methods
 
 
-    private void configureStandardHostValve(StandardHostValve host) {
+    public void configureStandardHostValve(StandardHostValve host) {
         // Set error report valve
         if ((errorReportValveClass != null)
             && !"".equals(errorReportValveClass)) {
