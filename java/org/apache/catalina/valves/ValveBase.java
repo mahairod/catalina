@@ -505,6 +505,7 @@ public abstract class ValveBase
         }
     }
 
+    /*
     private void unregisterMBean() {
         try {
             if ((oname != null) && 
@@ -520,5 +521,6 @@ public abstract class ValveBase
             }
         }
     }
+    */
     // END CR 6411114
 }
