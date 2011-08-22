@@ -245,15 +245,8 @@ public class CoyoteAdapter
 
             // Request may want to initialize async processing
             request.onAfterService();
-        } catch (IOException e) {
-            // Recycle the wrapper request and response
-            request.recycle();
-            response.recycle();
         } catch (Throwable t) {
             log.log(Level.SEVERE, sm.getString("coyoteAdapter.service"), t);
-            // Recycle the wrapper request and response
-            request.recycle();
-            response.recycle();
         }
     }
 
