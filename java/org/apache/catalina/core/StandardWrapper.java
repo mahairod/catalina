@@ -159,6 +159,12 @@ public class StandardWrapper
 
 
     /**
+     * Flag that indicates if this instance has been initialized
+     */
+    protected volatile boolean instanceInitialized = false;
+    
+
+    /**
      * The support object for our instance listeners.
      */
     private InstanceSupport instanceSupport = new InstanceSupport(this);
@@ -225,7 +231,7 @@ public class StandardWrapper
     /**
      * Does this servlet implement the SingleThreadModel interface?
      */
-    private boolean singleThreadModel = false;
+    private volatile boolean singleThreadModel = false;
 
 
     /**
@@ -1062,7 +1068,7 @@ public class StandardWrapper
                     throw new ServletException
                         (sm.getString("standardWrapper.allocate"), e);
                 }
-            } else if (instance.getServletConfig() == null) {
+            } else if (!instanceInitialized) {
                 /*
                  * Instance not yet initialized. This is the case
                  * when the instance was registered via
@@ -1411,7 +1417,7 @@ public class StandardWrapper
      * Initializes the given servlet instance, by calling its init method.
      */
     private void initServlet(Servlet servlet) throws ServletException {
-        if (servlet.getServletConfig() != null) {
+        if (instanceInitialized && !singleThreadModel) {
             // Servlet has already been initialized
             return;
         }
@@ -1430,6 +1436,8 @@ public class StandardWrapper
             } else {
                 servlet.init(facade);
             }
+
+            instanceInitialized = true;
 
             // Invoke jspInit on JSP pages
             if ((loadOnStartup >= 0) && (jspFile != null)) {
