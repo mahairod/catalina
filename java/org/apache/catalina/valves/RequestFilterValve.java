@@ -326,7 +326,6 @@ public abstract class RequestFilterValve
         ErrorPage errorPage = ((StandardHost)getContainer()).findErrorPage(statusCode);
         if (errorPage != null) {
             try {
-                request.lockSession();
                 hres.setStatus(statusCode);   
                 ServletContext servletContext =
                     request.getContext().getServletContext();
@@ -353,8 +352,6 @@ public abstract class RequestFilterValve
                             errorPage.getLocation());
                     log.log(Level.INFO, message, t);
                 }
-            } finally {
-                request.unlockSession();
             }
         } else {
             hres.sendError(statusCode);
