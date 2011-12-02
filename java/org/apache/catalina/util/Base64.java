@@ -20,6 +20,8 @@
 
 package org.apache.catalina.util;
 
+import java.nio.charset.Charset;
+
 /**
  * This class provides encode/decode for RFC 2045 Base64 as defined by
  * RFC 2045, N. Freed and N. Borenstein.  <a
@@ -82,7 +84,7 @@ public final class  Base64
 
     public static boolean isBase64( String isValidString )
     {
-        return isArrayByteBase64(isValidString.getBytes());
+        return isArrayByteBase64(isValidString.getBytes(Charset.defaultCharset()));
     }
 
     public static boolean isBase64( byte octect )

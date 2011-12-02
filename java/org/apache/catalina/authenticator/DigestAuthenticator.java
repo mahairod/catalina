@@ -30,6 +30,7 @@ import org.apache.catalina.LifecycleException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -371,7 +372,7 @@ public class DigestAuthenticator
         String ipTimeKey =
             request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
-        byte[] buffer = digest(ipTimeKey.getBytes());
+        byte[] buffer = digest(ipTimeKey.getBytes(Charset.defaultCharset()));
         
         return currentTime + ":" + new String (digestEncoder.encode(buffer));
     }
@@ -599,7 +600,7 @@ public class DigestAuthenticator
             }
             String serverIpTimeKey =
                 request.getRemoteAddr() + ":" + nOnceTime + ":" + key;
-            byte[] buffer = digest(serverIpTimeKey.getBytes());
+            byte[] buffer = digest(serverIpTimeKey.getBytes(Charset.defaultCharset()));
 
             String md5ServerIpTimeKey = new String(digestEncoder.encode(buffer));
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {

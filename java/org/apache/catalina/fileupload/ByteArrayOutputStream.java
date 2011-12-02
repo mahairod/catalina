@@ -25,8 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.catalina.util.RequestUtil;
 
 /**
  * This class implements an output stream in which the data is 
@@ -294,7 +297,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * @see java.io.ByteArrayOutputStream#toString()
      */
     public String toString() {
-        return new String(toByteArray());
+        return new String(toByteArray(), Charset.defaultCharset());
     }
 
     /**
@@ -307,7 +310,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * @see java.io.ByteArrayOutputStream#toString(String)
      */
     public String toString(String enc) throws UnsupportedEncodingException {
-        return new String(toByteArray(), enc);
+        return new String(toByteArray(), RequestUtil.lookupCharset(enc));
     }
 
 }

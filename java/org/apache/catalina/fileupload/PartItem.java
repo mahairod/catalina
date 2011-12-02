@@ -22,13 +22,16 @@
 package org.apache.catalina.fileupload;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.util.RequestUtil;
 
 import javax.servlet.http.Part;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * This class implements java.servlet.http.Part.
@@ -328,7 +331,7 @@ class PartItem
      */
     public String getString(final String charset)
         throws UnsupportedEncodingException {
-        return new String(get(), charset);
+        return new String(get(), RequestUtil.lookupCharset(charset));
     }
 
 
@@ -352,9 +355,9 @@ class PartItem
             charset = Globals.ISO_8859_1_ENCODING;
         }
         try {
-            return new String(rawdata, charset);
+            return new String(rawdata, RequestUtil.lookupCharset(charset));
         } catch (UnsupportedEncodingException e) {
-            return new String(rawdata);
+            return new String(rawdata, Charset.defaultCharset());
         }
     }
 
