@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -255,6 +255,12 @@ public class StandardWrapper
      * Stack containing the STM instances.
      */
     private Stack<Servlet> instancePool = null;
+
+
+    /**
+     * Wait time for servlet unload in ms.
+     */
+    protected long unloadDelay = 2000;
 
 
     /**
@@ -539,6 +545,7 @@ public class StandardWrapper
             throw new IllegalArgumentException
                 (sm.getString("standardWrapper.notContext"));
         if (container instanceof StandardContext) {
+            unloadDelay = ((StandardContext)container).getUnloadDelay();
             notifyContainerListeners =
                 ((StandardContext)container).isNotifyContainerListeners();
         }
@@ -1711,6 +1718,7 @@ public class StandardWrapper
         // (possibly more than once if non-STM)
         if (countAllocated.get() > 0) {
             int nRetries = 0;
+            long delay = unloadDelay / 20;
             while ((nRetries < 21) && (countAllocated.get() > 0)) {
                 if ((nRetries % 10) == 0) {
                     if (log.isLoggable(Level.FINE)) {
@@ -1720,7 +1728,7 @@ public class StandardWrapper
                     }
                 }
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     // Ignore
                 }
