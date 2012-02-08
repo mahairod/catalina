@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -48,6 +48,7 @@ public class ConstructorInfo extends FeatureInfo {
     transient ModelMBeanConstructorInfo info = null;
     protected String displayName = null;
     protected ParameterInfo parameters[] = new ParameterInfo[0];
+    protected final Object parametersMonitor = new Object();
 
 
     // ------------------------------------------------------------- Properties
@@ -105,7 +106,7 @@ public class ConstructorInfo extends FeatureInfo {
      */
     public void addParameter(ParameterInfo parameter) {
 
-        synchronized (parameters) {
+        synchronized (parametersMonitor) {
             ParameterInfo results[] = new ParameterInfo[parameters.length + 1];
             System.arraycopy(parameters, 0, results, 0, parameters.length);
             results[parameters.length] = parameter;

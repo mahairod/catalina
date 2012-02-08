@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -223,6 +223,8 @@ public final class StandardServer
      */
     private Service services[] = new Service[0];
 
+    private final Object servicesMonitor = new Object();
+
 
     /**
      * The shutdown command string we are looking for.
@@ -400,7 +402,7 @@ public final class StandardServer
 
         service.setServer(this);
 
-        synchronized (services) {
+        synchronized (servicesMonitor) {
             Service results[] = new Service[services.length + 1];
             System.arraycopy(services, 0, results, 0, services.length);
             results[services.length] = service;
@@ -528,7 +530,7 @@ public final class StandardServer
         if (name == null) {
             return (null);
         }
-        synchronized (services) {
+        synchronized (servicesMonitor) {
             for (int i = 0; i < services.length; i++) {
                 if (name.equals(services[i].getName())) {
                     return (services[i]);
@@ -569,7 +571,7 @@ public final class StandardServer
      */
     public void removeService(Service service) {
 
-        synchronized (services) {
+        synchronized (servicesMonitor) {
             int j = -1;
             for (int i = 0; i < services.length; i++) {
                 if (service == services[i]) {
@@ -717,7 +719,7 @@ public final class StandardServer
         started = true;
 
         // Start our defined Services
-        synchronized (services) {
+        synchronized (servicesMonitor) {
             for (int i = 0; i < services.length; i++) {
                 if (services[i] instanceof Lifecycle)
                     ((Lifecycle) services[i]).start();

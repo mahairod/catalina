@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -93,6 +93,7 @@ public class OperationInfo extends FeatureInfo {
     protected String role = "operation";
     protected String returnType = "void";    // FIXME - Validate
     protected ParameterInfo parameters[] = new ParameterInfo[0];
+    protected Object parametersMonitor = new Object();
 
 
     // ------------------------------------------------------------- Properties
@@ -178,7 +179,7 @@ public class OperationInfo extends FeatureInfo {
      */
     public void addParameter(ParameterInfo parameter) {
 
-        synchronized (parameters) {
+        synchronized (parametersMonitor) {
             ParameterInfo results[] = new ParameterInfo[parameters.length + 1];
             System.arraycopy(parameters, 0, results, 0, parameters.length);
             results[parameters.length] = parameter;

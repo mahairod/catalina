@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -46,6 +46,7 @@ public class NotificationInfo extends FeatureInfo {
      */
     transient ModelMBeanNotificationInfo info = null;
     protected String notifTypes[] = new String[0];
+    protected Object notifTypesMonitor = new Object();
 
     // ------------------------------------------------------------- Properties
 
@@ -90,7 +91,7 @@ public class NotificationInfo extends FeatureInfo {
      */
     public void addNotifType(String notifType) {
 
-        synchronized (notifTypes) {
+        synchronized (notifTypesMonitor) {
             String results[] = new String[notifTypes.length + 1];
             System.arraycopy(notifTypes, 0, results, 0, notifTypes.length);
             results[notifTypes.length] = notifType;
