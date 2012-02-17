@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -53,7 +53,7 @@ public class OutputBuffer extends Writer
 
     private static final String SET_COOKIE_HEADER = "Set-Cookie";
     public static final String DEFAULT_ENCODING = 
-        org.glassfish.grizzly.http.server.Constants.DEFAULT_CHARACTER_ENCODING;
+        org.glassfish.grizzly.http.util.Constants.DEFAULT_HTTP_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
     static final int debug = 0;
 
