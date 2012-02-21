@@ -183,6 +183,7 @@ public class ErrorReportValve
         }
 
         response.setSuspended(false);
+        sresp.setContentType("text/html");
 
         try {
             report(request, response, throwable);
