@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -88,6 +88,7 @@ import org.apache.catalina.core.ApplicationHttpRequest;
 import org.apache.catalina.core.ApplicationHttpResponse;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.fileupload.Multipart;
 import org.apache.catalina.security.SecurityUtil;
@@ -1267,7 +1268,7 @@ public class Request
             return;
         }
         getCharacterEncoding();
-        if (getMethod().equalsIgnoreCase("POST")) {
+        if (isMultipartConfigured() && getMethod().equalsIgnoreCase("POST")) {
             String contentType = getContentType();
             if (contentType != null && 
                         contentType.startsWith("multipart/form-data")) {
@@ -4222,13 +4223,29 @@ public class Request
         return multipart;
     }
 
+    private boolean isMultipartConfigured() {
+        if (wrapper instanceof StandardWrapper) {
+            return ((StandardWrapper)wrapper).isMultipartConfigured();
+        }
+        return false;
+    }
+
+    private void checkMultipartConfiguration(String name) {
+        if (! isMultipartConfigured()) {
+            throw new IllegalStateException(
+                sm.getString("coyoteRequest.multipart.not.configured", name));
+        }
+    } 
+
     @Override
     public Collection<Part> getParts() throws IOException, ServletException {
+        checkMultipartConfiguration("getParts");
         return getMultipart().getParts();
     }
 
     @Override
     public Part getPart(String name) throws IOException, ServletException {
+        checkMultipartConfiguration("getPart");
         return getMultipart().getPart(name);
     }
 
