@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -21,7 +21,7 @@
 package org.apache.catalina.startup;
 
 
-import org.glassfish.grizzly.http.server.util.IntrospectionUtils;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.catalina.*;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardEngine;

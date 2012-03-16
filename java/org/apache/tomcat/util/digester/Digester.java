@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -23,7 +23,7 @@
 package org.apache.tomcat.util.digester;
 
 
-import org.glassfish.grizzly.http.server.util.IntrospectionUtils;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
