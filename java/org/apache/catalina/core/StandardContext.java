@@ -2480,6 +2480,11 @@ public class StandardContext
                              "addFilter", getName()));
         }
 
+        if (filterName == null) {
+            throw new IllegalArgumentException(
+                sm.getString("standardContext.nullFilterName"));
+        }
+
         synchronized (filterDefs) {
             // Make sure filter name is unique for this context
             if (findFilterDef(filterName) != null) {
@@ -2525,7 +2530,7 @@ public class StandardContext
         }
 
         if (filterName == null || filter == null) {
-            throw new NullPointerException("Null filter instance or name");
+            throw new IllegalArgumentException("Null filter instance or name");
         }
 
         /*
@@ -2605,6 +2610,11 @@ public class StandardContext
             throw new IllegalStateException(
                 sm.getString("applicationContext.alreadyInitialized",
                              "addFilter", getName()));
+        }
+
+        if (filterName == null) {
+            throw new IllegalArgumentException(
+                sm.getString("standardContext.nullFilterName"));
         }
 
         synchronized (filterDefs) {
