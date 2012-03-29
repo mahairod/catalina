@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -82,7 +82,9 @@ public final class LifecycleSupport {
      * @param listener The listener to add
      */
     public void addLifecycleListener(LifecycleListener listener) {
-        listeners.add(listener);
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
     }
 
 
@@ -105,11 +107,24 @@ public final class LifecycleSupport {
      */
     public void fireLifecycleEvent(String type, Object data)
             throws LifecycleException {
-        LifecycleEvent event = new LifecycleEvent(lifecycle, type, data);
-        Iterator<LifecycleListener> i = listeners.iterator(); 
-        while (i.hasNext()) {
-            i.next().lifecycleEvent(event);
+
+
+        LifecycleListener[] listenersArray = null;
+
+        synchronized (listeners) {
+            if (listeners.isEmpty()) {
+                return;
+            }
+            listenersArray = listeners.toArray(
+                    new LifecycleListener[listeners.size()]);
         }
+
+        LifecycleEvent event = new LifecycleEvent(lifecycle, type, data);
+
+        for (int i = 0; i < listenersArray.length; i++) {
+            listenersArray[i].lifecycleEvent(event);
+        }
+
     }
 
 
@@ -119,7 +134,9 @@ public final class LifecycleSupport {
      * @param listener The listener to remove
      */
     public void removeLifecycleListener(LifecycleListener listener) {
-        listeners.remove(listener);
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
     }
 
 

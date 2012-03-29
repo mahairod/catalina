@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -89,6 +89,10 @@ public class ContextConfig
     
     protected static final Properties authenticators = new Properties();
     //END SJSAS 6202703
+
+
+    private ClassLoader classLoader;
+
 
     /**
      * The Context we are associated with.
@@ -200,6 +204,11 @@ public class ContextConfig
 
 
     // ----------------------------------------------------------- Properties
+
+
+    public void setClassLoader(ClassLoader cl) {
+        this.classLoader = cl;
+    }
 
 
     /**
@@ -688,13 +697,11 @@ public class ContextConfig
             try {
                 source.setByteStream(stream);
                 webDigester.setDebug(getDebug());
-                
                 // JFA
                 if (context instanceof StandardContext)
                     ((StandardContext) context).setReplaceWelcomeFiles(true);
                 webDigester.clear();
-                webDigester.setClassLoader(this.getClass().getClassLoader());
-                //log.info( "Using cl: " + webDigester.getClassLoader());
+                webDigester.setClassLoader(classLoader);
                 webDigester.setUseContextClassLoader(false);
                 webDigester.push(context);
                 webDigester.parse(source);
@@ -800,7 +807,7 @@ public class ContextConfig
         synchronized (contextDigester) {
             try {
                 source.setByteStream(stream);
-                contextDigester.setClassLoader(this.getClass().getClassLoader());
+                contextDigester.setClassLoader(classLoader);
                 contextDigester.setUseContextClassLoader(false);
                 contextDigester.push(context.getParent());
                 contextDigester.push(context);
