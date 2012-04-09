@@ -701,7 +701,7 @@ public class ContextConfig
                 if (context instanceof StandardContext)
                     ((StandardContext) context).setReplaceWelcomeFiles(true);
                 webDigester.clear();
-                webDigester.setClassLoader(classLoader);
+                webDigester.setClassLoader(this.getClass().getClassLoader());
                 webDigester.setUseContextClassLoader(false);
                 webDigester.push(context);
                 webDigester.parse(source);

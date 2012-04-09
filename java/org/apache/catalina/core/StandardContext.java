@@ -6532,8 +6532,10 @@ public class StandardContext
     public void updateObjectName() {
         try {
             StandardHost host = (StandardHost) getParent();
-            oname = createObjectName(host.getDomain(), host.getJmxName());
-            controller = oname;
+            synchronized (this) {
+                oname = createObjectName(host.getDomain(), host.getJmxName());
+                controller = oname;
+            }
             for (Container wrapper : findChildren()) {
                 ((StandardWrapper)wrapper).registerJMX(this);
             }
