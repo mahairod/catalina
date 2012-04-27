@@ -1518,7 +1518,7 @@ public class StandardWrapper
 
     // START IASRI 4665318
     void service(ServletRequest request, ServletResponse response,
-                 Servlet serv, RequestFacade requestFacade)
+                 Servlet serv)
              throws IOException, ServletException {
 
         InstanceSupport supp = getInstanceSupport();
@@ -1527,7 +1527,11 @@ public class StandardWrapper
             supp.fireInstanceEvent(BEFORE_SERVICE_EVENT,
                                    serv, request, response);
             if (!isAsyncSupported()) {
-                requestFacade.disableAsyncSupport();
+                RequestFacadeHelper reqFacHelper =
+                    RequestFacadeHelper.getInstance(request);
+                if (reqFacHelper != null) {
+                    reqFacHelper.disableAsyncSupport();
+                }
             } 
             if ((request instanceof HttpServletRequest) &&
                 (response instanceof HttpServletResponse)) {

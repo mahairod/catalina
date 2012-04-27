@@ -380,8 +380,7 @@ public final class ApplicationDispatcher
         if ((hrequest == null) || (hresponse == null)) {
             // Handle a non-HTTP forward
             ApplicationHttpRequest wrequest = wrapRequest(state);
-            processRequest(request, response, state,
-                wrequest.getRequestFacade());
+            processRequest(request, response, state);
             unwrapRequest(state);
         } else if ((servletPath == null) && (pathInfo == null)) {
             // Handle an HTTP named dispatcher forward
@@ -392,8 +391,7 @@ public final class ApplicationDispatcher
             wrequest.setPathInfo(hrequest.getPathInfo());
             wrequest.setQueryString(hrequest.getQueryString());
             
-            processRequest(request, response, state,
-                wrequest.getRequestFacade());
+            processRequest(request, response, state);
 
             wrequest.recycle();
             unwrapRequest(state);
@@ -419,8 +417,13 @@ public final class ApplicationDispatcher
 
             String targetContextPath = context.getPath();
             // START IT 10395
-            RequestFacade requestFacade = wrequest.getRequestFacade();
-            String originContextPath = requestFacade.getContextPath(false);
+            RequestFacadeHelper reqFacHelper = RequestFacadeHelper.getInstance(wrequest);
+            String originContextPath = null;
+            if (reqFacHelper != null) {
+                originContextPath = reqFacHelper.getContextPath(false);
+            } else {
+                originContextPath = wrequest.getContextPath();
+            }
             if (originContextPath != null &&
                     originContextPath.equals(targetContextPath)) {
                 targetContextPath = hrequest.getContextPath();
@@ -435,8 +438,7 @@ public final class ApplicationDispatcher
                 wrequest.setQueryParams(queryString);
             }
 
-            processRequest(request, response, state,
-                wrequest.getRequestFacade());
+            processRequest(request, response, state);
 
             wrequest.recycle();
             unwrapRequest(state);
@@ -455,8 +457,7 @@ public final class ApplicationDispatcher
      */
     private void processRequest(ServletRequest request, 
                                 ServletResponse response,
-                                State state,
-                                RequestFacade requestFacade)
+                                State state)
         throws IOException, ServletException {
                 
         if (request != null) {
@@ -464,9 +465,9 @@ public final class ApplicationDispatcher
                 state.outerRequest.setAttribute(
                     Globals.DISPATCHER_REQUEST_PATH_ATTR,
                     getCombinedPath());
-                invoke(state.outerRequest, response, state, requestFacade);
+                invoke(state.outerRequest, response, state);
             } else {
-                invoke(state.outerRequest, response, state, requestFacade);
+                invoke(state.outerRequest, response, state);
             }
         }
     }
@@ -563,8 +564,7 @@ public final class ApplicationDispatcher
             wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                                   getCombinedPath());
             try{
-                invoke(state.outerRequest, state.outerResponse, state,
-                    wrequest.getRequestFacade());
+                invoke(state.outerRequest, state.outerResponse, state);
             } finally {
                 wrequest.recycle();
                 unwrapRequest(state);
@@ -585,8 +585,7 @@ public final class ApplicationDispatcher
             wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                                   getCombinedPath());
             try{
-                invoke(state.outerRequest, state.outerResponse, state,
-                    wrequest.getRequestFacade());
+                invoke(state.outerRequest, state.outerResponse, state);
             } finally {
                 wrequest.recycle();
                 unwrapRequest(state);
@@ -615,7 +614,7 @@ public final class ApplicationDispatcher
      * @throws ServletException if a servlet error occurs
      */
     private void invoke(ServletRequest request, ServletResponse response,
-                State state, RequestFacade requestFacade)
+                State state)
             throws IOException, ServletException {
         //START OF 6364900 original invoke has been renamed to doInvoke
         boolean crossContext = false;
@@ -630,7 +629,7 @@ public final class ApplicationDispatcher
                 context.getManager().preRequestDispatcherProcess(request,
                                                                  response);
             }            
-            doInvoke(request, response, crossContext, state, requestFacade);
+            doInvoke(request, response, crossContext, state);
             if (crossContext) {
                 context.getManager().postRequestDispatcherProcess(request,
                                                                   response);
@@ -664,8 +663,7 @@ public final class ApplicationDispatcher
      * @throws ServletException if a servlet error occurs
      */
     private void doInvoke(ServletRequest request, ServletResponse response,
-                          boolean crossContext, State state,
-                          RequestFacade requestFacade)
+                          boolean crossContext, State state)
             throws IOException, ServletException {
 
         // Checking to see if the context classloader is the current context
@@ -735,6 +733,7 @@ public final class ApplicationDispatcher
         InstanceSupport support = ((StandardWrapper) wrapper).getInstanceSupport();
 
         // Call the service() method for the allocated servlet instance
+        RequestFacadeHelper reqFacHelper = RequestFacadeHelper.getInstance(request);
         try {
             String jspFile = wrapper.getJspFile();
             if (jspFile != null) {
@@ -750,13 +749,15 @@ public final class ApplicationDispatcher
             // START IASRI 4665318
             if (servlet != null) {
             // END IASRI 4665318
-                // START OF S1AS 4703023                
-                requestFacade.incrementDispatchDepth();
-                if (requestFacade.isMaxDispatchDepthReached()) {
-                    throw new ServletException(sm.getString(
-                        "applicationDispatcher.maxDispatchDepthReached",
-                        new Object[] { Integer.valueOf(
-                            Request.getMaxDispatchDepth())}));
+                // START OF S1AS 4703023
+                if (reqFacHelper != null) {
+                    reqFacHelper.incrementDispatchDepth();
+                    if (reqFacHelper.isMaxDispatchDepthReached()) {
+                        throw new ServletException(sm.getString(
+                            "applicationDispatcher.maxDispatchDepthReached",
+                            new Object[] { Integer.valueOf(
+                                Request.getMaxDispatchDepth())}));
+                    }
                 }
                 // END OF S1AS 4703023 
                 /* IASRI 4665318
@@ -764,12 +765,11 @@ public final class ApplicationDispatcher
                 */
                 // START IASRI 4665318
                 if (filterChain != null) {
-                    filterChain.setRequestFacade(requestFacade);
                     filterChain.setWrapper((StandardWrapper)wrapper);
                     filterChain.doFilter(request, response);
                 } else {
                     ((StandardWrapper)wrapper).service(
-                        request, response, servlet, requestFacade);
+                        request, response, servlet);
                 }
                 // END IASRI 4665318
             }
@@ -810,7 +810,9 @@ public final class ApplicationDispatcher
             runtimeException = e;
         // START OF S1AS 4703023
         } finally {
-            requestFacade.decrementDispatchDepth();
+            if (reqFacHelper != null) {
+                reqFacHelper.decrementDispatchDepth();
+            }
         // END OF S1AS 4703023
         }
 
