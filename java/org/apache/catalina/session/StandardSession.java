@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -112,7 +112,7 @@ public class StandardSession
     /**
      * The method signature for the <code>fireContainerEvent</code> method.
      */
-    protected static final Class<?> containerEventTypes[] =
+    static final Class<?> containerEventTypes[] =
         { String.class, Object.class };
 
     /**

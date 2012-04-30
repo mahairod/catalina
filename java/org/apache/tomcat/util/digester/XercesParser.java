@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -81,13 +81,13 @@ public class XercesParser{
     /**
      * A <code>float</code> representing the underlying Xerces version
      */
-    protected static float version;
+    static float version;
 
 
     /**
      * The current Xerces version.
      */
-    protected static String versionNumber = null;
+    static String versionNumber = null;
 
 
     /**
