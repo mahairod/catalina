@@ -466,6 +466,8 @@ public class Request
     private String servletPath;
     private String pathInfo;
 
+    private boolean initRequestFacadeHelper = false;
+
     // Allow Grizzly to auto detect a remote close connection.
     public final static boolean discardDisconnectEvent =
             Boolean.getBoolean("org.glassfish.grizzly.discardDisconnect");
@@ -578,6 +580,7 @@ public class Request
 
         mappingData.recycle();
 
+        initRequestFacadeHelper = false;
         if (enforceScope) {
             if (facade != null) {
                 facade.clear();
@@ -798,16 +801,25 @@ public class Request
         if (!maskDefaultContextMapping || !isDefaultContext) {
             if (facade == null) {
                 facade = new RequestFacade(this);
+            }
+
+            if (!initRequestFacadeHelper) {
                 attributes.put(Globals.REQUEST_FACADE_HELPER,
                         facade.getRequestFacadeHelper());
+                initRequestFacadeHelper = true;
             }
             return facade;
         } else {
             if (defaultContextMaskingFacade == null) {
                 defaultContextMaskingFacade = new RequestFacade(this, true);
+            }
+
+            if (!initRequestFacadeHelper) {
                 attributes.put(Globals.REQUEST_FACADE_HELPER,
                         defaultContextMaskingFacade.getRequestFacadeHelper());
+                initRequestFacadeHelper = true;
             }
+
             return defaultContextMaskingFacade;
         }
     }
