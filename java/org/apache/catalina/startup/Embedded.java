@@ -1050,7 +1050,7 @@ public class Embedded  extends StandardService {
      * be done prior to calling <code>start()</code>.
      *
      * @param context Context to receive a specialized logger
-     */
+     *
     private static void customize(Context context) {
 
         // Create a customized file logger for this context
@@ -1069,6 +1069,7 @@ public class Embedded  extends StandardService {
         context.setLogger(special);
 
     }
+    */
 
     /**
      * Set the security package access/protection.

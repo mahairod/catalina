@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -24,6 +24,8 @@ import org.apache.catalina.loader.StandardClassLoader;
 
 import java.io.File;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -193,12 +195,24 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        URL array[] = set.toArray(new URL[set.size()]);
+        final URL array[] = set.toArray(new URL[set.size()]);
+        final ClassLoader parentCL = parent;
         StandardClassLoader classLoader = null;
-        if (parent == null)
-            classLoader = new StandardClassLoader(array);
-        else
-            classLoader = new StandardClassLoader(array, parent);
+        if (parentCL == null)  {
+            classLoader = AccessController.doPrivileged(new PrivilegedAction<StandardClassLoader>() {
+                @Override
+                public StandardClassLoader run() {
+                    return new StandardClassLoader(array);
+                }
+            });
+        } else {
+            classLoader = AccessController.doPrivileged(new PrivilegedAction<StandardClassLoader>() {
+                @Override
+                public StandardClassLoader run() {
+                    return new StandardClassLoader(array, parentCL);
+                }
+            });
+        }
         classLoader.setDelegate(true);
         return (classLoader);
 

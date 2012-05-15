@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -37,6 +37,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -173,7 +175,12 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                 // Register a loader that will be find ant classes.
                 ObjectName defaultLoader= new ObjectName("modeler",
                         "loader", "modeler");
-                MLet mlet=new MLet( new URL[0], this.getClass().getClassLoader());
+                MLet mlet =  AccessController.doPrivileged(new PrivilegedAction<MLet>() {
+                    @Override
+                    public MLet run() {
+                        return new MLet(new URL[0], this.getClass().getClassLoader());
+                    }
+                });
                 server.registerMBean(mlet, defaultLoader);
                 loaderLoaded=true;
             }
