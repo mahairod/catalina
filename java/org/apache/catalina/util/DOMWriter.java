@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -331,6 +331,7 @@ public class DOMWriter {
 
    } // normalize(String):String
 
+   /*
    private static void printValidJavaEncoding() {
       System.err.println( "    ENCODINGS:" );
       System.err.print( "   " );
@@ -344,5 +345,6 @@ public class DOMWriter {
       }
 
    } // printJavaEncoding()
+   */
 
 }

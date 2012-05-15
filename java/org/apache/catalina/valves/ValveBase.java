@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -478,6 +478,7 @@ public abstract class ValveBase
     // START CR 6411114
 
 
+    /*
     private void registerMBean() {
 
         if ((getObjectName() == null) && (container != null)) {
@@ -505,7 +506,6 @@ public abstract class ValveBase
         }
     }
 
-    /*
     private void unregisterMBean() {
         try {
             if ((oname != null) && 

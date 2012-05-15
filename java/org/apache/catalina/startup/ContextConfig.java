@@ -966,7 +966,7 @@ public class ContextConfig
      * Log a message on the Logger associated with our Context (if any)
      *
      * @param message Message to be logged
-     */
+     *
     private void log(String message) {
 
         org.apache.catalina.Logger logger = null;
@@ -984,7 +984,7 @@ public class ContextConfig
      *
      * @param message Message to be logged
      * @param throwable Associated exception
-     */
+     *
     private void log(String message, Throwable throwable) {
 
         org.apache.catalina.Logger logger = null;
@@ -997,6 +997,7 @@ public class ContextConfig
             log.log(Level.SEVERE, message, throwable );
         }
     }
+    */
 
 
     

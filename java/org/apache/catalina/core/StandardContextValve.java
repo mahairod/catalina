@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -206,7 +206,7 @@ final class StandardContextValve
      * Log a message on the Logger associated with our Container (if any)
      *
      * @param message Message to be logged
-     */
+     *
     private void log(String message) {
         org.apache.catalina.Logger logger = null;
         String containerName = null;
@@ -231,7 +231,7 @@ final class StandardContextValve
      *
      * @param message Message to be logged
      * @param t Associated exception
-     */
+     *
     private void log(String message, Throwable t) {
         org.apache.catalina.Logger logger = null;
         String containerName = null;
@@ -247,6 +247,7 @@ final class StandardContextValve
                 "]: " + message, t);
         }
     }
+    */
 
 
     private Wrapper preInvoke(Request request, Response response) {

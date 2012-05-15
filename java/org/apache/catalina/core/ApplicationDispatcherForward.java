@@ -352,6 +352,7 @@ class ApplicationDispatcherForward {
     }
 
     
+/*
     private static ResponseFacade getResponseFacade(ServletResponse response) {
    
         while (response instanceof ServletResponseWrapper) {
@@ -360,6 +361,7 @@ class ApplicationDispatcherForward {
 
         return ((ResponseFacade) response);
     }
+*/
 
 
     private static void closeResponse(ServletResponse response) {
