@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -200,7 +200,7 @@ public class PersistentValve
                     store.save(session);
                     ((PersistentManager) manager).removeSuper(session);
                     session.recycle();
-                } else {
+                } else if (session!=null) {
                     log("newsessionId store: " + store + " session: " +
                         session + " valid: " + session.isValid() +
                         " Staled: " +

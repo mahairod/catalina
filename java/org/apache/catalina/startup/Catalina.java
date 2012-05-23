@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -477,14 +477,16 @@ public class Catalina extends Embedded {
             return;
         }
 
-        try {
-            inputSource.setByteStream(inputStream);
-            digester.push(this);
-            digester.parse(inputSource);
-            inputStream.close();
-        } catch (Exception e) {
-            log.log(Level.WARNING, "Catalina.start: ", e);
-            return;
+        if (inputStream != null) {
+            try {
+                inputSource.setByteStream(inputStream);
+                digester.push(this);
+                digester.parse(inputSource);
+                inputStream.close();
+            } catch (Exception e) {
+                log.log(Level.WARNING, "Catalina.start: ", e);
+                return;
+            }
         }
 
         // Start the new server

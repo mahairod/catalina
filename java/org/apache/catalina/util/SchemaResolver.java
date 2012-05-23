@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -51,13 +51,6 @@ public class SchemaResolver implements EntityResolver {
      * public identifier that corresponds.
      */
     protected HashMap<String, String> entityValidator = new HashMap<String, String>();
-
-
-    /**
-     * The public identifier of the DTD we are currently parsing under
-     * (if any).
-     */
-    protected String publicId = null;
 
 
     /**
@@ -115,7 +108,6 @@ public class SchemaResolver implements EntityResolver {
         throws SAXException {
 
         if (publicId != null) {
-            this.publicId = publicId;
             digester.setPublicId(publicId);
         }
 

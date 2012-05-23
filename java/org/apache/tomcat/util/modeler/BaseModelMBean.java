@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -443,7 +443,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             else if (t instanceof Error)
                 throw new RuntimeErrorException
                     ((Error) t, "Error invoking method " + name);
-            else
+            else if (t instanceof Exception)
                 throw new MBeanException
                     ((Exception)t, "Exception invoking method " + name);
         } catch (Exception e) {

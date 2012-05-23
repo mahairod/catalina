@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -88,7 +88,7 @@ public final class SecurityUtil{
     /**
      * Do we need to execute all invokation under a Subject.doAs call.
      */
-    public static boolean executeUnderSubjectDoAs = true;
+    public static final boolean executeUnderSubjectDoAs = true;
     // END SJS WS 7.0 6236329
    
     

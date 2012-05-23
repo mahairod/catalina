@@ -1999,9 +1999,9 @@ public class StandardContext
     public void setWorkDir(String workDir) {
         synchronized (this) {
             this.workDir = workDir;
-        }
-        if (started) {
-            postWorkDirectory();
+            if (started) {
+                postWorkDirectory();
+            }
         }
     }
 
@@ -3228,7 +3228,7 @@ public class StandardContext
      */
      public Set<String> addServletMapping(ServletMap servletMap) {
          return addServletMapping(servletMap.getServletName(),
-                                  servletMap.getUrlPatterns());
+                                  servletMap.getURLPatterns());
      }
 
     /**

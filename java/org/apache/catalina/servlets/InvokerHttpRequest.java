@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -91,13 +91,6 @@ class InvokerHttpRequest extends HttpServletRequestWrapper {
      * The servlet path for this request.
      */
     protected String servletPath = null;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------- HttpServletRequest Methods
