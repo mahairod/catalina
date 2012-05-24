@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -785,8 +785,12 @@ public class StandardHostDeployer implements Deployer {
      */
     public void addChild(Container child) {
 
-        Context context = (Context) child;
-        String contextPath = context.getPath();
+        Context context = null;
+        String contextPath = null;
+        if (child instanceof Context) {
+            context = (Context) child;
+            contextPath = context.getPath();
+        }
         if (contextPath == null)
             throw new IllegalArgumentException
                 (sm.getString("standardHost.pathRequired"));

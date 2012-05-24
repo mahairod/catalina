@@ -399,9 +399,7 @@ public class ContextConfig
                     sm.getString("contextConfig.applicationParse"), e);
             } finally {
                 try {
-                    if (stream != null) {
-                        stream.close();
-                    }
+                    stream.close();
                 } catch (IOException e) {
                     log.log(Level.SEVERE,
                             sm.getString("contextConfig.applicationClose"),

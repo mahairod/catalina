@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -82,7 +82,6 @@ public class ContextRuleSet extends RuleSetBase {
     public ContextRuleSet(String prefix) {
 
         super();
-        this.namespaceURI = null;
         this.prefix = prefix;
 
     }
@@ -99,7 +98,6 @@ public class ContextRuleSet extends RuleSetBase {
     public ContextRuleSet(String prefix, boolean create) {
 
         super();
-        this.namespaceURI = null;
         this.prefix = prefix;
         this.create = create;
 

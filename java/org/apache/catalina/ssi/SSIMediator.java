@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -56,7 +56,6 @@ public class SSIMediator {
     protected String className = getClass().getName();
     protected SSIExternalResolver ssiExternalResolver;
     protected long lastModifiedDate;
-    protected int debug;
     protected Strftime strftime;
     protected SSIConditionalState conditionalState = new SSIConditionalState();
     static {
@@ -81,7 +80,6 @@ public class SSIMediator {
             long lastModifiedDate, int debug) {
         this.ssiExternalResolver = ssiExternalResolver;
         this.lastModifiedDate = lastModifiedDate;
-        this.debug = debug;
         setConfigTimeFmt(DEFAULT_CONFIG_TIME_FMT, true);
     }
 

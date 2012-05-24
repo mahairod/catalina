@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -44,7 +44,7 @@ public class ServletMap {
         return servletName;
     }
         
-    public String[] getUrlPatterns() {
+    public String[] getURLPatterns() {
         return urlPatterns;
     }
 }
