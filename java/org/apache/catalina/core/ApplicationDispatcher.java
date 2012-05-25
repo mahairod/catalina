@@ -379,6 +379,7 @@ public final class ApplicationDispatcher
 
         if ((hrequest == null) || (hresponse == null)) {
             // Handle a non-HTTP forward
+            wrapRequest(state);
             processRequest(request, response, state);
             unwrapRequest(state);
         } else if ((servletPath == null) && (pathInfo == null)) {
