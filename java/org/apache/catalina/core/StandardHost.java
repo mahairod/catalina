@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -26,10 +26,11 @@ import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.modeler.Registry;
 import org.glassfish.web.valve.GlassFishValve;
 
 import javax.management.MBeanServer;
+import javax.management.Notification;
+import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -91,6 +92,12 @@ public class StandardHost
      * The auto deploy flag for this Host.
      */
     private boolean autoDeploy = true;
+
+
+     /**
+      * The broadcaster that sends j2ee notifications.
+      */
+     private NotificationBroadcasterSupport broadcaster = null;
 
 
     /**
@@ -209,6 +216,12 @@ public class StandardHost
     
 
     private SingleSignOn sso;
+
+
+     /**
+      * The notification sequence number.
+      */
+     private long sequenceNumber = 0;
 
     
     // ------------------------------------------------------------- Properties
@@ -918,25 +931,6 @@ public class StandardHost
         if( ! initialized )
             init();
 
-        // Look for a realm - that may have been configured earlier. 
-        // If the realm is added after context - it'll set itself.
-        if( realm == null ) {
-            ObjectName realmName=null;
-            try {
-                realmName=new ObjectName( domain + ":type=Host,host=" + getName());
-                if( mserver.isRegistered(realmName ) ) {
-                    mserver.invoke(realmName, "setContext", 
-                            new Object[] {this},
-                            new String[] { "org.apache.catalina.Container" }
-                    );            
-                }
-            } catch( Throwable t ) {
-                if (log.isLoggable(Level.FINE)) {
-                    log.fine("No realm for this host " + realmName);
-                }
-            }
-        }
-
         // Set error report valve
         configureStandardHostValve((StandardHostValve) pipeline.getBasic());
 
@@ -957,6 +951,18 @@ public class StandardHost
         super.start();
 
     }
+
+
+     public void sendNotification(Notification notification) {
+
+         if (broadcaster == null) {
+             broadcaster = ((StandardEngine)getParent()).getService().getBroadcaster();
+         }
+         if (broadcaster != null) {
+             broadcaster.sendNotification(notification);
+         }
+         return;
+     }
 
 
     // ------------------------------------------------------- Deployer Methods
@@ -1254,23 +1260,6 @@ public class StandardHost
         initialized=true;
         */
         
-        // already registered.
-        if(getParent() == null) {
-            try {
-                // Register with the Engine
-                ObjectName serviceName=new ObjectName(domain + ":type=Engine");
-                if (mserver.isRegistered(serviceName)) {
-                    log.fine("Registering with the Engine");
-                    mserver.invoke(serviceName, "addChild",
-                            new Object[] { this },
-                            new String[] { "org.apache.catalina.Container" } );
-                }
-            } catch(Exception ex) {
-                log.log(Level.SEVERE, "Error registering host " + getName(),
-                        ex);
-            }
-        }
-        
         if( oname==null ) {
             // not registered in JMX yet - standalone mode
             try {
@@ -1285,7 +1274,9 @@ public class StandardHost
                 // START CR 6368091
                 controller = oname;
                 // END CR 6368091
-                Registry.getRegistry(null, null).registerComponent(this, oname, null);
+                Notification notification =
+                        new Notification("j2ee.object.created", this, sequenceNumber++);
+                sendNotification(notification);
             } catch(Throwable t) {
                 log.log(Level.SEVERE, "Error registering host " + getName(),
                         t);
@@ -1294,17 +1285,6 @@ public class StandardHost
         // START CR 6368085
         initialized = true;
         // END CR 6368085
-    }
-
-    @Override
-    public ObjectName preRegister(MBeanServer server, ObjectName oname )
-        throws Exception
-    {
-        ObjectName res=super.preRegister(server, oname);
-        String name=oname.getKeyProperty("host");
-        if( name != null )
-            setName( name );
-        return res;        
     }
     
     @Override
