@@ -22,15 +22,10 @@ package org.apache.catalina.valves;
 
 import org.apache.catalina.*;
 import org.apache.catalina.core.ContainerBase;
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
-import org.apache.tomcat.util.modeler.Registry;
 import org.glassfish.web.valve.GlassFishValve;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.ServletException;
@@ -52,10 +47,10 @@ import java.util.logging.Logger;
 
 public abstract class ValveBase
 /** CR 6411114
-    implements Contained, Valve, MBeanRegistration {
+    implements Contained, Valve {
 */
 // START CR 6411114
-    implements Contained, Lifecycle, Valve, GlassFishValve, MBeanRegistration {
+    implements Contained, Lifecycle, Valve, GlassFishValve {
 // END CR 6411114
     private static Logger log = Logger.getLogger(ValveBase.class.getName());
 
@@ -313,8 +308,6 @@ public abstract class ValveBase
         if (started)
             return;
         lifecycle.fireLifecycleEvent(START_EVENT, null);
-        // Do not register unused tomcat mbeans
-        //registerMBean();
         started = true;
     }
 
@@ -333,8 +326,6 @@ public abstract class ValveBase
         if (!started)
             return;
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        // Do not register unused tomcat mbeans
-        //unregisterMBean();
         started = false;
 
     }
@@ -346,7 +337,6 @@ public abstract class ValveBase
     // -------------------- JMX and Registration  --------------------
     protected String domain;
     protected ObjectName oname;
-    protected MBeanServer mserver;
     protected ObjectName controller;
 
     public ObjectName getObjectName() {
@@ -359,25 +349,6 @@ public abstract class ValveBase
 
     public String getDomain() {
         return domain;
-    }
-
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        domain=name.getDomain();
-
-
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-    }
-
-    public void preDeregister() throws Exception {
-    }
-
-    public void postDeregister() {
     }
 
     public ObjectName getController() {
@@ -469,58 +440,4 @@ public abstract class ValveBase
         return objectName;
     }
 
-    // -------------------- JMX data  --------------------
-
-    public ObjectName getContainerName() {
-        if( container== null) return null;
-        return ((ContainerBase)container).getJmxName();
-    }
-    // START CR 6411114
-
-
-    /*
-    private void registerMBean() {
-
-        if ((getObjectName() == null) && (container != null)) {
-            try {
-                String domain=((ContainerBase)container).getDomain();
-                if (container instanceof StandardContext) {
-                    domain=((StandardContext)container).getEngineName();
-                }
-                if (container instanceof StandardWrapper) {
-                    Container ctx=((StandardWrapper)container).getParent();
-                    domain=((StandardContext)ctx).getEngineName();
-                }
-                ObjectName vname=createObjectName(domain,
-                        ((ContainerBase)container).getJmxName());
-                if (vname != null) {
-                    setObjectName(vname);
-                    setController(vname);
-                    Registry.getRegistry(null, null).registerComponent(this, vname, getClass().getName());
-                }
-            } catch( Throwable t ) {
-                if (log.isLoggable(Level.INFO)) {
-                    log.log(Level.INFO, "Can't register valve " + this , t );
-                }
-            }
-        }
-    }
-
-    private void unregisterMBean() {
-        try {
-            if ((oname != null) && 
-                (oname == controller) &&
-                (Registry.getRegistry(null, null).getMBeanServer().isRegistered(oname))) {
-                Registry.getRegistry(null, null).getMBeanServer().unregisterMBean(oname);
-                setObjectName(null);
-                setController(null);
-            }
-        } catch( Throwable t ) {
-            if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, "Can't unregister valve " + this , t );
-            }
-        }
-    }
-    */
-    // END CR 6411114
 }

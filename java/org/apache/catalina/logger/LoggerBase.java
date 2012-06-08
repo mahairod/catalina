@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -29,10 +29,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.LifecycleSupport;
-import org.apache.tomcat.util.modeler.Registry;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.servlet.ServletException;
 import java.beans.PropertyChangeListener;
@@ -55,7 +52,7 @@ import java.util.logging.Logger;
  */
 
 public class LoggerBase
-    implements Lifecycle, org.apache.catalina.Logger, MBeanRegistration 
+    implements Lifecycle, org.apache.catalina.Logger
  {
     private static Logger log = Logger.getLogger(LoggerBase.class.getName());
     
@@ -369,7 +366,6 @@ public class LoggerBase
     protected String path;
     protected ObjectName oname;
     protected ObjectName controller;
-    protected MBeanServer mserver;
 
     public ObjectName getController() {
         return controller;
@@ -385,56 +381,6 @@ public class LoggerBase
           
     public String getDomain() {
         return domain;
-    }
-    
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception {
-        oname=name;
-        mserver=server;
-        // FIXME null pointer exception 
-        if (name == null) {
-            return null;
-        }
-        domain=name.getDomain();
-        host=name.getKeyProperty("host");
-        path=name.getKeyProperty("path");
-        if(log.isLoggable(Level.FINE)) {
-            log.fine("preRegister with "+name);
-        }
-        if( container== null ) {
-            // Register with the parent
-            try {
-                ObjectName cname=null;
-                if( host == null ) {
-                    // global
-                    cname=new ObjectName(domain +":type=Engine");
-                } else if( path==null ) {
-                    cname=new ObjectName(domain +
-                            ":type=Host,host=" + host);
-                } else {
-                    cname=new ObjectName(domain +":j2eeType=WebModule,name=//" +
-                            host + "/" + path);
-                }
-                if(log.isLoggable(Level.FINE)) {
-                    log.fine("Register with " + cname);
-                }
-                mserver.invoke(cname, "setLogger", new Object[] {this},
-                        new String[] {"org.apache.catalina.Logger"});
-            } catch (Exception e) {
-                log.log(Level.WARNING, "Unable to register Logger", e);
-            }
-        } 
-                
-        return name;
-    }
-
-    public void postRegister(Boolean registrationDone) {
-    }
-
-    public void preDeregister() throws Exception {
-    }
-
-    public void postDeregister() {
     }
 
     public void init() {
@@ -528,8 +474,6 @@ public class LoggerBase
         if ( getObjectName()==null ) {   
             ObjectName oname = createObjectName();   
             try {
-                // Do not register unused tomcat mbeans
-                //Registry.getRegistry(null, null).registerComponent(this, oname, null);
                 if (log.isLoggable(Level.FINE)) {
                     log.fine("Registering logger " + oname);
                 }
@@ -555,8 +499,6 @@ public class LoggerBase
         if ( getObjectName()!=null ) {   
             ObjectName oname = createObjectName();   
             try {
-                // Do not register unused tomcat mbeans
-                //Registry.getRegistry(null, null).unregisterComponent(oname);
                 if (log.isLoggable(Level.FINE)) {
                     log.fine("Unregistering logger " + oname);
                 }
