@@ -370,10 +370,11 @@ public class Catalina extends Embedded {
             Digester digester = createStopDigester();
             digester.setClassLoader(Thread.currentThread().getContextClassLoader());
             File file = configFile();
+            FileInputStream fis = null;
             try {
                 InputSource is =
                     new InputSource("file://" + file.getAbsolutePath());
-                FileInputStream fis = new FileInputStream(file);
+                fis = new FileInputStream(file);
                 is.setByteStream(fis);
                 digester.push(this);
                 digester.parse(is);
@@ -381,6 +382,12 @@ public class Catalina extends Embedded {
             } catch (Exception e) {
                 log.log(Level.SEVERE, "Catalina.stop: ", e);
                 System.exit(1);
+            } finally {
+                try {
+                    if (fis != null) {
+                        fis.close();
+                    }
+                } catch (IOException ioe) {}
             }
         }
 
@@ -482,10 +489,13 @@ public class Catalina extends Embedded {
                 inputSource.setByteStream(inputStream);
                 digester.push(this);
                 digester.parse(inputSource);
-                inputStream.close();
             } catch (Exception e) {
                 log.log(Level.WARNING, "Catalina.start: ", e);
                 return;
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {}
             }
         }
 
