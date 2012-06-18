@@ -710,6 +710,10 @@ public class StandardContext
     // Created via embedded API
     private boolean isEmbedded = false;
 
+    protected boolean directoryDeployed = false;
+
+    protected boolean showArchivedRealPathEnabled = true;
+
     // ----------------------------------------------------- Context Properties
 
     public String getEncodedPath() {
@@ -6818,6 +6822,10 @@ public class StandardContext
      * translation
      */
     public String getRealPath(String path) {
+        if (!(showArchivedRealPathEnabled || directoryDeployed)) {
+            return null;
+        }
+
         if (!isFilesystemBased())
             return null;
 
