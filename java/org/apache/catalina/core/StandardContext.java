@@ -6568,7 +6568,6 @@ public class StandardContext
     public void init() throws Exception {
 
         if( this.getParent() == null ) {
-            ObjectName parentName=getParentName();
 
             ContextConfig config = new ContextConfig();
             this.addLifecycleListener(config);
