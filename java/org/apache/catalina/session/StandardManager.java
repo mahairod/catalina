@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -399,7 +399,9 @@ public class StandardManager
                 // ignore
             }
             // Delete the persistent storage file
-            file.delete();
+            if (!file.delete() && log.isLoggable(Level.FINE)) {
+                log.fine("Cannot delete file: " + file);
+            }
         }
     }
 

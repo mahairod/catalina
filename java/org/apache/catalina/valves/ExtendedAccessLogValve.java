@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -977,7 +977,9 @@ public final class ExtendedAccessLogValve
         File dir = new File(directory);
         if (!dir.isAbsolute())
             dir = new File(System.getProperty("catalina.base"), directory);
-        dir.mkdirs();
+        if (!dir.mkdirs() && !dir.isDirectory()) {
+            log.log(Level.SEVERE, sm.getString("accessLogValve.openDirFail", dir));
+        }
 
         // Open the current log file
         try {
