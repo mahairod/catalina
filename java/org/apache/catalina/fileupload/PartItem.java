@@ -31,6 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -59,6 +61,7 @@ class PartItem
      */
     private static final long serialVersionUID = 2237570099615271025L;
 
+    protected Logger log = Logger.getLogger(PartItem.class.getName());
 
     // ----------------------------------------------------------- Data members
 
@@ -468,7 +471,7 @@ class PartItem
         cachedContent = null;
         File outputFile = getStoreLocation();
         if (outputFile != null && outputFile.exists()) {
-            outputFile.delete();
+            deleteFile(outputFile);
         }
     }
 
@@ -580,7 +583,7 @@ class PartItem
         File outputFile = dfos.getFile();
 
         if (outputFile != null && outputFile.exists()) {
-            outputFile.delete();
+            deleteFile(outputFile);
         }
     }
 
@@ -697,7 +700,7 @@ class PartItem
         } else {
             FileInputStream input = new FileInputStream(dfosFile);
             Streams.copy(input, output, false);
-            dfosFile.delete();
+            deleteFile(dfosFile);
             dfosFile = null;
         }
         output.close();
@@ -742,5 +745,11 @@ class PartItem
      */
     public Collection<String> getHeaderNames() {
         return headers.getHeaderNames();
+    }
+
+    private void deleteFile(File file) {
+        if (!file.delete() && log.isLoggable(Level.FINE)) {
+            log.fine("Cannot delete file: " + file);
+        }
     }
 }

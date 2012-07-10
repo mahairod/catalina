@@ -39,6 +39,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Concrete implementation of the <b>Store</b> interface that utilizes
@@ -60,6 +62,7 @@ public final class FileStore extends StoreBase {
      */
     private static final String FILE_EXT = ".session";
 
+    protected Logger log = Logger.getLogger(FileStore.class.getName());
 
     // ----------------------------------------------------- Instance Variables
 
@@ -344,9 +347,10 @@ public final class FileStore extends StoreBase {
         //HERCULES: addition
         // Take it out of the cache 
         sessions.remove(id);        
-        //HERCULES: addition        
-        file.delete();
-
+        //HERCULES: addition
+        if (!file.delete() && log.isLoggable(Level.FINE)) {
+            log.fine("Cannot delete file: " + file);
+        }
     }
 
 
