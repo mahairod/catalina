@@ -23,6 +23,7 @@ package org.apache.catalina.connector;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.StringManager;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import java.io.IOException;
 import java.security.AccessController;
@@ -228,7 +229,7 @@ public class CoyoteInputStream
         }        
     }
 
-
+    
     public int readLine(byte[] b, int off, int len) throws IOException {
         // Disallow operation if the object has gone out of scope
         if (ib == null) {
@@ -237,6 +238,36 @@ public class CoyoteInputStream
         }
 
         return super.readLine(b, off, len);
+    }
+
+
+    public boolean isFinished() {
+        if (ib == null) {
+            throw new IllegalStateException(
+                sm.getString("object.invalidScope"));
+        }
+
+        return ib.isFinished();
+    }
+
+
+    public boolean isReady() {
+        if (ib == null) {
+            throw new IllegalStateException(
+                sm.getString("object.invalidScope"));
+        }
+
+        return ib.isReady();
+    }
+
+
+    public void setReadListener(ReadListener readListener) {
+        if (ib == null) {
+            throw new IllegalStateException(
+                sm.getString("object.invalidScope"));
+        }
+
+        ib.setReadListener(readListener);
     }
 
 
@@ -275,5 +306,4 @@ public class CoyoteInputStream
              ib.close();
         }            
     }
-
 }

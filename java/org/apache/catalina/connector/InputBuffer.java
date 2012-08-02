@@ -25,7 +25,10 @@ import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ReadListener;
+
 import org.apache.catalina.util.StringManager;
+import org.glassfish.grizzly.ReadHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.util.ByteChunk.ByteInputChannel;
 import org.glassfish.grizzly.http.util.CharChunk;
@@ -67,7 +70,10 @@ public class InputBuffer extends Reader
     private Request grizzlyRequest;
 
     private org.glassfish.grizzly.http.server.io.InputBuffer grizzlyInputBuffer;
-    
+
+    private ReadHandler readHandler = null;
+    private boolean hasSetReadListener = false;
+    private boolean prevIsReady = true;
 
     // ----------------------------------------------------------- Constructors
 
@@ -132,6 +138,7 @@ public class InputBuffer extends Reader
 
         grizzlyInputBuffer = null;
         grizzlyRequest = null;
+        hasSetReadListener = false;
 
     }
 
@@ -188,6 +195,31 @@ public class InputBuffer extends Reader
         return grizzlyInputBuffer.read(b, off, len);
     }
 
+
+    public boolean isFinished() {
+        return grizzlyInputBuffer.isFinished();
+    }
+
+
+    public boolean isReady() {
+        boolean result = (grizzlyInputBuffer.available() > 0);
+        if (prevIsReady && result == false && readHandler != null) {
+            grizzlyInputBuffer.notifyAvailable(readHandler);
+        }
+        prevIsReady = result;
+        return result;
+    }
+
+
+    public void setReadListener(ReadListener readListener) {
+        if (hasSetReadListener) {
+            throw new IllegalStateException(
+                sm.getString("inputBuffer.alreadySetReadListener"));
+        }
+
+        readHandler = new ReadHandlerImpl(readListener);
+        hasSetReadListener = true;
+    }
 
     // ------------------------------------------------- Chars Handling Methods
 
@@ -296,5 +328,26 @@ public class InputBuffer extends Reader
 
         grizzlyInputBuffer.processingChars();
 
+    }
+
+
+    static class ReadHandlerImpl implements ReadHandler {
+        private ReadListener readListener = null;
+
+        private ReadHandlerImpl(ReadListener listener) {
+            readListener = listener;
+        }
+
+        public void onDataAvailable() {
+            readListener.onDataAvailable();
+        }
+
+        public void onAllDataRead() {
+            readListener.onAllDataRead();
+        }
+
+        public void onError(final Throwable t) {
+            readListener.onError(t);
+        }
     }
 }
