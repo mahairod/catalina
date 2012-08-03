@@ -39,6 +39,7 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
      */
     protected ByteArrayOutputStream buf = null;
 
+    private boolean hasSetWriteListener = false;
 
     /**
      * Construct a new ServletOutputStream.
@@ -73,6 +74,9 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
 
     @Override
     public void setWriteListener(WriteListener writeListener) {
-        //no op
+        if (hasSetWriteListener) {
+            throw new IllegalStateException();
+        }
+        hasSetWriteListener = true;
     }
 }
