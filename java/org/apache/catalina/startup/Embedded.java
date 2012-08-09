@@ -860,6 +860,7 @@ public class Embedded  extends StandardService {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
 
         /* SJSAS 5022949
@@ -910,6 +911,7 @@ public class Embedded  extends StandardService {
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException {
 
         if (log.isLoggable(Level.FINE))
@@ -935,6 +937,15 @@ public class Embedded  extends StandardService {
         }
 
     }
+
+    @Override
+    public void destroy() throws LifecycleException {
+        if( started ) stop();
+        if (initialized) {
+            initialized = false;
+        }
+    }
+
 
 
     // ------------------------------------------------------ Protected Methods
