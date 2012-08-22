@@ -89,6 +89,7 @@ public class OutputBuffer extends Writer
     private WriteHandler writeHandler = null;
     private boolean hasSetWriteListener = false;
     private boolean prevCanWrite = true;
+    private static final ThreadLocal<Boolean> CAN_WRITE_SCOPE = new ThreadLocal<Boolean>();
 
     /**
      * Suspended flag. All output bytes will be swallowed if this is true.
@@ -200,7 +201,7 @@ public class OutputBuffer extends Writer
         grizzlyResponse = null;
         grizzlyOutputBuffer = null;
         writeHandler = null;
-        prevCanWrite = false;
+        prevCanWrite = true;
         hasSetWriteListener = false;
         response = null;
 
@@ -462,11 +463,26 @@ public class OutputBuffer extends Writer
 
 
     public boolean canWrite() {
-        boolean result = grizzlyOutputBuffer.canWrite(1);
-        if (prevCanWrite && result == false && writeHandler != null) {
-            grizzlyOutputBuffer.notifyCanWrite(writeHandler, 1);
+        if (!prevCanWrite) {
+            return false;
         }
-        prevCanWrite = result;
+        
+        boolean result = grizzlyOutputBuffer.canWrite(1);
+        if (!result) {
+            if (hasSetWriteListener) {
+                prevCanWrite = false; // Not can write
+                CAN_WRITE_SCOPE.set(Boolean.TRUE);
+                try {
+                    grizzlyOutputBuffer.notifyCanWrite(writeHandler, 1);
+                } finally {
+                    CAN_WRITE_SCOPE.remove();
+                }
+                
+            } else {
+                prevCanWrite = true;  // Allow next .canWrite() call to check underlying outputStream
+            }
+        }
+        
         return result;
     }
 
@@ -674,19 +690,51 @@ public class OutputBuffer extends Writer
         }
     }
     
-    static class WriteHandlerImpl implements WriteHandler {
+    class WriteHandlerImpl implements WriteHandler {
         private WriteListener writeListener = null;
+        private Object lk = new Object();
 
         private WriteHandlerImpl(WriteListener listener) {
             writeListener = listener;
         }
 
         public void onWritePossible() {
-            writeListener.onWritePossible();
+            if (!Boolean.TRUE.equals(CAN_WRITE_SCOPE.get())) {
+                processWritePossible();
+            } else {
+                AsyncContextImpl.pool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        processWritePossible();
+                    }
+                });
+            }
         }
 
-        public void onError(Throwable t) {
-            writeListener.onError(t);
+        private void processWritePossible() {
+            synchronized(lk) {
+                prevCanWrite = true;
+                writeListener.onWritePossible();
+            }
+        }
+
+        public void onError(final Throwable t) {
+            if (!Boolean.TRUE.equals(CAN_WRITE_SCOPE.get())) {
+                processError(t);
+            } else {
+                AsyncContextImpl.pool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        processError(t);
+                    }
+                });
+            }
+        }
+
+        private void processError(final Throwable t) {
+            synchronized(lk) {
+                writeListener.onError(t);
+            }
         }
     }
 
