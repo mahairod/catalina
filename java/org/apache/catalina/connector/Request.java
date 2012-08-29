@@ -471,6 +471,16 @@ public class Request
     public final static boolean discardDisconnectEvent =
             Boolean.getBoolean("org.glassfish.grizzly.discardDisconnect");
 
+    /*
+     * An upgrade request is received
+     */
+    private boolean upgrade = false;
+
+    /*
+     * The ProtocolHandler to be used for upgrade request
+     */
+    private ProtocolHandler protocolHandler;
+
     // ----------------------------------------------------------- Constructor
     public Request() {
         // START OF SJSAS 6231069
@@ -484,7 +494,7 @@ public class Request
     // --------------------------------------------------------- Public Methods
     /**
      * Set the Coyote request.
-     * 
+     *
      * @param grizzlyRequest The Coyote request
      */
     public void setCoyoteRequest(org.glassfish.grizzly.http.server.Request grizzlyRequest) {
@@ -548,6 +558,7 @@ public class Request
         localName = null;
         multipart = null;
         jrouteId = null;
+        upgrade = false;
 
         attributes.clear();
         notes.clear();
@@ -626,6 +637,14 @@ public class Request
      */
     public boolean getUnsuccessfulSessionFind() {
         return this.unsuccessfulSessionFind;
+    }
+
+    public boolean isUpgrade() {
+        return upgrade;
+    }
+
+    public ProtocolHandler getProtocolHandler() {
+        return protocolHandler;
     }
 
     // -------------------------------------------------------- Request Methods
@@ -2956,10 +2975,19 @@ public class Request
     public ServletContext getServletContext() {
         return servletContext;
     }
-    
+
+    /**
+     * Notifies that the given ProtcolHandler will be used to upgrade the request.
+     *
+     * @param handler The <code>ProtocolHandler</code> used for the upgrade.
+     *
+     * @exception IOException if an I/O error occurred during the upgrade
+     *
+     */
     @Override
-    public void upgrade(ProtocolHandler handler)  {
-        //XXX Servlet 3.1
+    public void upgrade(ProtocolHandler handler) throws IOException  {
+        upgrade = true;
+        protocolHandler = handler;
     }
 
     // ------------------------------------------------------ Protected Methods
