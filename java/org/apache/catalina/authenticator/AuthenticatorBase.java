@@ -803,9 +803,7 @@ public abstract class AuthenticatorBase
 
         Session session = getSession(request, false);
         if (session != null && changeSessionIdOnAuthentication) {
-            Manager manager = request.getContext().getManager();
-            manager.changeSessionId(session);
-            request.changeSessionId(session.getId());
+            request.changeSessionId();
         }
         
         // Cache the authentication information in our session, if any
