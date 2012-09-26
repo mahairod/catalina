@@ -538,6 +538,7 @@ public class Request
     public void setCoyoteRequest(org.glassfish.grizzly.http.server.Request grizzlyRequest) {
         this.coyoteRequest = grizzlyRequest;
         inputBuffer.setRequest(grizzlyRequest);
+        inputBuffer.setRequest(this);
     }
 
     /**
@@ -3045,6 +3046,7 @@ public class Request
     public void upgrade(ProtocolHandler handler) throws IOException  {
         upgrade = true;
         protocolHandler = handler;
+        coyoteRequest.getResponse().suspend();
     }
 
     // ------------------------------------------------------ Protected Methods
