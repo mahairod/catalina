@@ -71,6 +71,8 @@ public class InputBuffer extends Reader
 
     private org.glassfish.grizzly.http.server.io.InputBuffer grizzlyInputBuffer;
 
+    private org.apache.catalina.connector.Request request;
+
     private ReadHandler readHandler = null;
     private boolean hasSetReadListener = false;
     private boolean prevIsReady = true;
@@ -113,6 +115,11 @@ public class InputBuffer extends Reader
     public void setRequest(Request grizzlyRequest) {
 	this.grizzlyRequest = grizzlyRequest;
         this.grizzlyInputBuffer = grizzlyRequest.getInputBuffer();
+    }
+
+
+    public void setRequest(org.apache.catalina.connector.Request request) {
+        this.request = request;
     }
 
 
@@ -389,6 +396,10 @@ public class InputBuffer extends Reader
                         processAllDataRead();
                     }
                 });
+            }
+            // TODO We should move resume() using upgrade finished API.
+            if (request.isUpgrade()) {
+                grizzlyRequest.getResponse().resume();
             }
         }
 
