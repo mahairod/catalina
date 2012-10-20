@@ -71,7 +71,6 @@ public class HostRuleSet extends RuleSetBase {
     public HostRuleSet(String prefix) {
 
         super();
-        this.namespaceURI = null;
         this.prefix = prefix;
 
     }
