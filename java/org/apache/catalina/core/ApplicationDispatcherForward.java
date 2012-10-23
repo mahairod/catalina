@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,6 +73,8 @@ class ApplicationDispatcherForward {
 
     public static final Logger log =
             Logger.getLogger(WEB_CORE_LOGGER, SHARED_LOGMESSAGE_RESOURCE);
+
+    public static final ResourceBundle rb = log.getResourceBundle();
 
     @LogMessageInfo(
             message = "Exception processing {0}",
@@ -198,7 +201,7 @@ class ApplicationDispatcherForward {
                 try {
                     serveErrorPage(response, errorPage, statusCode);
                 } catch (Exception e) {
-                    String msg = MessageFormat.format(EXCEPTION_PROCESSING, errorPage);
+                    String msg = MessageFormat.format(rb.getString(EXCEPTION_PROCESSING), errorPage);
                     log.log(Level.WARNING, msg, e);
                 }
             }
@@ -236,10 +239,10 @@ class ApplicationDispatcherForward {
                 servletContext.getRequestDispatcher(errorPage.getLocation());
             dispatcher.dispatch(request, response, DispatcherType.ERROR);
         } catch (IllegalStateException ise) {
-            String msg = MessageFormat.format(EXCEPTION_PROCESSING, errorPage);
+            String msg = MessageFormat.format(rb.getString(EXCEPTION_PROCESSING), errorPage);
             log.log(Level.WARNING, msg, ise);
         } catch (Throwable t) {
-            String msg = MessageFormat.format(EXCEPTION_PROCESSING, errorPage);
+            String msg = MessageFormat.format(rb.getString(EXCEPTION_PROCESSING), errorPage);
             log.log(Level.WARNING, msg, t);
         }
     }
