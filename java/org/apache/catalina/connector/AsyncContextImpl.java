@@ -5,6 +5,7 @@
 
 package org.apache.catalina.connector;
 
+import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.Globals;
 import org.apache.catalina.core.ApplicationDispatcher;
 import org.apache.catalina.core.ApplicationHttpRequest;
@@ -17,6 +18,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -71,6 +74,8 @@ class AsyncContextImpl implements AsyncContext {
     private AtomicBoolean isOkToConfigure = new AtomicBoolean(true); 
 
     private long asyncTimeoutMillis = DEFAULT_ASYNC_TIMEOUT_MILLIS;
+
+    private final Queue<AsyncListener> listenerQueue = new ConcurrentLinkedQueue<AsyncListener>();
 
     private final LinkedList<AsyncListenerContext> asyncListenerContexts =
         new LinkedList<AsyncListenerContext>();
@@ -257,6 +262,7 @@ class AsyncContextImpl implements AsyncContext {
         if (ctx != null) {
             try {
                 listener = ctx.createListenerInstance(clazz);
+                listenerQueue.add(listener);
             } catch (Throwable t) {
                 throw new ServletException(t);
             }
@@ -487,6 +493,17 @@ class AsyncContextImpl implements AsyncContext {
         synchronized(asyncListenerContexts) {
             asyncListenerContexts.clear();
         }
+
+        StandardContext ctx = (StandardContext) origRequest.getContext();
+        if (ctx != null) {
+            for (AsyncListener l : listenerQueue) {
+                ctx.fireContainerEvent(ContainerEvent.PRE_DESTROY, l);
+            }
+        }
+        listenerQueue.clear();
+        servletRequest = null;
+        servletResponse = null;
+        origRequest = null;
     }
 
     /**
