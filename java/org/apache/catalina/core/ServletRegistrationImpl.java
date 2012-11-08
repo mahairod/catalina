@@ -5,9 +5,6 @@
 
 package org.apache.catalina.core;
 
-import org.apache.catalina.util.StringManager;
-import org.glassfish.logging.annotation.LogMessageInfo;
-import org.glassfish.logging.annotation.LoggerInfo;
 import javax.servlet.ServletRegistration;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -15,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
+import org.glassfish.logging.annotation.LogMessageInfo;
 
 public class ServletRegistrationImpl implements ServletRegistration {
 

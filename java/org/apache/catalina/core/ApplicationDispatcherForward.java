@@ -28,6 +28,7 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ResponseUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.valves.ErrorReportValve;
+import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -37,10 +38,6 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.glassfish.logging.annotation.LogMessageInfo;
-import org.glassfish.logging.annotation.LoggerInfo;
-import org.glassfish.logging.annotation.LogMessagesResourceBundle;
 
 /**
  * Class responsible for processing the result of a RD.forward() invocation
@@ -64,9 +61,9 @@ import org.glassfish.logging.annotation.LogMessagesResourceBundle;
  */
 class ApplicationDispatcherForward {
 
-    public static final Logger log = StandardServer.log;
+    private static final Logger log = StandardServer.log;
 
-    public static final ResourceBundle rb = log.getResourceBundle();
+    private static final ResourceBundle rb = log.getResourceBundle();
 
     @LogMessageInfo(
             message = "Exception processing {0}",

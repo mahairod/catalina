@@ -29,7 +29,6 @@ import org.apache.catalina.valves.ValveBase;
 import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
 
-import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
@@ -42,9 +41,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Standard implementation of the <b>Host</b> interface.  Each
@@ -61,9 +58,6 @@ public class StandardHost
     implements Deployer, Host  
  {
     /* Why do we implement deployer and delegate to deployer ??? */
-
-     private static final Logger log = StandardServer.log;
-     private static final ResourceBundle rb = log.getResourceBundle();
 
      @LogMessageInfo(
          message = "Host name is required",
