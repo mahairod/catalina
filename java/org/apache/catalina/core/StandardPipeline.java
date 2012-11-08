@@ -28,6 +28,7 @@ import org.apache.catalina.connector.*;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.valves.ValveBase;
+import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
 import org.glassfish.web.valve.GlassFishValveAdapter;
 import org.glassfish.web.valve.TomcatValveAdapter;
@@ -38,6 +39,8 @@ import javax.servlet.http.ProtocolHandler;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,9 +66,89 @@ import org.apache.tomcat.util.modeler.Registry;
 public class StandardPipeline
     implements Pipeline, Contained, Lifecycle {
 
-    private static final Logger log = Logger.getLogger(
-        StandardPipeline.class.getName());
-   
+    private static final Logger log = StandardServer.log;
+    private static final ResourceBundle rb = log.getResourceBundle();
+
+    @LogMessageInfo(
+        message = "Pipeline has already been started",
+        level = "WARNING"
+    )
+    public static final String PIPLINE_STARTED = "AS-WEB-CORE-00200";
+
+    @LogMessageInfo(
+        message = "Pipeline has not been started",
+        level = "WARNING"
+    )
+    public static final String PIPLINE_NOT_STARTED = "AS-WEB-CORE-00201";
+
+    @LogMessageInfo(
+        message = "Exception occurred when stopping GlassFishValve in StandardPipeline.setBasic",
+        level = "SEVERE",
+        cause = "Could not terminate the active use of the public methods of this component",
+        action = "Verify if stop() is the last one called on a given instance of this component, " +
+                 "and it should send STOP_EVENT to any registered listeners"
+    )
+    public static final String SET_BASIC_STOP_EXCEPTION = "AS-WEB-CORE-00202";
+
+    @LogMessageInfo(
+        message = "Exception occurred when starting GlassFishValve in StandardPipeline.setBasic",
+        level = "SEVERE",
+        cause = "Could not prepare for the beginning of active use of the public methods of this component",
+        action = "Verify if start() is called before any of the public " +
+                 "methods of this component are utilized, and it should " +
+                 "send START_EVENT to any registered listeners"
+    )
+    public static final String SET_BASIC_START_EXCEPTION = "AS-WEB-CORE-00203";
+
+    @LogMessageInfo(
+        message = "Exception occurred when starting GlassFishValve in StandardPipline.addValve",
+        level = "SEVERE",
+        cause = "Specific valve could not be associated with current container",
+        action = "Verify the availability of current valve"
+    )
+    public static final String ADD_VALVE_EXCEPTION = "AS-WEB-CORE-00204";
+
+    @LogMessageInfo(
+        message = "Unable to add valve {0}",
+        level = "SEVERE",
+        cause = "Could not add tomcat-style valve",
+        action = "Verify if this is a GlassFish-style valve that was compiled against" +
+                 " the old org.apache.catalina.Valve interface"
+    )
+    public static final String ADD_TOMCAT_STYLE_VALVE_EXCEPTION = "AS-WEB-CORE-00205";
+
+    @LogMessageInfo(
+        message = "No more Valves in the Pipeline processing this request",
+        level = "WARNING"
+    )
+    public static final String NO_VALVES_IN_PIPELINE_EXCEPTION = "AS-WEB-CORE-00206";
+
+    @LogMessageInfo(
+        message = "Protocol handler cannot be null",
+        level = "WARNING"
+    )
+    public static final String PROTOCOL_HANDLER_REQUIRED_EXCEPTION = "AS-WEB-CORE-00207";
+
+    @LogMessageInfo(
+        message = "Exception occurred when stopping GlassFishValve in StandardPipeline.removeValve",
+        level = "SEVERE",
+        cause = "Could not terminate the active use of the public methods of this component",
+        action = "Verify if stop() is the last one called on a given instance of this component, " +
+                 "and it should send STOP_EVENT to any registered listeners"
+    )
+    public static final String REMOVE_VALVE_EXCEPTION = "AS-WEB-CORE-00208";
+
+    @LogMessageInfo(
+        message = "StandardPipeline[{0}]: {1}",
+        level = "INFO"
+    )
+    public static final String STANDARD_PIPELINE_INFO = "AS-WEB-CORE-00209";
+
+    @LogMessageInfo(
+        message = "StandardPipeline[null]: {0}",
+        level = "INFO"
+    )
+    public static final String STANDARD_PIPELINE_NULL_INFO = "AS-WEB-CORE-00210";
 
     // ----------------------------------------------------------- Constructors
 
@@ -125,13 +208,6 @@ public class StandardPipeline
      * The lifecycle event support for this component.
      */
     protected LifecycleSupport lifecycle = new LifecycleSupport(this);
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**
@@ -245,7 +321,7 @@ public class StandardPipeline
         // Validate and update our current component state
         if (started)
             throw new LifecycleException
-                (sm.getString("standardPipeline.alreadyStarted"));
+                    (rb.getString(PIPLINE_STARTED));
 
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
@@ -289,7 +365,7 @@ public class StandardPipeline
         // Validate and update our current component state
         if (!started)
             throw new LifecycleException
-                (sm.getString("standardPipeline.notStarted"));
+                    (rb.getString(PIPLINE_NOT_STARTED));
 
         started = false;
 
@@ -366,8 +442,7 @@ public class StandardPipeline
                     try {
                         ((Lifecycle) oldBasic).stop();
                     } catch (LifecycleException e) {
-                        log.log(Level.SEVERE, "StandardPipeline.setBasic: stop",
-                                e);
+                        log.log(Level.SEVERE, rb.getString(SET_BASIC_STOP_EXCEPTION), e);
                     }
                 }
             }
@@ -397,7 +472,7 @@ public class StandardPipeline
             try {
                 ((Lifecycle) valve).start();
             } catch (LifecycleException e) {
-                log.log(Level.SEVERE, "StandardPipeline.setBasic: start", e);
+                log.log(Level.SEVERE, rb.getString(SET_BASIC_START_EXCEPTION), e);
                 return;
             }
         }
@@ -444,8 +519,7 @@ public class StandardPipeline
                 try {
                     ((Lifecycle) valve).start();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE,
-                            "StandardPipeline.addValve: start: ", e);
+                    log.log(Level.SEVERE, rb.getString(ADD_VALVE_EXCEPTION), e);
                 }
             }
             /** CR 6411114 (MBean registration moved to ValveBase.start())
@@ -477,8 +551,8 @@ public class StandardPipeline
             try {
                 addValve(new GlassFishValveAdapter(valve));
             } catch (Exception e) {
-                log.log(Level.SEVERE,
-                        "Unable to add valve " + valve, e);
+                String msg = MessageFormat.format(rb.getString(ADD_TOMCAT_STYLE_VALVE_EXCEPTION), valve);
+                log.log(Level.SEVERE, msg, e);
             }
             return;
         }
@@ -493,7 +567,7 @@ public class StandardPipeline
                     ((Lifecycle) valve).start();
                 } catch (LifecycleException e) {
                     log.log(Level.SEVERE,
-                            "StandardPipeline.addValve: start: ", e);
+                            rb.getString(ADD_VALVE_EXCEPTION), e);
                 }
             }
         }
@@ -646,7 +720,7 @@ public class StandardPipeline
 
         } else {
             throw new ServletException
-                (sm.getString("standardPipeline.noValve"));
+                    (rb.getString(NO_VALVES_IN_PIPELINE_EXCEPTION));
         }
 
         // Calls the protocol handler's init method if the request is marked to be upgraded
@@ -660,7 +734,7 @@ public class StandardPipeline
                             req.getInputStream(),
                             ((org.apache.catalina.connector.Response)req.getResponse()).getOutputStream()));
                 } else {
-                    log.log(Level.SEVERE, sm.getString("standardPipeline.protocolHandler.required"));
+                    log.log(Level.SEVERE, rb.getString(PROTOCOL_HANDLER_REQUIRED_EXCEPTION));
                 }
             }
         }
@@ -731,16 +805,14 @@ public class StandardPipeline
                     try {
                         ((Lifecycle) valve).stop();
                     } catch (LifecycleException e) {
-                        log.log(Level.SEVERE,
-                            "StandardPipeline.removeValve: stop: ", e);
+                        log.log(Level.SEVERE, rb.getString(REMOVE_VALVE_EXCEPTION), e);
                     }
                 }
             } else if (valve instanceof Lifecycle) {
                 try {
                     ((Lifecycle) valve).stop();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE,
-                        "StandardPipeline.removeValve: stop: ", e);
+                    log.log(Level.SEVERE, rb.getString(REMOVE_VALVE_EXCEPTION), e);
                 }
             }
 
@@ -765,18 +837,21 @@ public class StandardPipeline
         org.apache.catalina.Logger logger = null;
         if (container != null) {
             logger = container.getLogger();
+
+            String msg = MessageFormat.format(rb.getString(STANDARD_PIPELINE_INFO),
+                    new Object[] {container.getName(), message});
+
             if (logger != null) {
-                logger.log("StandardPipeline[" + container.getName() + "]: " +
-                        message);
+                logger.log(msg);
             } else {
                 if (log.isLoggable(Level.INFO)) {
-                    log.info("StandardPipeline[" + container.getName() +
-                            "]: " + message);
+                    log.log(Level.INFO, msg);
                 }
             }
         } else {
             if (log.isLoggable(Level.INFO)) {
-                log.info("StandardPipeline[null]: " + message);
+                String msg = MessageFormat.format(rb.getString(STANDARD_PIPELINE_NULL_INFO), message);
+                log.log(Level.INFO, msg);
             }
         }
     }
@@ -793,15 +868,19 @@ public class StandardPipeline
         org.apache.catalina.Logger logger = null;
         if (container != null) {
             logger = container.getLogger();
+
+            String msg = MessageFormat.format(rb.getString(STANDARD_PIPELINE_INFO),
+                                              new Object[] {container.getName(), message});
+
+
             if (logger != null) {
-                logger.log("StandardPipeline[" + container.getName() + "]: " +
-                        message, t, org.apache.catalina.Logger.WARNING);
+                logger.log(msg, t, org.apache.catalina.Logger.WARNING);
             } else {
-                log.log(Level.WARNING, "StandardPipeline[" + container.getName() +
-                        "]: " + message, t);
+                log.log(Level.WARNING, msg, t);
             }
         } else {
-            log.log(Level.WARNING, "StandardPipeline[null]: " + message, t);
+            String msg = MessageFormat.format(rb.getString(STANDARD_PIPELINE_NULL_INFO), message);
+            log.log(Level.WARNING, msg, t);// INFO set to WARNING
         }      
     }                                                                     
 

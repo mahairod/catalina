@@ -25,15 +25,18 @@ import org.apache.catalina.*;
 import org.apache.catalina.deploy.*;
 import org.apache.catalina.util.StringManager;
 import org.apache.naming.*;
+import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,8 +50,39 @@ import java.util.logging.Logger;
 public class NamingContextListener
     implements LifecycleListener, ContainerListener, PropertyChangeListener {
 
-    private static final Logger log = Logger.getLogger(
-        NamingContextListener.class.getName());
+    private static final Logger log = StandardServer.log;
+    private static final ResourceBundle rb = log.getResourceBundle();
+
+    @LogMessageInfo(
+        message = "Creation of the naming context failed: {0}",
+        level = "WARNING"
+    )
+    public static final String CREATION_NAMING_CONTEXT_FAILED = "AS-WEB-CORE-00046";
+
+    @LogMessageInfo(
+        message = "Failed to bind object: {0}",
+        level = "WARNING"
+    )
+    public static final String BIND_OBJECT_FAILED = "AS-WEB-CORE-00047";
+
+    @LogMessageInfo(
+        message = "Environment entry {0} has an invalid type",
+        level = "WARNING"
+    )
+    public static final String ENV_ENTRY_INVALID_TYPE = "AS-WEB-CORE-00048";
+
+    @LogMessageInfo(
+        message = "Environment entry {0} has an invalid value",
+        level = "WARNING"
+    )
+    public static final String ENV_ENTRY_INVALID_VALUE = "AS-WEB-CORE-00049";
+
+    @LogMessageInfo(
+        message = "Failed to unbind object: {0}",
+        level = "WARNING"
+    )
+    public static final String UNBIND_OBJECT_FAILED = "AS-WEB-CORE-00050";
+
 
 
     // ----------------------------------------------------------- Constructors
@@ -59,7 +93,7 @@ public class NamingContextListener
      */
     public NamingContextListener() {
         if (log.isLoggable(Level.FINEST))
-            log.finest( "new NamingContextListener");
+            log.log(Level.FINEST, "new NamingContextListener");
     }
 
 
@@ -114,13 +148,6 @@ public class NamingContextListener
     protected javax.naming.Context envCtx = null;
 
 
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
     // ------------------------------------------------------------- Properties
 
 
@@ -165,7 +192,7 @@ public class NamingContextListener
 
         this.name = name;
         if (log.isLoggable(Level.FINE))
-            log.fine( "setName " + name);
+            log.log(Level.FINE, "setName " + name);
     }
 
 
@@ -213,7 +240,7 @@ public class NamingContextListener
             ContextAccessController.setSecurityToken(getName(), container);
             ContextBindings.bindContext(container, namingContext, container);
             if (log.isLoggable(Level.FINE)) {
-                log.fine("Bound " + container );
+                log.log(Level.FINE, "Bound " + container);
             }
 
             // Setting the context in read/write mode
@@ -222,7 +249,8 @@ public class NamingContextListener
             try {
                 createNamingContext();
             } catch (NamingException e) {
-                log(sm.getString("naming.namingContextCreationFailed", e));
+                String msg = MessageFormat.format(rb.getString(CREATION_NAMING_CONTEXT_FAILED), e);
+                log(msg);
             }
 			
             namingResources.addPropertyChangeListener(this);
@@ -236,7 +264,8 @@ public class NamingContextListener
                         (container, container, 
                          ((Container) container).getLoader().getClassLoader());
                 } catch (NamingException e) {
-                    log(sm.getString("naming.bindFailed", e));
+                    String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+                    log(msg);
                 }
             }
 
@@ -248,7 +277,8 @@ public class NamingContextListener
                         (container, container, 
                          this.getClass().getClassLoader());
                 } catch (NamingException e) {
-                    log(sm.getString("naming.bindFailed", e));
+                    String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+                    log(msg);
                 }
                 if (container instanceof StandardServer) {
                     ((StandardServer) container).setGlobalNamingContext
@@ -629,7 +659,7 @@ public class NamingContextListener
         int i;
 
         if (log.isLoggable(Level.FINE))
-            log.fine("Creating JNDI naming context");
+            log.log(Level.FINE, "Creating JNDI naming context");
 
         if (namingResources == null) {
             namingResources = new NamingResources();
@@ -678,7 +708,8 @@ public class NamingContextListener
                 addAdditionalParameters
                     (namingResources, ref, "UserTransaction");
             } catch (NamingException e) {
-                log(sm.getString("naming.bindFailed", e));
+                String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+                log(msg);
             }
         }
 
@@ -688,7 +719,8 @@ public class NamingContextListener
                 compCtx.bind("Resources", 
                              ((Container) container).getResources());
             } catch (NamingException e) {
-                log(sm.getString("naming.bindFailed", e));
+                String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+                log(msg);
             }
         }
 
@@ -709,7 +741,8 @@ public class NamingContextListener
             createSubcontexts(envCtx, ejb.getName());
             envCtx.bind(ejb.getName(), ref);
         } catch (NamingException e) {
-            log(sm.getString("naming.bindFailed", e));
+            String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -776,12 +809,15 @@ public class NamingContextListener
                     }
                 }
             } else {
-                log(sm.getString("naming.invalidEnvEntryType", env.getName()));
+                String msg = MessageFormat.format(rb.getString(ENV_ENTRY_INVALID_TYPE), env.getName());
+                log(msg);
             }
         } catch (NumberFormatException e) {
-            log(sm.getString("naming.invalidEnvEntryValue", env.getName()));
+            String msg = MessageFormat.format(rb.getString(ENV_ENTRY_INVALID_VALUE), env.getName());
+            log(msg);
         } catch (IllegalArgumentException e) {
-            log(sm.getString("naming.invalidEnvEntryValue", env.getName()));
+            String msg = MessageFormat.format(rb.getString(ENV_ENTRY_INVALID_VALUE), env.getName());
+            log(msg);
         }
 
         // Binding the object to the appropriate name
@@ -792,7 +828,8 @@ public class NamingContextListener
                 createSubcontexts(envCtx, env.getName());
                 envCtx.bind(env.getName(), value);
             } catch (NamingException e) {
-                log(sm.getString("naming.invalidEnvEntryValue", e));
+                String msg = MessageFormat.format(rb.getString(ENV_ENTRY_INVALID_VALUE), env.getName());
+                log(msg);
             }
         }
 
@@ -829,7 +866,8 @@ public class NamingContextListener
             createSubcontexts(envCtx, resource.getName());
             envCtx.bind(resource.getName(), ref);
         } catch (NamingException e) {
-            log(sm.getString("naming.bindFailed", e));
+            String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -850,7 +888,8 @@ public class NamingContextListener
             createSubcontexts(envCtx, name);
             envCtx.bind(name, ref);
         } catch (NamingException e) {
-            log(sm.getString("naming.bindFailed", e));
+            String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -873,7 +912,8 @@ public class NamingContextListener
             createSubcontexts(envCtx, resourceLink.getName());
             envCtx.bind(resourceLink.getName(), ref);
         } catch (NamingException e) {
-            log(sm.getString("naming.bindFailed", e));
+            String msg = MessageFormat.format(rb.getString(BIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -887,7 +927,8 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log(sm.getString("naming.unbindFailed", e));
+            String msg = MessageFormat.format(rb.getString(UNBIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -901,7 +942,8 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log(sm.getString("naming.unbindFailed", e));
+            String msg = MessageFormat.format(rb.getString(UNBIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -915,7 +957,8 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log(sm.getString("naming.unbindFailed", e));
+            String msg = MessageFormat.format(rb.getString(UNBIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -929,7 +972,8 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log(sm.getString("naming.unbindFailed", e));
+            String msg = MessageFormat.format(rb.getString(UNBIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -943,7 +987,8 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log(sm.getString("naming.unbindFailed", e));
+            String msg = MessageFormat.format(rb.getString(UNBIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -957,7 +1002,8 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log(sm.getString("naming.unbindFailed", e));
+            String msg = MessageFormat.format(rb.getString(UNBIND_OBJECT_FAILED), e);
+            log(msg);
         }
 
     }
@@ -1019,7 +1065,8 @@ public class NamingContextListener
     protected void log(String message) {
         if (!(container instanceof Container)) {
             if (log.isLoggable(Level.INFO)) {
-                log.info(logName() + ": " + message);
+                // Did not localize this message
+                log.log(Level.INFO, logName() + ": " + message);
             }
             return;
         }
@@ -1029,7 +1076,7 @@ public class NamingContextListener
             logger.log(logName() + ": " + message);
         } else {
             if (log.isLoggable(Level.INFO)) {
-                log.info(logName() + ": " + message);
+                log.log(Level.INFO, logName() + ": " + message);
             }
         }
     }
