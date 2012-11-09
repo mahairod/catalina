@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -21,6 +21,7 @@
 package org.apache.catalina.authenticator;
 
 import org.apache.catalina.Session;
+import org.apache.catalina.core.StandardServer;
 
 import java.security.Principal;
 import java.util.HashSet;
@@ -34,8 +35,7 @@ import java.util.logging.Logger;
  */
 public class SingleSignOnEntry {
 
-    private static final Logger log = Logger.getLogger(
-        SingleSignOnEntry.class.getName());
+    private static final Logger log = StandardServer.log;
 
     protected String id = null;
 
@@ -105,7 +105,8 @@ public class SingleSignOnEntry {
     public synchronized void expireSessions() {
         for (Session session: sessions) {
             if (log.isLoggable(Level.FINE)) {
-                log.fine(" Invalidating session " + session);
+
+                log.log(Level.FINE, " Invalidating session " + session);
             }
         
             //6406580 START

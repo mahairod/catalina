@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,6 +22,7 @@ package org.apache.catalina.authenticator;
 
 import org.apache.catalina.HttpRequest;
 import org.apache.catalina.HttpResponse;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.Base64;
 
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,10 +47,6 @@ import java.util.logging.Logger;
 
 public class BasicAuthenticator
     extends AuthenticatorBase {
-
-    private static Logger log = Logger.getLogger(
-        BasicAuthenticator.class.getName());
-
 
     // --------------------------------------------------- Instance Variables
 
@@ -99,7 +97,7 @@ public class BasicAuthenticator
             ((HttpServletRequest) request.getRequest()).getUserPrincipal();
         if (principal != null) {
             if (log.isLoggable(Level.FINE))
-                log.fine("Already authenticated '" + principal.getName() + "'");
+                log.log(Level.FINE, "Already authenticated '" + principal.getName() + "'");
             return (true);
         }
 
