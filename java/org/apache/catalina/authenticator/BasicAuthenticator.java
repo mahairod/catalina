@@ -22,7 +22,6 @@ package org.apache.catalina.authenticator;
 
 import org.apache.catalina.HttpRequest;
 import org.apache.catalina.HttpResponse;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.Base64;
 
@@ -32,9 +31,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC

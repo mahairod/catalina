@@ -192,12 +192,6 @@ public class StandardPipeline
 
 
     /**
-     * The debugging detail level for this component.
-     */
-    protected int debug = 0;
-
-
-    /**
      * Descriptive information about this implementation.
      */
     protected static final String info = "org.apache.catalina.core.StandardPipeline/1.0";
