@@ -551,7 +551,7 @@ public class StandardService
         // Validate and update our current component state
         if (started) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, rb.getString(SERVICE_STARTED));
+                log.log(Level.INFO, SERVICE_STARTED);
             }
         }
         
@@ -651,7 +651,7 @@ public class StandardService
         // Service shouldn't be used with embedded, so it doesn't matter
         if (initialized) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, rb.getString(SERVICE_HAS_BEEN_INIT));
+                log.log(Level.INFO, SERVICE_HAS_BEEN_INIT);
             }
             return;
         }

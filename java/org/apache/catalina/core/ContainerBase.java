@@ -523,7 +523,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldLoader).stop();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_LOADER_STOP), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_LOADER_STOP, e);
                 }
             }
 
@@ -535,7 +535,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) loader).start();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_LOADER_START), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_LOADER_START, e);
                 }
             }
         } finally {
@@ -593,7 +593,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldLogger).stop();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_LOGGER_STOP), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_LOGGER_STOP, e);
                 }
             }
 
@@ -606,7 +606,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) logger).start();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_LOGGER_START), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_LOGGER_START, e);
                 }
             }
         } finally {
@@ -664,7 +664,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldManager).stop();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_MANAGER_STOP), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_MANAGER_STOP, e);
                 }
             }
 
@@ -676,7 +676,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) manager).start();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_MANAGER_START), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_MANAGER_START, e);
                 }
             }
         } finally {
@@ -876,7 +876,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) oldRealm).stop();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_REALM_STOP), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_REALM_STOP, e);
                 }
             }
 
@@ -888,7 +888,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) realm).start();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_SET_REALM_START), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_SET_REALM_START, e);
                 }
             }
         } finally {
@@ -1002,7 +1002,7 @@ public abstract class ContainerBase
                 try {
                     ((Lifecycle) child).start();
                 } catch (LifecycleException e) {
-                    log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_ADD_CHILD_START), e);
+                    log.log(Level.SEVERE, CONTAINER_BASE_ADD_CHILD_START, e);
                     throw new IllegalStateException
                             (rb.getString(CONTAINER_BASE_ADD_CHILD_START) + e);
                 }
@@ -1137,7 +1137,7 @@ public abstract class ContainerBase
                     ((Lifecycle) child).stop();
                 }
             } catch (LifecycleException e) {
-                log.log(Level.SEVERE, rb.getString(CONTAINER_BASE_REMOVE_CHILD_STOP), e);
+                log.log(Level.SEVERE, CONTAINER_BASE_REMOVE_CHILD_STOP, e);
             }
         }
         
@@ -1374,7 +1374,7 @@ public abstract class ContainerBase
                     }
                 }
             } catch( Throwable t ) {
-                log.log(Level.SEVERE, rb.getString(ERROR_UNREGISTERING), t);
+                log.log(Level.SEVERE, ERROR_UNREGISTERING, t);
             }
         }
 
@@ -1794,7 +1794,7 @@ public abstract class ContainerBase
                 }
                 container.backgroundProcess();
             } catch (Throwable t) {
-                log.log(Level.SEVERE, rb.getString(EXCEPTION_INVOKES_PERIODIC_OP), t);
+                log.log(Level.SEVERE, EXCEPTION_INVOKES_PERIODIC_OP, t);
             } finally {
                 Thread.currentThread().setContextClassLoader(cl);
             }

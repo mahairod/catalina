@@ -1212,7 +1212,7 @@ public class StandardHost
         if( deployer!= null )
             return deployer;
         if (log.isLoggable(Level.INFO)) {
-            log.log(Level.INFO, rb.getString(CREATE_HOST_DEPLOYER_INFO));
+            log.log(Level.INFO, CREATE_HOST_DEPLOYER_INFO);
         }
         try {
             Class<?> c=Class.forName( STANDARD_HOST_DEPLOYER );
@@ -1220,7 +1220,7 @@ public class StandardHost
             Method m=c.getMethod("setHost", new Class[] {Host.class} );
             m.invoke( deployer,  new Object[] { this } );
         } catch( Throwable t ) {
-            log.log(Level.SEVERE, rb.getString(ERROR_CREATING_DEPLOYER_EXCEPTION), t);
+            log.log(Level.SEVERE, ERROR_CREATING_DEPLOYER_EXCEPTION, t);
         }
         return deployer;
     }
