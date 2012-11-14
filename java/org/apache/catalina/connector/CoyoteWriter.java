@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,10 +20,11 @@
 
 package org.apache.catalina.connector;
 
-import org.apache.catalina.util.StringManager;
+import org.apache.catalina.core.StandardServer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ResourceBundle;
 
 
 /**
@@ -35,6 +36,8 @@ import java.io.PrintWriter;
 public class CoyoteWriter
     extends PrintWriter {
 
+    private static final ResourceBundle rb = StandardServer.log.getResourceBundle();
+
 
     // -------------------------------------------------------------- Constants
 
@@ -44,11 +47,6 @@ public class CoyoteWriter
     private static final char[] LINE_SEP =
         System.getProperty("line.separator").toCharArray();
 
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -104,8 +102,7 @@ public class CoyoteWriter
 
         // Disallow operation if the object has gone out of scope
         if (ob == null) {
-            throw new IllegalStateException(
-                sm.getString("object.invalidScope"));
+            throw new IllegalStateException(rb.getString(CoyoteInputStream.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (error)
@@ -124,8 +121,7 @@ public class CoyoteWriter
 
         // Disallow operation if the object has gone out of scope
         if (ob == null) {
-            throw new IllegalStateException(
-                sm.getString("object.invalidScope"));
+            throw new IllegalStateException(rb.getString(CoyoteInputStream.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         // We don't close the PrintWriter - super() is not called,
@@ -143,8 +139,7 @@ public class CoyoteWriter
     public boolean checkError() {
         // Disallow operation if the object has gone out of scope
         if (ob == null) {
-            throw new IllegalStateException(
-                sm.getString("object.invalidScope"));
+            throw new IllegalStateException(rb.getString(CoyoteInputStream.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
         flush();
         return error;
@@ -155,8 +150,7 @@ public class CoyoteWriter
 
         // Disallow operation if the object has gone out of scope
         if (ob == null) {
-            throw new IllegalStateException(
-                sm.getString("object.invalidScope"));
+            throw new IllegalStateException(rb.getString(CoyoteInputStream.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (error)
@@ -175,8 +169,7 @@ public class CoyoteWriter
 
         // Disallow operation if the object has gone out of scope
         if (ob == null) {
-            throw new IllegalStateException(
-                sm.getString("object.invalidScope"));
+            throw new IllegalStateException(rb.getString(CoyoteInputStream.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (error)
@@ -199,8 +192,7 @@ public class CoyoteWriter
 
         // Disallow operation if the object has gone out of scope
         if (ob == null) {
-            throw new IllegalStateException(
-                sm.getString("object.invalidScope"));
+            throw new IllegalStateException(rb.getString(CoyoteInputStream.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (error)
@@ -224,8 +216,7 @@ public class CoyoteWriter
 
         // Disallow operation if the object has gone out of scope
         if (ob == null) {
-            throw new IllegalStateException(
-                sm.getString("object.invalidScope"));
+            throw new IllegalStateException(rb.getString(CoyoteInputStream.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (error)

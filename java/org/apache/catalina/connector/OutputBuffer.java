@@ -23,6 +23,7 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.WriteListener;
@@ -33,11 +34,12 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.RequestUtil;
-import org.apache.catalina.util.StringManager;
 import org.glassfish.grizzly.WriteHandler;
 import org.glassfish.grizzly.http.server.io.OutputBuffer.LifeCycleListener;
 import org.glassfish.grizzly.http.util.ByteChunk;
+import org.glassfish.logging.annotation.LogMessageInfo;
 
 /**
  * The buffer used by Tomcat response. This is a derivative of the Tomcat 3.3
@@ -50,9 +52,14 @@ import org.glassfish.grizzly.http.util.ByteChunk;
 public class OutputBuffer extends Writer
     implements ByteChunk.ByteOutputChannel {
 
-    private static final Logger log = Logger.getLogger(OutputBuffer.class.getName());
+    private static final Logger log = StandardServer.log;
+    private static final ResourceBundle rb = log.getResourceBundle();
 
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
+    @LogMessageInfo(
+            message = "The WriteListener has already been set.",
+            level = "WARNING"
+    )
+    public static final String WRITE_LISTENER_BEEN_SET = "AS-WEB-CORE-00355";
 
 
     // -------------------------------------------------------------- Constants
@@ -190,7 +197,7 @@ public class OutputBuffer extends Writer
     public void recycle() {
 
 	if (log.isLoggable(Level.FINE))
-            log.fine("recycle()");
+            log.log(Level.FINE, "recycle()");
 
         bytesWritten = 0;
         charsWritten = 0;
@@ -269,7 +276,7 @@ public class OutputBuffer extends Writer
 	throws IOException {
 
         if (log.isLoggable(Level.FINE))
-            log.fine("realWrite(b, " + off + ", " + cnt + ") " + grizzlyResponse);
+            log.log(Level.FINE, "realWrite(b, " + off + ", " + cnt + ") " + grizzlyResponse);
 
         if (grizzlyResponse == null)
             return;
@@ -308,7 +315,7 @@ public class OutputBuffer extends Writer
         if (grizzlyOutputBuffer.isClosed())
             return;
         if (log.isLoggable(Level.FINE))
-            log.fine("write(b,off,len)");
+            log.log(Level.FINE, "write(b,off,len)");
 
         grizzlyOutputBuffer.write(b, off, len);
         bytesWritten += len;
@@ -486,8 +493,7 @@ public class OutputBuffer extends Writer
 
     public void setWriteListener(WriteListener writeListener) {
         if (hasSetWriteListener) {
-            throw new IllegalStateException(
-                sm.getString("outputBuffer.alreadysetWriteListener"));
+            throw new IllegalStateException(rb.getString(WRITE_LISTENER_BEEN_SET));
         }
 
         writeHandler = new WriteHandlerImpl(writeListener);
