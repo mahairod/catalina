@@ -436,8 +436,7 @@ public class FormAuthenticator
             //NOTE: is finishResponse necessary or is it unnecessary after forward
             response.finishResponse();
         } catch (Throwable t) {
-            log.log(Level.WARNING,
-                    rb.getString(UNEXPECTED_ERROR_FORWARDING_TO_LOGIN_PAGE),
+            log.log(Level.WARNING, UNEXPECTED_ERROR_FORWARDING_TO_LOGIN_PAGE,
                     t);
         }
     }
@@ -478,8 +477,7 @@ public class FormAuthenticator
             RequestDispatcher disp = sc.getRequestDispatcher(errorPage);
             disp.forward(request.getRequest(), response.getResponse());
         } catch (Throwable t) {
-            log.log(Level.WARNING,
-                    rb.getString(UNEXPECTED_ERROR_FORWARDING_TO_LOGIN_PAGE),
+            log.log(Level.WARNING, UNEXPECTED_ERROR_FORWARDING_TO_LOGIN_PAGE,
                     t);
         }
     }
