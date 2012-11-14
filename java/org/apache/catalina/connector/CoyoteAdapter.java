@@ -61,6 +61,8 @@ package org.apache.catalina.connector;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -73,6 +75,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
 import org.glassfish.grizzly.http.Method;
@@ -84,6 +87,7 @@ import org.glassfish.grizzly.http.util.ByteChunk;
 import org.glassfish.grizzly.http.util.CharChunk;
 import org.glassfish.grizzly.http.util.DataChunk;
 import org.glassfish.grizzly.http.util.MessageBytes;
+import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
 
 /**
@@ -98,7 +102,37 @@ import org.glassfish.web.valve.GlassFishValve;
 public class CoyoteAdapter
     implements Adapter 
  {
-    private static final Logger log = Logger.getLogger(CoyoteAdapter.class.getName());
+
+    private static final Logger log = StandardServer.log;
+    private static final ResourceBundle rb = log.getResourceBundle();
+
+    @LogMessageInfo(
+            message = "An exception or error occurred in the container during the request processing",
+            level = "SEVERE",
+            cause = "Could not process the request in the container",
+            action = "Verify certificate chain retrieved from the request header and the correctness of request"
+    )
+    public static final String REQUEST_PROCESSING_EXCEPTION = "AS-WEB-CORE-00410";
+
+    @LogMessageInfo(
+            message = "HTTP listener on port {0} has been disabled",
+            level = "FINE"
+    )
+    public static final String HTTP_LISTENER_DISABLED = "AS-WEB-CORE-00411";
+
+    @LogMessageInfo(
+            message = "Error parsing client cert chain into array of java.security.cert.X509Certificate instances",
+            level = "SEVERE",
+            cause = "Could not get the SSL client certificate chain",
+            action = "Verify certificate chain and the request"
+    )
+    public static final String PARSING_CLIENT_CERT_EXCEPTION = "AS-WEB-CORE-00412";
+
+    @LogMessageInfo(
+            message = "No Host matches server name {0}",
+            level = "INFO"
+    )
+    public static final String NO_HOST_MATCHES_SERVER_NAME_INFO = "AS-WEB-CORE-00413";
 
     // -------------------------------------------------------------- Constants
     private static final String POWERED_BY = "Servlet/3.0 JSP/2.2 " +
@@ -179,13 +213,6 @@ public class CoyoteAdapter
     private int debug = 0;
 
 
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
     // -------------------------------------------------------- Adapter Methods
 
 
@@ -244,7 +271,7 @@ public class CoyoteAdapter
             // Request may want to initialize async processing
             request.onAfterService();
         } catch (Throwable t) {
-            log.log(Level.SEVERE, sm.getString("coyoteAdapter.service"), t);
+            log.log(Level.SEVERE, REQUEST_PROCESSING_EXCEPTION, t);
         }
     }
 
@@ -259,8 +286,8 @@ public class CoyoteAdapter
         // START SJSAS 6331392
         // Check connector for disabled state
         if (!connector.isEnabled()) {
-            String msg = sm.getString("coyoteAdapter.listenerOff",
-                                      String.valueOf(connector.getPort()));
+            String msg = MessageFormat.format(rb.getString(HTTP_LISTENER_DISABLED),
+                                              String.valueOf(connector.getPort()));
             if (log.isLoggable(Level.FINE)) {
                 log.fine(msg);            
             }
@@ -296,8 +323,7 @@ public class CoyoteAdapter
                     certs = proxyHandler.getSSLClientCertificateChain(
                                 request.getRequest());
                 } catch (CertificateException ce) {
-                    log.log(Level.SEVERE,
-                            sm.getString("coyoteAdapter.proxyAuthCertError"),
+                    log.log(Level.SEVERE, PARSING_CLIENT_CERT_EXCEPTION,
                             ce);
                 }
                 if (certs != null) {
@@ -326,9 +352,10 @@ public class CoyoteAdapter
                     Host host = request.getHost();
                     if (host == null) {
                         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        response.setDetailMessage(sm.getString(
-                                "coyoteAdapter.noHost",
-                                request.getRequest().getServerName()));
+
+                        String msg = MessageFormat.format(rb.getString(NO_HOST_MATCHES_SERVER_NAME_INFO),
+                                                          request.getRequest().getServerName());
+                        response.setDetailMessage(msg);
                         return;
                     }
                     if (host.getPipeline().hasNonBasicValves() ||
@@ -900,7 +927,7 @@ public class CoyoteAdapter
      * @param message Message to be logged
      */
     protected void log(String message) {
-        log.info( message );
+        log.log(Level.INFO, message);
     }
 
 
@@ -957,7 +984,7 @@ public class CoyoteAdapter
                 ((ContainerBase)connector.getContainer())
                     .fireContainerEvent(type,data);
             } catch (Throwable t){
-                log.log(Level.SEVERE, sm.getString("coyoteAdapter.service"), t);
+                log.log(Level.SEVERE, REQUEST_PROCESSING_EXCEPTION, t);
             }
         }
     }
@@ -1019,7 +1046,7 @@ public class CoyoteAdapter
                         servletResponse.setUpgrade(servletRequest.isUpgrade());
                     }
                 } catch (Exception e) {
-                    log.log(Level.SEVERE, sm.getString("coyoteAdapter.service"), e);
+                    log.log(Level.SEVERE, REQUEST_PROCESSING_EXCEPTION, e);
                 } finally {
                     servletRequest.recycle();
                     servletResponse.recycle();
