@@ -4430,7 +4430,7 @@ public class Request
          */
         if (asyncContext != null
                 && !asyncContext.isDispatchInScope()
-                && !isAsyncComplete && isAsyncStarted()) {
+                && !isAsyncComplete) {
             ((HttpServletResponse) response).setStatus(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setError();
@@ -4449,7 +4449,7 @@ public class Request
                  * did not call AsyncContext#complete or any of the
                  * AsyncContext#dispatch methods, call AsyncContext#complete
                  */
-                if (!isAsyncComplete && isAsyncStarted()) {
+                if (!isAsyncComplete) {
                     asyncComplete();
                 }
             }
