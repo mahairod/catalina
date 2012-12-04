@@ -194,7 +194,6 @@ public class CoyoteAdapter
     public CoyoteAdapter(Connector connector) {
         super();
         this.connector = connector;
-        this.debug = connector.getDebug();
     }
 
 
@@ -205,12 +204,6 @@ public class CoyoteAdapter
      * The CoyoteConnector with which this processor is associated.
      */
     private Connector connector = null;
-
-
-    /**
-     * The debugging detail level for this component.
-     */
-    private int debug = 0;
 
 
     // -------------------------------------------------------- Adapter Methods
