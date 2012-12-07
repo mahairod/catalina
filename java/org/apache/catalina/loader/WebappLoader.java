@@ -676,8 +676,7 @@ public class WebappLoader
 
         if (container.getResources() == null) {
             if (log.isLoggable(Level.INFO)) {
-                String msg = MessageFormat.format(rb.getString(NO_RESOURCE_INFO), container);
-                log.log(Level.INFO, msg);
+                log.log(Level.INFO, NO_RESOURCE_INFO, container);
             }
             return;
         }
@@ -800,9 +799,7 @@ public class WebappLoader
                 setReloadable
                     ( ((Boolean) event.getNewValue()).booleanValue() );
             } catch (NumberFormatException e) {
-                String msg = MessageFormat.format(rb.getString(SET_RELOADABLE_PROPERTY_EXCEPTION),
-                                                  event.getNewValue().toString());
-                log.log(Level.SEVERE, msg);
+                log.log(Level.SEVERE, SET_RELOADABLE_PROPERTY_EXCEPTION, event.getNewValue().toString());
             }
         }
     }
@@ -1009,8 +1006,7 @@ public class WebappLoader
             (File) servletContext.getAttribute(ServletContext.TEMPDIR);
         if (workDir == null) {
             if (log.isLoggable(Level.INFO)) {
-                String msg = MessageFormat.format(rb.getString(NO_WORK_DIR_INFO), servletContext);
-                log.log(Level.INFO, msg);
+                log.log(Level.INFO, NO_WORK_DIR_INFO, servletContext);
             }
         }
 
@@ -1095,9 +1091,7 @@ public class WebappLoader
                 copyJars = true;
                 destDir = new File(workDir, libPath);
                 if (!destDir.mkdirs() && !destDir.isDirectory()) {
-                    String msg = MessageFormat.format(rb.getString(FAILED_CREATE_WORK_DIR_EXCEPTION),
-                                                      destDir.getAbsolutePath());
-                    log.log(Level.SEVERE, msg);
+                    log.log(Level.SEVERE, FAILED_CREATE_WORK_DIR_EXCEPTION, destDir.getAbsolutePath());
                 }
             }
 

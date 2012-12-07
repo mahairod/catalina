@@ -1001,7 +1001,7 @@ public abstract class RealmBase
                     response.setDetailMessage(rb.getString(ACCESS_RESOURCE_DENIED));
                     // END S1AS 4878272
 
-                    if (log.isLoggable(Level.FINE)) log.fine("No roles ");
+                    if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "No roles ");
                     return (false); // No listed roles means no access at all
                 } else {
                     if (log.isLoggable(Level.FINE)) {
@@ -1174,14 +1174,10 @@ public abstract class RealmBase
         if (log.isLoggable(Level.FINE)) {
             String name = principal.getName();
             if (result) {
-                String msg = MessageFormat.format(rb.getString(USERNAME_HAS_ROLE),
-                                                  new Object[] {name, role});
-                log.log(Level.FINE, msg);
+                log.log(Level.FINE, USERNAME_HAS_ROLE, new Object[] {name, role});
             }
             else {
-                String msg = MessageFormat.format(rb.getString(USERNAME_NOT_HAVE_ROLE),
-                                                  new Object[] {name, role});
-                log.log(Level.FINE, msg);
+                log.log(Level.FINE, USERNAME_NOT_HAVE_ROLE, new Object[] {name, role});
             }
         }
         return (result);
