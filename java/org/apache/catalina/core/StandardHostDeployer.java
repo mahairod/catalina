@@ -333,9 +333,7 @@ public class StandardHostDeployer implements Deployer {
 
         // Calculate the document base for the new web application
         if (log.isLoggable(Level.INFO)) {
-            String msg = MessageFormat.format(rb.getString(INSTALLING_WEB_APP_INFO),
-                                              new Object[] {contextPath, war.toString()});
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, INSTALLING_WEB_APP_INFO, new Object[] {contextPath, war.toString()});
         }
         String url = war.toString();
         String docBase = null;
@@ -477,9 +475,7 @@ public class StandardHostDeployer implements Deployer {
 
         // Calculate the document base for the new web application
         if (log.isLoggable(Level.INFO)) {
-            String msg = MessageFormat.format(rb.getString(INSTALLING_WEB_APP_INFO),
-                                              new Object[] {contextPath, war.toString()});
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, INSTALLING_WEB_APP_INFO, new Object[] {contextPath, war.toString()});
         }
         String url = war.toString();
         String docBase = null;
@@ -575,8 +571,7 @@ public class StandardHostDeployer implements Deployer {
                     (rb.getString(USE_CONFIG_FILE_NOT_ALLOWED));
 
         if (log.isLoggable(Level.INFO)) {
-            String msg = MessageFormat.format(rb.getString(PROCESSING_CONTEXT_CONFIG_INFO), config);
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, PROCESSING_CONTEXT_CONFIG_INFO, config);
         }
 
         // Calculate the document base for the new web application (if needed)
@@ -585,8 +580,7 @@ public class StandardHostDeployer implements Deployer {
         if (war != null) {
             String url = war.toString();
             if (log.isLoggable(Level.INFO)) {
-                String msg = MessageFormat.format(rb.getString(INSTALLING_WEB_APP_FROM_URL_INFO), url);
-                log.log(Level.INFO, msg);
+                log.log(Level.INFO, INSTALLING_WEB_APP_FROM_URL_INFO, url);
             }
             // Calculate the WAR file absolute pathname
             if (url.startsWith("jar:")) {
@@ -710,8 +704,7 @@ public class StandardHostDeployer implements Deployer {
 
         // Remove this web application
         if (log.isLoggable(Level.INFO)) {
-            String msg = MessageFormat.format(rb.getString(REMOVING_WEB_APP_INFO), contextPath);
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, REMOVING_WEB_APP_INFO, contextPath);
         }
         try {
             host.removeChild(context);
@@ -880,8 +873,7 @@ public class StandardHostDeployer implements Deployer {
             throw new IllegalArgumentException(msg);
         }
         if (log.isLoggable(Level.INFO)) {
-            String msg = MessageFormat.format(rb.getString(STARTING_WEB_APP_INFO), contextPath);
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, STARTING_WEB_APP_INFO, contextPath);
         }
         try {
             ((Lifecycle) context).start();
@@ -924,7 +916,7 @@ public class StandardHostDeployer implements Deployer {
         }
         if (log.isLoggable(Level.INFO)) {
             String msg = MessageFormat.format(rb.getString(STOPPING_WEB_APP_INFO), contextPath);
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, STOPPING_WEB_APP_INFO, contextPath);
 
         }
         try {
@@ -1035,8 +1027,7 @@ public class StandardHostDeployer implements Deployer {
 
     protected void deleteFile(File dir) {
         if (!dir.delete()) {
-            String msg = MessageFormat.format(rb.getString(FAILED_REMOVE_FILE), dir.getAbsolutePath());
-            log.log(Level.WARNING, msg);
+            log.log(Level.WARNING, FAILED_REMOVE_FILE, dir.getAbsolutePath());
         }
     }
 

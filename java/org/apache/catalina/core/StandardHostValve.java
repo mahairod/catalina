@@ -256,9 +256,7 @@ final class StandardHostValve
         // If this is an aborted request from a client just log it and return
         if (realError instanceof ClientAbortException ) {
             if (log.isLoggable(Level.FINE)) {
-                String msg = MessageFormat.format(rb.getString(REMOTE_CLIENT_ABORTED_EXCEPTION),
-                                                  realError.getCause().getMessage());
-                log.log(Level.FINE, msg);
+                log.log(Level.FINE, REMOTE_CLIENT_ABORTED_EXCEPTION, realError.getCause().getMessage());
             }
             return;
         }
@@ -335,8 +333,7 @@ final class StandardHostValve
             if (errorPage.getLocation() != null) {
                 File file = new File(context.getDocBase(), errorPage.getLocation());
                 if (!file.exists()) {
-                    String msg = MessageFormat.format(rb.getString(ERROR_PAGE_NOT_EXIST), file.getAbsolutePath());
-                    log.log(Level.WARNING, msg);
+                    log.log(Level.WARNING, ERROR_PAGE_NOT_EXIST, file.getAbsolutePath());
                 }
             }
             setErrorPageContentType(response, errorPage.getLocation(), context);
@@ -354,8 +351,7 @@ final class StandardHostValve
                 if (errorPage.getLocation() != null) {
                     File file = new File(context.getDocBase(), errorPage.getLocation());
                     if (!file.exists()) {
-                        String msg = MessageFormat.format(rb.getString(ERROR_PAGE_NOT_EXIST), file.getAbsolutePath());
-                        log.log(Level.WARNING, msg);
+                        log.log(Level.WARNING, ERROR_PAGE_NOT_EXIST, file.getAbsolutePath());
                     }
                 }
                 try {

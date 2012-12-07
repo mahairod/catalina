@@ -562,8 +562,7 @@ public class StandardService
         lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
 
         if (log.isLoggable(Level.INFO)) {
-            String msg = MessageFormat.format(rb.getString(STARTING_SERVICE), this.name);
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, STARTING_SERVICE, this.name);
         }
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
@@ -613,8 +612,7 @@ public class StandardService
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
 
         if (log.isLoggable(Level.INFO)) {
-            String msg = MessageFormat.format(rb.getString(STOPPING_SERVICE), this.name);
-            log.log(Level.INFO, msg);
+            log.log(Level.INFO, STOPPING_SERVICE, this.name);
         }
         started = false;
 
