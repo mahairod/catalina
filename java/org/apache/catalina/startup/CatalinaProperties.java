@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -19,6 +19,9 @@
  */
 
 package org.apache.catalina.startup;
+
+import org.apache.catalina.core.StandardServer;
+import org.glassfish.logging.annotation.LogMessageInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,8 +44,7 @@ public class CatalinaProperties {
 
     // ----------------------------------------------------- Static Variables
 
-    private static Logger log = Logger.getLogger(
-        CatalinaProperties.class.getName());
+    private static final Logger log = StandardServer.log;
 
     private static Properties properties = null;
 
@@ -50,7 +52,11 @@ public class CatalinaProperties {
         loadProperties();
     }
 
-
+    @LogMessageInfo(
+            message = "Failed to load catalina.properties",
+            level = "WARNING"
+    )
+    public static final String FAILED_LOAD_CATALINA_PROPERTIES_EXCEPTION = "AS-WEB-CORE-00707";
     // ------------------------------------------------------- Public Methods
 
     /**
@@ -127,7 +133,7 @@ public class CatalinaProperties {
 
         if ((is == null) || (error != null)) {
             // Do something
-            log.log(Level.WARNING, "Failed to load catalina.properties",
+            log.log(Level.WARNING, FAILED_LOAD_CATALINA_PROPERTIES_EXCEPTION,
                     error);
             // That's fine - we have reasonable defaults.
             properties = new Properties();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -21,6 +21,7 @@
 package org.apache.catalina.startup;
 
 import com.sun.logging.LogDomains;
+import org.apache.catalina.core.StandardServer;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 import javax.inject.Inject;
@@ -157,5 +158,5 @@ public class DigesterFactory {
         }
     }
 
-    protected static final Logger _logger = LogDomains.getLogger(DigesterFactory.class, LogDomains.WEB_LOGGER);
+    protected static final Logger _logger = StandardServer.log;
 }

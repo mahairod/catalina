@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,7 +20,9 @@
 
 package org.apache.catalina.startup;
 
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.security.SecurityClassLoad;
+import org.glassfish.logging.annotation.LogMessageInfo;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -63,7 +65,15 @@ public final class Bootstrap {
      */
     private static Bootstrap daemon = null;
 
-    private static Logger log = Logger.getLogger(Bootstrap.class.getName());
+    private static final Logger log = StandardServer.log;
+
+    @LogMessageInfo(
+            message = "Class loader creation threw exception",
+            level = "SEVERE",
+            cause = "Could not create class loader",
+            action = "Verify the availability of current repository "
+    )
+    public static final String CLASS_LOADER_CREATION_EXCEPTION = "AS-WEB-CORE-00690";
 
     // ----------------------------------------------------------- Variables
 
@@ -99,7 +109,7 @@ public final class Bootstrap {
             catalinaLoader = createClassLoader("server", commonLoader);
             sharedLoader = createClassLoader("shared", commonLoader);
         } catch (Throwable t) {
-            log.log(Level.SEVERE, "Class loader creation threw exception", t);
+            log.log(Level.SEVERE, CLASS_LOADER_CREATION_EXCEPTION, t);
             System.exit(1);
         }
     }
@@ -176,7 +186,7 @@ public final class Bootstrap {
 
         // Load our startup class and call its process() method
         if (log.isLoggable(Level.FINE))
-            log.fine("Loading startup class");
+            log.log(Level.FINE, "Loading startup class");
         Class startupClass =
             catalinaLoader.loadClass
             ("org.apache.catalina.startup.Catalina");
@@ -184,7 +194,7 @@ public final class Bootstrap {
 
         // Set the shared extensions class loader
         if (log.isLoggable(Level.FINE))
-            log.fine("Setting startup class properties");
+            log.log(Level.FINE, "Setting startup class properties");
         String methodName = "setParentClassLoader";
         Class paramTypes[] = new Class[1];
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
@@ -220,8 +230,8 @@ public final class Bootstrap {
         }
         Method method = 
             catalinaDaemon.getClass().getMethod(methodName, paramTypes);
-        if (log.isLoggable(Level.FINE)) 
-            log.fine("Calling startup class " + method);
+        if (log.isLoggable(Level.FINE))
+            log.log(Level.FINE, "Calling startup class " + method);
         method.invoke(catalinaDaemon, param);
 
     }
