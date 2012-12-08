@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -25,8 +25,12 @@ import java.util.HashMap;
 */
 // START PWC 6057385
 
+import org.apache.catalina.core.StandardServer;
+import org.glassfish.logging.annotation.LogMessageInfo;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 
 /**
@@ -46,6 +50,14 @@ public final class ParameterMap extends HashMap {
 // START PWC 6057385
 public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 // END PWC 6057385
+
+    private static final ResourceBundle rb = StandardServer.log.getResourceBundle();
+
+    @LogMessageInfo(
+            message = "Map is currently locked",
+            level = "WARNING"
+    )
+    public static final String MAP_IS_LOCKED_EXCEPTION = "AS-WEB-CORE-00835";
 
     // ----------------------------------------------------------- Constructors
 
@@ -131,12 +143,6 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
     }
 
 
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -152,7 +158,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
+                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
         super.clear();
 
     }
@@ -176,7 +182,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
+                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
         return (super.put(key, value));
 
     }
@@ -196,7 +202,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
+                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
         super.putAll(map);
 
     }
@@ -217,7 +223,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
+                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
         return (super.remove(key));
 
     }

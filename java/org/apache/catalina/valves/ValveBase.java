@@ -22,8 +22,8 @@ package org.apache.catalina.valves;
 
 import org.apache.catalina.*;
 import org.apache.catalina.core.ContainerBase;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.LifecycleSupport;
-import org.apache.catalina.util.StringManager;
 import org.glassfish.web.valve.GlassFishValve;
 
 import javax.management.MalformedObjectNameException;
@@ -31,6 +31,7 @@ import javax.management.ObjectName;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +53,8 @@ public abstract class ValveBase
 // START CR 6411114
     implements Contained, Lifecycle, Valve, GlassFishValve {
 // END CR 6411114
-    private static Logger log = Logger.getLogger(ValveBase.class.getName());
+    protected static final Logger log = StandardServer.log;
+    protected static final ResourceBundle rb = log.getResourceBundle();
 
     //------------------------------------------------------ Instance Variables
 
@@ -96,12 +98,6 @@ public abstract class ValveBase
      */
     protected Valve next = null;
 
-
-    /**
-     * The string manager for this package.
-     */
-    protected final static StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     //-------------------------------------------------------------- Properties
@@ -402,7 +398,7 @@ public abstract class ValveBase
         }
         
         if (log.isLoggable(Level.FINE)) {
-            log.fine("valve parent=" + parentName + " " + parent);
+            log.log(Level.FINE, "valve parent=" + parentName + " " + parent);
         }
 
         String className=this.getClass().getName();
@@ -419,8 +415,8 @@ public abstract class ValveBase
             if( valves[i]!=null &&
                     valves[i].getClass() == this.getClass()) {
                 if (log.isLoggable(Level.FINE)) {
-                    log.fine("Duplicate " + valves[i] + " " + this + " " +
-                             container);
+                    log.log(Level.FINE, "Duplicate " + valves[i] + " " + this + " " +
+                            container);
                 }
                 seq++;
             }
@@ -434,7 +430,7 @@ public abstract class ValveBase
             new ObjectName( domain + ":type=Valve,name=" + className + ext + parentName);
 
         if (log.isLoggable(Level.FINE)) {
-            log.fine("valve objectname = "+objectName);
+            log.log(Level.FINE, "valve objectname = "+objectName);
         }
 
         return objectName;

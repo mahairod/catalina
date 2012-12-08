@@ -22,7 +22,7 @@ package org.apache.catalina.valves;
 
 
 import org.apache.catalina.*;
-import org.apache.catalina.util.StringManager;
+import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -41,7 +41,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * <p>Implementation of the <b>Valve</b> interface that generates a web server
@@ -117,6 +116,13 @@ public final class AccessLogValve
     extends ValveBase {
     // END CR 6411114
 
+    @LogMessageInfo(
+            message = "Could not create a new directory: {0}",
+            level = "SEVERE",
+            cause = "Could not create a new directory",
+            action = "Verify if file is directory, and access permission"
+    )
+    public static final String CREATING_DIR_EXCEPTION = "AS-WEB-CORE-00850";
 
     // ----------------------------------------------------------- Constructors
 
@@ -208,13 +214,6 @@ public final class AccessLogValve
 
 
     /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
      * Has this component been started yet?
      */
     /** CR 6411114 (Lifecycle implementation moved to ValveBase)
@@ -242,9 +241,6 @@ public final class AccessLogValve
 
     private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getDefault();
     
-    private static final Logger log = Logger.getLogger(
-        AccessLogValve.class.getName());
-
     /**
      * ThreadLocal for a date formatter to format Dates into a day string in the format
      * "dd".
@@ -816,7 +812,7 @@ public final class AccessLogValve
         if (!dir.isAbsolute())
             dir = new File(System.getProperty("catalina.base"), directory);
         if (!dir.mkdirs() && !dir.isDirectory()) {
-            log.log(Level.SEVERE, sm.getString("accessLogValve.openDirFail", dir));
+            log.log(Level.SEVERE, CREATING_DIR_EXCEPTION, dir);
         }
 
         // Open the current log file

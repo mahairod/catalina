@@ -21,6 +21,7 @@
 package org.apache.tomcat.util.digester;
 
 
+import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.util.IntrospectionUtils;
 import org.xml.sax.Attributes;
 
@@ -33,6 +34,12 @@ import java.util.logging.Level;
  */
 
 public class SetPropertyRule extends Rule {
+
+    @LogMessageInfo(
+            message = "[SetPropertyRule]{0} Setting property {1} to {2} did not find a matching property.",
+            level = "WARNING"
+    )
+    public static final String PROPERTY_RULE_NOT_FIND_MATCHING_PROPERTY = "AS-WEB-CORE-00931";
 
 
     // ----------------------------------------------------------- Constructors
@@ -122,7 +129,7 @@ public class SetPropertyRule extends Rule {
 
         // Log some debugging information
         if (digester.log.isLoggable(Level.FINE)) {
-            digester.log.fine("[SetPropertyRule]{" + digester.match +
+            digester.log.log(Level.FINE, "[SetPropertyRule]{" + digester.match +
                     "} Set " + top.getClass().getName() + " property " +
                     actualName + " to " + actualValue);
         }
@@ -131,9 +138,8 @@ public class SetPropertyRule extends Rule {
         if (!digester.isFakeAttribute(top, actualName) 
                 && !IntrospectionUtils.setProperty(top, actualName, actualValue) 
                 && digester.getRulesValidation()) {
-            digester.log.warning("[SetPropertyRule]{" + digester.match +
-                    "} Setting property '" + name + "' to '" +
-                    value + "' did not find a matching property.");
+            digester.log.log(Level.WARNING, PROPERTY_RULE_NOT_FIND_MATCHING_PROPERTY,
+                             new Object[] {digester.match, name, value});
         }
 
     }

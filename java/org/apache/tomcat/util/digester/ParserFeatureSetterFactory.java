@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -59,7 +59,7 @@ public class ParserFeatureSetterFactory{
      * parser implementation.
      */
     public static SAXParser newSAXParser(Properties properties)
-            throws ParserConfigurationException, 
+            throws ParserConfigurationException,
                    SAXException,
                    SAXNotRecognizedException, 
                    SAXNotSupportedException {

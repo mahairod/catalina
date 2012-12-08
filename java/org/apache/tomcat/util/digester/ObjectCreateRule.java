@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -200,7 +200,7 @@ public class ObjectCreateRule extends Rule {
             }
         }
         if (digester.log.isLoggable(Level.FINE)) {
-            digester.log.fine("[ObjectCreateRule]{" + digester.match +
+            digester.log.log(Level.FINE, "[ObjectCreateRule]{" + digester.match +
                     "}New " + realClassName);
         }
 
@@ -219,7 +219,7 @@ public class ObjectCreateRule extends Rule {
 
         Object top = digester.pop();
         if (digester.log.isLoggable(Level.FINE)) {
-            digester.log.fine("[ObjectCreateRule]{" + digester.match +
+            digester.log.log(Level.FINE, "[ObjectCreateRule]{" + digester.match +
                     "} Pop " + top.getClass().getName());
         }
 

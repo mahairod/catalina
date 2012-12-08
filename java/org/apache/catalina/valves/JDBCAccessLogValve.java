@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -25,7 +25,6 @@ import org.apache.catalina.HttpResponse;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Request;
 import org.apache.catalina.Response;
-import org.apache.catalina.util.StringManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -205,12 +204,6 @@ public final class JDBCAccessLogValve
     /** CR 6411114 (Lifecycle implementation moved to ValveBase)
     protected LifecycleSupport lifecycle = new LifecycleSupport(this);
     */
-
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**
