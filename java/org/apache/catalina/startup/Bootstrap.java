@@ -62,8 +62,9 @@ public final class Bootstrap {
 
     /**
      * Daemon object used by main.
-     */
+     *
     private static Bootstrap daemon = null;
+     */
 
     private static final Logger log = StandardServer.log;
 
