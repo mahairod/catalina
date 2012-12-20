@@ -91,7 +91,6 @@ public class InputBuffer extends Reader
     private org.apache.catalina.connector.Request request;
 
     private ReadHandler readHandler = null;
-    private boolean hasSetReadListener = false;
     private boolean prevIsReady = true;
     private static final ThreadLocal<Boolean> IS_READY_SCOPE = new ThreadLocal<Boolean>();
 
@@ -164,7 +163,6 @@ public class InputBuffer extends Reader
         grizzlyInputBuffer = null;
         grizzlyRequest = null;
         readHandler = null;
-        hasSetReadListener = false;
         prevIsReady = true;
 
     }
@@ -235,7 +233,7 @@ public class InputBuffer extends Reader
 
         boolean result = (grizzlyInputBuffer.available() > 0);
         if (!result) {
-            if (hasSetReadListener) {
+            if (readHandler != null) {
                 prevIsReady = false; // Not data available
                 IS_READY_SCOPE.set(Boolean.TRUE);
                 try {
@@ -254,12 +252,11 @@ public class InputBuffer extends Reader
 
 
     public void setReadListener(ReadListener readListener) {
-        if (hasSetReadListener) {
+        if (readHandler != null) {
             throw new IllegalStateException(rb.getString(ALREADY_SET_READ_LISTENER));
         }
 
         readHandler = new ReadHandlerImpl(readListener);
-        hasSetReadListener = true;
 
         if (isReady()) {
             try {

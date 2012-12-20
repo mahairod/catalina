@@ -99,7 +99,6 @@ public class OutputBuffer extends Writer
     private org.glassfish.grizzly.http.server.io.OutputBuffer grizzlyOutputBuffer;
 
     private WriteHandler writeHandler = null;
-    private boolean hasSetWriteListener = false;
     private boolean prevIsReady = true;
     private static final ThreadLocal<Boolean> CAN_WRITE_SCOPE = new ThreadLocal<Boolean>();
 
@@ -196,7 +195,6 @@ public class OutputBuffer extends Writer
         grizzlyOutputBuffer = null;
         writeHandler = null;
         prevIsReady = true;
-        hasSetWriteListener = false;
         response = null;
 
     }
@@ -463,7 +461,7 @@ public class OutputBuffer extends Writer
         
         boolean result = grizzlyOutputBuffer.canWrite();
         if (!result) {
-            if (hasSetWriteListener) {
+            if (writeHandler != null) {
                 prevIsReady = false; // Not can write
                 CAN_WRITE_SCOPE.set(Boolean.TRUE);
                 try {
@@ -481,12 +479,11 @@ public class OutputBuffer extends Writer
     }
 
     public void setWriteListener(WriteListener writeListener) {
-        if (hasSetWriteListener) {
+        if (writeHandler != null) {
             throw new IllegalStateException(rb.getString(WRITE_LISTENER_BEEN_SET));
         }
 
         writeHandler = new WriteHandlerImpl(writeListener);
-        hasSetWriteListener = true;
 
         if (isReady()) {
             try {
