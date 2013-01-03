@@ -429,6 +429,11 @@ public class Catalina extends Embedded {
                 digester.parse(is);
             } catch (Exception e) {
                 log.log(Level.SEVERE, CATALINA_STOP_EXCEPTION, e);
+                try {
+                    if (fis != null) {
+                        fis.close();
+                    }
+                } catch (IOException ioe) {}
                 System.exit(1);
             } finally {
                 try {

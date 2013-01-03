@@ -1620,7 +1620,9 @@ public abstract class ContainerBase
     protected ObjectName controller;
 
     public ObjectName getJmxName() {
-        return oname;
+        synchronized (this) {
+            return oname;
+        }
     }
     
     public String getObjectName() {
