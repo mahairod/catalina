@@ -178,10 +178,10 @@ public class StandardContext
     public static final String SERVLET_CONTEXT_ALREADY_INIT_EXCEPTION = "AS-WEB-CORE-00079";
 
     @LogMessageInfo(
-        message = "Filter name is null",
+        message = "Filter name is null or an empty String",
         level = "WARNING"
     )
-    public static final String NULL_FILTER_NAME_EXCEPTION = "AS-WEB-CORE-00080";
+    public static final String NULL_EMPTY_FILTER_NAME_EXCEPTION = "AS-WEB-CORE-00080";
 
     @LogMessageInfo(
         message = "Unable to set {0} session tracking mode on servlet context {1}, because it is not supported",
@@ -494,6 +494,24 @@ public class StandardContext
     )
     public static final String ERROR_REGISTERING_WRAPPER_INFO = "AS-WEB-CORE-00129";
 
+
+    @LogMessageInfo(
+            message = "Null filter instance",
+            level = "WARNING"
+    )
+    public static final String NULL_FILTER_INSTANCE_EXCEPTION = "AS-WEB-CORE-00130";
+
+    @LogMessageInfo(
+            message = "Servlet name is null or an empty String",
+            level = "WARNING"
+    )
+    public static final String NULL_EMPTY_SERVLET_NAME_EXCEPTION = "AS-WEB-CORE-00131";
+
+    @LogMessageInfo(
+            message = "Null servlet instance",
+            level = "WARNING"
+    )
+    public static final String NULL_SERVLET_INSTANCE_EXCEPTION = "AS-WEB-CORE-00132";
 
     private static final ClassLoader standardContextClassLoader =
         StandardContext.class.getClassLoader();
@@ -2882,8 +2900,8 @@ public class StandardContext
             throw new IllegalStateException(msg);
         }
 
-        if (filterName == null) {
-            throw new IllegalArgumentException(rb.getString(NULL_FILTER_NAME_EXCEPTION));
+        if (filterName == null || filterName.length() == 0) {
+            throw new IllegalArgumentException(rb.getString(NULL_EMPTY_FILTER_NAME_EXCEPTION));
         }
 
         synchronized (filterDefs) {
@@ -2930,8 +2948,12 @@ public class StandardContext
             throw new IllegalStateException(msg);
         }
 
-        if (filterName == null || filter == null) {
-            throw new IllegalArgumentException("Null filter instance or name");
+        if (filterName == null || filterName.length() == 0) {
+            throw new IllegalArgumentException(rb.getString(NULL_EMPTY_FILTER_NAME_EXCEPTION));
+        }
+
+        if (filter == null) {
+            throw new IllegalArgumentException(rb.getString(NULL_FILTER_INSTANCE_EXCEPTION));
         }
 
         /*
@@ -3013,8 +3035,8 @@ public class StandardContext
             throw new IllegalStateException(msg);
         }
 
-        if (filterName == null) {
-            throw new IllegalArgumentException(rb.getString(NULL_FILTER_NAME_EXCEPTION));
+        if (filterName == null || filterName.length() == 0) {
+            throw new IllegalArgumentException(rb.getString(NULL_EMPTY_FILTER_NAME_EXCEPTION));
         }
 
         synchronized (filterDefs) {
@@ -3782,6 +3804,11 @@ public class StandardContext
                                                       new Object[] {"addServlet", getName()});
             throw new IllegalStateException(msg);
         }
+
+        if (servletName == null || servletName.length() == 0) {
+            throw new IllegalArgumentException(rb.getString(NULL_EMPTY_SERVLET_NAME_EXCEPTION));
+        }
+
         synchronized (children) {
             if (findChild(servletName) == null) {
                 DynamicServletRegistrationImpl regis =
@@ -3832,6 +3859,11 @@ public class StandardContext
                                               new Object[] {"addServlet", getName()});
             throw new IllegalStateException(msg);
         }
+
+        if (servletName == null || servletName.length() == 0) {
+            throw new IllegalArgumentException(rb.getString(NULL_EMPTY_SERVLET_NAME_EXCEPTION));
+        }
+
         // Make sure servlet name is unique for this context
         synchronized (children) {
             if (findChild(servletName) == null) {
@@ -3906,8 +3938,12 @@ public class StandardContext
             throw new IllegalStateException(msg);
         }
 
-        if (servletName == null || servlet == null) {
-            throw new NullPointerException("Null servlet instance or name");
+        if (servletName == null || servletName.length() == 0) {
+            throw new IllegalArgumentException(rb.getString(NULL_EMPTY_SERVLET_NAME_EXCEPTION));
+        }
+
+        if (servlet == null) {
+            throw new NullPointerException(rb.getString(NULL_SERVLET_INSTANCE_EXCEPTION));
         }
 
         if (servlet instanceof SingleThreadModel) {
