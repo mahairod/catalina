@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -777,6 +777,10 @@ public class Request
      */
     public boolean getUnsuccessfulSessionFind() {
         return this.unsuccessfulSessionFind;
+    }
+
+    public void setUpgrade(boolean upgrade) {
+        this.upgrade = upgrade;
     }
 
     public boolean isUpgrade() {
