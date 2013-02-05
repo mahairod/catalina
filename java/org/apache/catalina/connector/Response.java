@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -351,9 +351,7 @@ public class Response
         }
 
         context = null;
-        if (!upgrade) {
-            outputBuffer.recycle();
-        }
+        outputBuffer.recycle();
         usingOutputStream = false;
         usingWriter = false;
         appCommitted = false;
@@ -368,7 +366,7 @@ public class Response
                 facade.clear();
                 facade = null;
             }
-            if ((outputStream != null) && !upgrade) {
+            if (outputStream != null) {
                 outputStream.clear();
                 outputStream = null;
             }

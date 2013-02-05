@@ -478,7 +478,7 @@ public class InputBuffer extends Reader
                             ((Response)request.getResponse()).setUpgrade(false);
                         }
                     } finally {
-                        ((StandardContext)request.getContext()).fireContainerEvent(
+                        (request.getContext()).fireContainerEvent(
                             ContainerEvent.PRE_DESTROY, httpUpgradeHandler);
                     }
                     if (grizzlyRequest.getResponse().isSuspended()) {
