@@ -13,6 +13,8 @@ import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.ResourceBundle;
@@ -64,7 +66,7 @@ class AsyncContextImpl implements AsyncContext {
     private static final long DEFAULT_ASYNC_TIMEOUT_MILLIS = 30000L;
 
     // Thread pool for async dispatches
-    static final ExecutorService pool =
+    private static final ExecutorService pool =
         Executors.newCachedThreadPool(new AsyncPoolThreadFactory());
 
     private static final StringManager STRING_MANAGER =
@@ -235,7 +237,32 @@ class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void start(Runnable run) {
-        pool.execute(run);
+        ClassLoader oldCL = null;
+        if (Globals.IS_SECURITY_ENABLED) {
+            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+            oldCL = AccessController.doPrivileged(pa);
+        } else {
+            oldCL = Thread.currentThread().getContextClassLoader();
+        }
+
+        try {
+            ClassLoader newCL = origRequest.getContext().getLoader().getClassLoader();
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(newCL);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(newCL);
+            }
+
+            pool.execute(run);
+        } finally {
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(oldCL);
+            }
+        }
     }
 
     @Override
@@ -469,34 +496,64 @@ class AsyncContextImpl implements AsyncContext {
                 asyncListenerContexts.clear();
             }
         }
-        for (AsyncListenerContext asyncListenerContext : clone) {
-            AsyncListener asyncListener =
-                asyncListenerContext.getAsyncListener();
-            AsyncEvent asyncEvent = new AsyncEvent(
-                this, asyncListenerContext.getRequest(),
-                asyncListenerContext.getResponse(), t);
-            try {
-                switch (asyncEventType) {
-                case COMPLETE:
-                    asyncListener.onComplete(asyncEvent);
-                    break;
-                case TIMEOUT:
-                    asyncListener.onTimeout(asyncEvent);
-                    break;
-                case ERROR:
-                    asyncListener.onError(asyncEvent);
-                    break;
-                case START_ASYNC:
-                    asyncListener.onStartAsync(asyncEvent);
-                    break;
-                default: // not possible
-                    break;
+
+        ClassLoader oldCL;
+        if (Globals.IS_SECURITY_ENABLED) {
+            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+            oldCL = AccessController.doPrivileged(pa);
+        } else {
+            oldCL = Thread.currentThread().getContextClassLoader();
+        }
+
+        try {
+            ClassLoader newCL = origRequest.getContext().getLoader().getClassLoader();
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(newCL);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(newCL);
+            }
+
+            for (AsyncListenerContext asyncListenerContext : clone) {
+                AsyncListener asyncListener =
+                    asyncListenerContext.getAsyncListener();
+                AsyncEvent asyncEvent = new AsyncEvent(
+                    this, asyncListenerContext.getRequest(),
+                    asyncListenerContext.getResponse(), t);
+                try {
+                    switch (asyncEventType) {
+                    case COMPLETE:
+                        asyncListener.onComplete(asyncEvent);
+                        break;
+                    case TIMEOUT:
+                        asyncListener.onTimeout(asyncEvent);
+                        break;
+                    case ERROR:
+                        asyncListener.onError(asyncEvent);
+                        break;
+                    case START_ASYNC:
+                        asyncListener.onStartAsync(asyncEvent);
+                        break;
+                    default: // not possible
+                        break;
+                    }
+                } catch (Throwable throwable) {
+                    log.log(Level.WARNING, ERROR_INVOKE_ASYNCLISTENER,
+                            throwable);
                 }
-            } catch (Throwable throwable) {
-                log.log(Level.WARNING, ERROR_INVOKE_ASYNCLISTENER,
-                        throwable);
+            }
+        } finally {
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(oldCL);
             }
         }
+    }
+
+    static ExecutorService getExecutorService() {
+        return pool;
     }
 
     void clear() {
@@ -568,4 +625,27 @@ class AsyncContextImpl implements AsyncContext {
 
     } // END AsyncPoolThreadFactory
 
+    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
+
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        @Override
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }
+
+    private static class PrivilegedGetTccl
+            implements PrivilegedAction<ClassLoader> {
+
+        @Override
+        public ClassLoader run() {
+            return Thread.currentThread().getContextClassLoader();
+        }
+    }
 }

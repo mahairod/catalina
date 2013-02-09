@@ -22,6 +22,8 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -711,7 +713,7 @@ public class OutputBuffer extends Writer
             if (!Boolean.TRUE.equals(CAN_WRITE_SCOPE.get())) {
                 processWritePossible();
             } else {
-                AsyncContextImpl.pool.execute(new Runnable() {
+                AsyncContextImpl.getExecutorService().execute(new Runnable() {
                     @Override
                     public void run() {
                         processWritePossible();
@@ -721,12 +723,37 @@ public class OutputBuffer extends Writer
         }
 
         private void processWritePossible() {
-            synchronized(lk) {
-                prevIsReady = true;
-                try {
-                    writeListener.onWritePossible();
-                } catch(Throwable t) {
-                    writeListener.onError(t);
+            ClassLoader oldCL;
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                oldCL = AccessController.doPrivileged(pa);
+            } else {
+                oldCL = Thread.currentThread().getContextClassLoader();
+            }
+
+            try {
+                ClassLoader newCL = response.getContext().getLoader().getClassLoader();
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(newCL);
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(newCL);
+                }
+
+                synchronized(lk) {
+                    prevIsReady = true;
+                    try {
+                        writeListener.onWritePossible();
+                    } catch(Throwable t) {
+                        writeListener.onError(t);
+                    }
+                }
+            } finally {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(oldCL);
                 }
             }
         }
@@ -735,7 +762,7 @@ public class OutputBuffer extends Writer
             if (!Boolean.TRUE.equals(CAN_WRITE_SCOPE.get())) {
                 processError(t);
             } else {
-                AsyncContextImpl.pool.execute(new Runnable() {
+                AsyncContextImpl.getExecutorService().execute(new Runnable() {
                     @Override
                     public void run() {
                         processError(t);
@@ -745,9 +772,58 @@ public class OutputBuffer extends Writer
         }
 
         private void processError(final Throwable t) {
-            synchronized(lk) {
-                writeListener.onError(t);
+            ClassLoader oldCL;
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                oldCL = AccessController.doPrivileged(pa);
+            } else {
+                oldCL = Thread.currentThread().getContextClassLoader();
             }
+
+            try {
+                ClassLoader newCL = response.getContext().getLoader().getClassLoader();
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(newCL);
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(newCL);
+                }
+
+                synchronized(lk) {
+                    writeListener.onError(t);
+                }
+            } finally {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(oldCL);
+                }
+            }
+        }
+    }
+
+    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
+
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        @Override
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }
+
+    private static class PrivilegedGetTccl
+            implements PrivilegedAction<ClassLoader> {
+
+        @Override
+        public ClassLoader run() {
+            return Thread.currentThread().getContextClassLoader();
         }
     }
 }
