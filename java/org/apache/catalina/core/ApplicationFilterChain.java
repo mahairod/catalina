@@ -60,6 +60,7 @@ final class ApplicationFilterChain implements FilterChain {
     )
     public static final String FILTER_EXECUTION_EXCEPTION = "AS-WEB-CORE-00023";
 
+
     // -------------------------------------------------------------- Constants
 
 
@@ -297,6 +298,7 @@ final class ApplicationFilterChain implements FilterChain {
                                       servlet, request, response, e);
             throw new ServletException
               (sm.getString("filterChain.servlet"), e);
+              //filterChain.servlet=PWC1244: Servlet execution threw an exception
         }
 
         */
