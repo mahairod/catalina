@@ -190,10 +190,7 @@ public class StandardContext
     public static final String UNSUPPORTED_TRACKING_MODE_EXCEPTION = "AS-WEB-CORE-00081";
 
     @LogMessageInfo(
-        message = "Unable to add listener of type: {0}, " +
-                  "because it does not implement any of the required ServletContextListener, " +
-                  "ServletContextAttributeListener, ServletRequestListener, ServletRequestAttributeListener, " +
-                  "HttpSessionListener, or HttpSessionAttributeListener interfaces",
+        message = "Unable to add listener of type: {0}, because it does not implement any of the required ServletContextListener, ServletContextAttributeListener, ServletRequestListener, ServletRequestAttributeListener, HttpSessionListener, or HttpSessionAttributeListener interfaces",
         level = "WARNING"
     )
     public static final String UNABLE_ADD_LISTENER_EXCEPTION = "AS-WEB-CORE-00082";
@@ -3346,8 +3343,7 @@ public class StandardContext
                 !HttpSessionIdListener.class.isAssignableFrom(clazz) &&
                 !HttpSessionListener.class.isAssignableFrom(clazz)) {
             String msg = MessageFormat.format(rb.getString(UNABLE_ADD_LISTENER_EXCEPTION),
-                                              new Object[] {"standardContext.invalidListenerType",
-                                                            clazz.getName()});
+                                              new Object[] {clazz.getName()});
             throw new IllegalArgumentException(msg);
         }
 
