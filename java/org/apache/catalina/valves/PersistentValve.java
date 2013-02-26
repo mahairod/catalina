@@ -48,7 +48,7 @@ public class PersistentValve
             message = "No Context configured to process this request",
             level = "WARNING"
     )
-    public static final String NO_CONTEXT_CONFIGURED = "AS-WEB-CORE-00890";
+    public static final String NO_CONTEXT_CONFIGURED = "AS-WEB-CORE-00514";
     // ----------------------------------------------------- Instance Variables
 
 

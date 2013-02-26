@@ -71,7 +71,7 @@ public class Digester extends DefaultHandler {
             cause = "Could not create new SAXParser",
             action = "Verify the parser configuration and if SAXParser is supported"
     )
-    public static final String GET_PARRSER_EXCEPTION = "AS-WEB-CORE-00910";
+    public static final String GET_PARRSER_EXCEPTION = "AS-WEB-CORE-00517";
 
     @LogMessageInfo(
             message = "Cannot get XMLReader",
@@ -79,7 +79,7 @@ public class Digester extends DefaultHandler {
             cause = "Could not get XML Reader",
             action = "Verify if there are XML Readers can be instantiated"
     )
-    public static final String CANNOT_GET_XML_READER_EXCEPTION = "AS-WEB-CORE-00911";
+    public static final String CANNOT_GET_XML_READER_EXCEPTION = "AS-WEB-CORE-00518";
 
     @LogMessageInfo(
             message = "Finish event threw exception",
@@ -87,7 +87,7 @@ public class Digester extends DefaultHandler {
             cause = "Rules could not remove data",
             action = "Verify if finish() is called after all parsing methods have been called"
     )
-    public static final String FINISH_EVENT_EXCEPTION = "AS-WEB-CORE-00912";
+    public static final String FINISH_EVENT_EXCEPTION = "AS-WEB-CORE-00519";
 
     @LogMessageInfo(
             message = "Finish event threw error",
@@ -95,7 +95,7 @@ public class Digester extends DefaultHandler {
             cause = "Rules could not remove data",
             action = "Verify if finish() is called after all parsing methods have been called"
     )
-    public static final String FINISH_EVENT_ERROR = "AS-WEB-CORE-00913";
+    public static final String FINISH_EVENT_ERROR = "AS-WEB-CORE-00520";
 
     @LogMessageInfo(
             message = "Body event threw exception",
@@ -103,7 +103,7 @@ public class Digester extends DefaultHandler {
             cause = "Could not fire body()",
             action = "Verify if the current rule has body"
     )
-    public static final String BODY_EVENT_EXCEPTION = "AS-WEB-CORE-00914";
+    public static final String BODY_EVENT_EXCEPTION = "AS-WEB-CORE-00521";
 
     @LogMessageInfo(
             message = "Body event threw error",
@@ -111,13 +111,13 @@ public class Digester extends DefaultHandler {
             cause = "Could not fire body()",
             action = "Verify if the current rule has body"
     )
-    public static final String BODY_EVENT_ERROR = "AS-WEB-CORE-00915";
+    public static final String BODY_EVENT_ERROR = "AS-WEB-CORE-00522";
 
     @LogMessageInfo(
             message = "No rules found matching {0}.",
             level = "WARNING"
     )
-    public static final String NO_RULES_FOUND_MATCHING_EXCEPTION = "AS-WEB-CORE-00916";
+    public static final String NO_RULES_FOUND_MATCHING_EXCEPTION = "AS-WEB-CORE-00523";
 
     @LogMessageInfo(
             message = "End event threw exception",
@@ -126,7 +126,7 @@ public class Digester extends DefaultHandler {
             action = "Verify if this method is called when the end of a matching XML element " +
                      "is encountered"
     )
-    public static final String END_EVENT_EXCEPTION = "AS-WEB-CORE-00917";
+    public static final String END_EVENT_EXCEPTION = "AS-WEB-CORE-00524";
 
     @LogMessageInfo(
             message = "End event threw error",
@@ -135,7 +135,7 @@ public class Digester extends DefaultHandler {
             action = "Verify if this method is called when the end of a matching XML element " +
                     "is encountered"
     )
-    public static final String END_EVENT_ERROR = "AS-WEB-CORE-00918";
+    public static final String END_EVENT_ERROR = "AS-WEB-CORE-00525";
 
     @LogMessageInfo(
             message = "Begin event threw exception",
@@ -144,7 +144,7 @@ public class Digester extends DefaultHandler {
             action = "Verify if this method is called when the beginning of a matching XML element " +
                     "is encountered"
     )
-    public static final String BEGIN_EVENT_EXCEPTION = "AS-WEB-CORE-00919";
+    public static final String BEGIN_EVENT_EXCEPTION = "AS-WEB-CORE-00526";
 
     @LogMessageInfo(
             message = "Begin event threw error",
@@ -153,7 +153,7 @@ public class Digester extends DefaultHandler {
             action = "Verify if this method is called when the beginning of a matching XML element " +
                     "is encountered"
     )
-    public static final String BEGIN_EVENT_ERROR = "AS-WEB-CORE-00920";
+    public static final String BEGIN_EVENT_ERROR = "AS-WEB-CORE-00527";
 
     @LogMessageInfo(
             message = "Parse Error at line {0} column {1}: {2}",
@@ -161,7 +161,7 @@ public class Digester extends DefaultHandler {
             cause = "Parsing error occurs",
             action = "Verify if there are any parsing errors occur"
     )
-    public static final String PARSE_ERROR = "AS-WEB-CORE-00921";
+    public static final String PARSE_ERROR = "AS-WEB-CORE-00528";
 
     @LogMessageInfo(
             message = "Parse Fatal Error at line {0} column {1}: {2}",
@@ -169,7 +169,7 @@ public class Digester extends DefaultHandler {
             cause = "Parsing error occurs",
             action = "Verify if there are any parsing errors occur"
     )
-    public static final String PARSE_FATAL_ERROR = "AS-WEB-CORE-00922";
+    public static final String PARSE_FATAL_ERROR = "AS-WEB-CORE-00529";
 
     @LogMessageInfo(
             message = "Parse Warning Error at line {0} column {1}: {2}",
@@ -177,13 +177,13 @@ public class Digester extends DefaultHandler {
             cause = "Parsing error occurs",
             action = "Verify if there are any parsing errors occur"
     )
-    public static final String PARSE_WARNING_ERROR = "AS-WEB-CORE-00923";
+    public static final String PARSE_WARNING_ERROR = "AS-WEB-CORE-00530";
 
     @LogMessageInfo(
             message = "Empty stack (returning null)",
             level = "WARNING"
     )
-    public static final String EMPTY_STACK_EXCEPTION = "AS-WEB-CORE-00924";
+    public static final String EMPTY_STACK_EXCEPTION = "AS-WEB-CORE-00531";
 
     @LogMessageInfo(
             message = "No Locator!",
@@ -191,7 +191,7 @@ public class Digester extends DefaultHandler {
             cause = "There is no document locator",
             action = "Verify if document locator has been set"
     )
-    public static final String NO_LOCATOR_EXCEPTION = "AS-WEB-CORE-00925";
+    public static final String NO_LOCATOR_EXCEPTION = "AS-WEB-CORE-00532";
     // ---------------------------------------------------------- Static Fields
 
 

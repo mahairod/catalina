@@ -91,7 +91,7 @@ public final class SecurityUtil{
             message = "An exception occurs when running the PrivilegedExceptionAction block.",
             level = "FINE"
     )
-    public static final String PRIVILEGE_ACTION_EXCEPTION = "AS-WEB-CORE-00540";
+    public static final String PRIVILEGE_ACTION_EXCEPTION = "AS-WEB-CORE-00322";
    
     
     /**
