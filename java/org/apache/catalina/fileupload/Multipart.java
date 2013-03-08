@@ -13,7 +13,6 @@ package org.apache.catalina.fileupload;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
@@ -115,11 +114,11 @@ public class Multipart {
                                          requestItem.getFieldName(),
                                          requestItem.getContentType(),
                                          requestItem.isFormField(),
-                                         requestItem.getName(),
+                                         requestItem.getSubmittedFileName(),
                                          request.getCharacterEncoding());
                 Streams.copy(requestItem.openStream(),
                              partItem.getOutputStream(), true);
-                String fileName = partItem.getFileName();
+                String fileName = partItem.getSubmittedFileName();
                 if (fileName == null || fileName.length() == 0) {
                     // Add part name and value as a parameter
                     request.addParameter(partItem.getName(),

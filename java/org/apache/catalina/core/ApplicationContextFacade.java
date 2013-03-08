@@ -840,6 +840,15 @@ public final class ApplicationContextFacade
         }
     }
 
+    @Override
+    public String getVirtualServerName() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (String)doPrivileged("getVirtualServerName", null);
+        } else {
+            return context.getVirtualServerName();
+        }
+    }
+
 
     // START PWC 1.2
     /**
