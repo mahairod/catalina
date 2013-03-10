@@ -39,6 +39,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.RequestUtil;
 import org.glassfish.grizzly.WriteHandler;
+import org.glassfish.grizzly.http.server.io.OutputBuffer.LifeCycleListener;
 import org.glassfish.grizzly.http.util.ByteChunk;
 import org.glassfish.logging.annotation.LogMessageInfo;
 
@@ -103,7 +104,7 @@ public class OutputBuffer extends Writer
     private Response response;
     
     private org.glassfish.grizzly.http.server.Response grizzlyResponse;
-    private org.glassfish.grizzly.http.io.OutputBuffer grizzlyOutputBuffer;
+    private org.glassfish.grizzly.http.server.io.OutputBuffer grizzlyOutputBuffer;
 
     private WriteHandler writeHandler = null;
     private boolean prevIsReady = true;
@@ -116,7 +117,7 @@ public class OutputBuffer extends Writer
 
     private int size;
     
-    private org.glassfish.grizzly.http.io.OutputBuffer.LifeCycleListener sessionCookieChecker =
+    private org.glassfish.grizzly.http.server.io.OutputBuffer.LifeCycleListener sessionCookieChecker =
             new SessionCookieChecker();
     // ----------------------------------------------------------- Constructors
 
@@ -691,7 +692,7 @@ public class OutputBuffer extends Writer
     }
     // END PWC 6512276
     
-    private class SessionCookieChecker implements org.glassfish.grizzly.http.io.OutputBuffer.LifeCycleListener {
+    private class SessionCookieChecker implements LifeCycleListener {
 
         @Override
         public void onCommit() throws IOException {
