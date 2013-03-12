@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,6 +22,7 @@ package org.apache.catalina.ssi;
 
 
 import org.apache.catalina.util.IOTools;
+import org.glassfish.web.util.HtmlEntityEncoder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,24 +50,27 @@ public class SSIProcessor {
     protected HashMap<String, SSICommand> commands =
         new HashMap<String, SSICommand>();
     protected int debug;
+    protected HtmlEntityEncoder htmlEntityEncoder;
 
 
-    public SSIProcessor(SSIExternalResolver ssiExternalResolver, int debug) {
+    public SSIProcessor(SSIExternalResolver ssiExternalResolver, int debug,
+            HtmlEntityEncoder htmlEntityEncoder) {
         this.ssiExternalResolver = ssiExternalResolver;
         this.debug = debug;
+        this.htmlEntityEncoder = htmlEntityEncoder;
         addBuiltinCommands();
     }
 
 
     protected void addBuiltinCommands() {
-        addCommand("config", new SSIConfig());
-        addCommand("echo", new SSIEcho());
-        addCommand("exec", new SSIExec());
-        addCommand("include", new SSIInclude());
-        addCommand("flastmod", new SSIFlastmod());
-        addCommand("fsize", new SSIFsize());
-        addCommand("printenv", new SSIPrintenv());
-        addCommand("set", new SSISet());
+        addCommand("config", new SSIConfig(htmlEntityEncoder));
+        addCommand("echo", new SSIEcho(htmlEntityEncoder));
+        addCommand("exec", new SSIExec(htmlEntityEncoder));
+        addCommand("include", new SSIInclude(htmlEntityEncoder));
+        addCommand("flastmod", new SSIFlastmod(htmlEntityEncoder));
+        addCommand("fsize", new SSIFsize(htmlEntityEncoder));
+        addCommand("printenv", new SSIPrintenv(htmlEntityEncoder));
+        addCommand("set", new SSISet(htmlEntityEncoder));
         SSIConditional ssiConditional = new SSIConditional();
         addCommand("if", ssiConditional);
         addCommand("elif", ssiConditional);
@@ -164,7 +168,7 @@ public class SSIProcessor {
                         }
                         if (errorMessage != null) {
                             ssiExternalResolver.log(errorMessage, null);
-                            writer.write(configErrMsg);
+                            writer.write(htmlEntityEncoder.encode(configErrMsg));
                         }
                     } else {
                         command.append(c);

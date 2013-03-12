@@ -56,6 +56,7 @@ import org.glassfish.grizzly.http.util.FastHttpDateFormat;
 import org.glassfish.grizzly.http.util.MimeHeaders;
 import org.glassfish.grizzly.http.util.UEncoder;
 import org.glassfish.logging.annotation.LogMessageInfo;
+import org.glassfish.web.util.HtmlEntityEncoder;
 // START S1AS 6170450
 
 // END S1AS 6170450
@@ -1445,7 +1446,8 @@ public class Response
             setContentType("text/html");
             setLocale(Locale.getDefault());
 
-            String href = RequestUtil.filter(absolute);
+            HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
+            String href = htmlEntityEncoder.encode(absolute);
             StringBuilder sb = new StringBuilder(150 + href.length());
 
             sb.append("<html>\r\n");

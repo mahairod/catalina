@@ -61,7 +61,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.naming.resources.CacheEntry;
@@ -73,6 +72,7 @@ import org.glassfish.grizzly.http.server.util.AlternateDocBase;
 import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.loader.ResourceEntry;
 import org.glassfish.web.loader.WebappClassLoader;
+import org.glassfish.web.util.HtmlEntityEncoder;
 
 /**
  * <p>The default resource-serving servlet for most web applications,
@@ -1414,6 +1414,7 @@ public class DefaultServlet
 
             // rewriteUrl(contextPath) is expensive. cache result for later reuse
             String rewrittenContextPath =  rewriteUrl(contextPath);
+            HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
 
             while (enumeration.hasMoreElements()) {
 
@@ -1450,7 +1451,7 @@ public class DefaultServlet
                   .append("'");
 
                 sb.append(">");
-                sb.append(RequestUtil.filter(trimmed));
+                sb.append(htmlEntityEncoder.encode(trimmed));
                 if (childCacheEntry.context != null)
                     sb.append("/");
                 sb.append("</entry>");
@@ -1618,6 +1619,7 @@ public class DefaultServlet
             }
 
             boolean shade = false;
+            HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
             while (enumeration.hasMoreElements()) {
 
                 NameClassPair ncPair = enumeration.nextElement();
@@ -1647,7 +1649,7 @@ public class DefaultServlet
                 if (childCacheEntry.context != null)
                     sb.append("/");
                 sb.append("\"><tt>");
-                sb.append(RequestUtil.filter(trimmed));
+                sb.append(htmlEntityEncoder.encode(trimmed));
                 if (childCacheEntry.context != null)
                     sb.append("/");
                 sb.append("</tt></a></td>\r\n");

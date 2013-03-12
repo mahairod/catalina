@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,6 +20,7 @@
 
 package org.apache.catalina.ssi;
 
+import org.glassfish.web.util.HtmlEntityEncoder;
 
 import java.io.PrintWriter;
 /**
@@ -31,6 +32,12 @@ import java.io.PrintWriter;
  * @version $Revision: 1.4 $, $Date: 2007/05/05 05:32:20 $
  */
 public class SSISet implements SSICommand {
+    protected HtmlEntityEncoder htmlEntityEncoder;
+
+    public SSISet(HtmlEntityEncoder htmlEntityEncoder) {
+        this.htmlEntityEncoder = htmlEntityEncoder;
+    }
+
     /**
      * @see SSICommand
      */
@@ -38,7 +45,7 @@ public class SSISet implements SSICommand {
             String[] paramNames, String[] paramValues, PrintWriter writer)
             throws SSIStopProcessingException {
         long lastModified = 0;
-        String errorMessage = ssiMediator.getConfigErrMsg();
+        String errorMessage = null;
         String variableName = null;
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
@@ -54,15 +61,29 @@ public class SSISet implements SSICommand {
                     lastModified = System.currentTimeMillis();
                 } else {
                     ssiMediator.log("#set--no variable specified");
+                    if (errorMessage == null) {
+                        errorMessage = getEncodedConfigErrorMessage(ssiMediator);
+                    }
                     writer.write(errorMessage);
                     throw new SSIStopProcessingException();
                 }
             } else {
                 ssiMediator.log("#set--Invalid attribute: " + paramName);
+                if (errorMessage == null) {
+                        errorMessage = getEncodedConfigErrorMessage(ssiMediator);
+                }
                 writer.write(errorMessage);
                 throw new SSIStopProcessingException();
             }
         }
         return lastModified;
+    }
+
+    private String getEncodedConfigErrorMessage(SSIMediator ssiMediator) {
+        String errorMessage = ssiMediator.getConfigErrMsg();
+        if (errorMessage != null && errorMessage.length() > 0) {
+            errorMessage = htmlEntityEncoder.encode(errorMessage);
+        }
+        return errorMessage;
     }
 }

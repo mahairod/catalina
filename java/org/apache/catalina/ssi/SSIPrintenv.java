@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -21,6 +21,8 @@
 package org.apache.catalina.ssi;
 
 
+import org.glassfish.web.util.HtmlEntityEncoder;
+
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,6 +34,12 @@ import java.util.Iterator;
  * @version $Revision: 1.3 $, $Date: 2007/02/13 19:16:21 $
  */
 public class SSIPrintenv implements SSICommand {
+    protected HtmlEntityEncoder htmlEntityEncoder;
+
+    public SSIPrintenv(HtmlEntityEncoder htmlEntityEncoder) {
+        this.htmlEntityEncoder = htmlEntityEncoder;
+    }
+
     /**
      * @see SSICommand
      */
@@ -41,6 +49,9 @@ public class SSIPrintenv implements SSICommand {
         //any arguments should produce an error
         if (paramNames.length > 0) {
             String errorMessage = ssiMediator.getConfigErrMsg();
+            if (errorMessage != null && errorMessage.length() > 0) {
+                errorMessage = htmlEntityEncoder.encode(errorMessage);
+            }
             writer.write(errorMessage);
         } else {
             Collection<String> variableNames = ssiMediator.getVariableNames();

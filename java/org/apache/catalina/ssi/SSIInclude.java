@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,6 +20,7 @@
 
 package org.apache.catalina.ssi;
 
+import org.glassfish.web.util.HtmlEntityEncoder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,13 +34,19 @@ import java.io.PrintWriter;
  * @version $Revision: 1.4 $, $Date: 2007/05/05 05:32:20 $
  */
 public final class SSIInclude implements SSICommand {
+    protected HtmlEntityEncoder htmlEntityEncoder;
+
+    public SSIInclude(HtmlEntityEncoder htmlEntityEncoder) {
+        this.htmlEntityEncoder = htmlEntityEncoder;
+    }
+
     /**
      * @see SSICommand
      */
     public long process(SSIMediator ssiMediator, String commandName,
             String[] paramNames, String[] paramValues, PrintWriter writer) {
         long lastModified = 0;
-        String configErrMsg = ssiMediator.getConfigErrMsg();
+        String configErrMsg = null;
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
             String paramValue = paramValues[i];
@@ -57,14 +64,28 @@ public final class SSIInclude implements SSICommand {
                 } else {
                     ssiMediator.log("#include--Invalid attribute: "
                             + paramName);
+                    if (configErrMsg == null) {
+                        configErrMsg = getEncodedConfigErrorMessage(ssiMediator);
+                    }
                     writer.write(configErrMsg);
                 }
             } catch (IOException e) {
                 ssiMediator.log("#include--Couldn't include file: "
                         + substitutedValue, e);
+                if (configErrMsg == null) {
+                    configErrMsg = getEncodedConfigErrorMessage(ssiMediator);
+                }
                 writer.write(configErrMsg);
             }
         }
         return lastModified;
+    }
+
+    private String getEncodedConfigErrorMessage(SSIMediator ssiMediator) {
+        String errorMessage = ssiMediator.getConfigErrMsg();
+        if (errorMessage != null && errorMessage.length() > 0) {
+            errorMessage = htmlEntityEncoder.encode(errorMessage);
+        }
+        return errorMessage;
     }
 }

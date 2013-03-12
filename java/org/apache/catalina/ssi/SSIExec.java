@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,6 +22,7 @@ package org.apache.catalina.ssi;
 
 
 import org.apache.catalina.util.IOTools;
+import org.glassfish.web.util.HtmlEntityEncoder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,9 +39,14 @@ import java.io.PrintWriter;
  * @version $Revision: 1.4 $, $Date: 2007/05/05 05:32:19 $
  */
 public class SSIExec implements SSICommand {
-    protected SSIInclude ssiInclude = new SSIInclude();
+    protected SSIInclude ssiInclude;
     protected final static int BUFFER_SIZE = 1024;
+    protected HtmlEntityEncoder htmlEntityEncoder;
 
+    public SSIExec(HtmlEntityEncoder htmlEntityEncoder) {
+        this.htmlEntityEncoder = htmlEntityEncoder;
+        this.ssiInclude = new SSIInclude(htmlEntityEncoder);
+    }
 
     /**
      * @see SSICommand
@@ -73,7 +79,7 @@ public class SSIExec implements SSICommand {
                 lastModified = System.currentTimeMillis();                
             } catch (InterruptedException e) {
                 ssiMediator.log("Couldn't exec file: " + substitutedValue, e);
-                writer.write(configErrMsg);
+                writer.write(htmlEntityEncoder.encode(configErrMsg));
             } catch (IOException e) {
                 //if (!foundProgram) {
                     //apache doesn't output an error message if it can't find

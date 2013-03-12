@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -439,7 +439,7 @@ public final class CGIServlet extends HttpServlet {
         out.println("<li><b>queryString</b> = " +
                        htmlEntityEncoder.encode(req.getQueryString()));
         out.println("<li><b>remoteUser</b> = " +
-                       req.getRemoteUser());
+                       htmlEntityEncoder.encode(req.getRemoteUser()));
         out.println("<li><b>requestedSessionId</b> = " +
                        htmlEntityEncoder.encode(req.getRequestedSessionId()));
         out.println("<li><b>requestedSessionIdFromCookie</b> = " +
@@ -449,11 +449,11 @@ public final class CGIServlet extends HttpServlet {
         out.println("<li><b>requestedSessionIdValid</b> = " +
                        req.isRequestedSessionIdValid());
         out.println("<li><b>requestURI</b> = " +
-                       req.getRequestURI());
+                       htmlEntityEncoder.encode(req.getRequestURI()));
         out.println("<li><b>servletPath</b> = " +
                        req.getServletPath());
         out.println("<li><b>userPrincipal</b> = " +
-                       req.getUserPrincipal());
+                       htmlEntityEncoder.encode(req.getUserPrincipal()));
         out.println("</ul>");
         out.println("<hr>");
 
@@ -477,7 +477,7 @@ public final class CGIServlet extends HttpServlet {
             out.println("<h1>HttpSession Properties</h1>");
             out.println("<ul>");
             out.println("<li><b>id</b> = " +
-                           session.getId());
+                           htmlEntityEncoder.encode(session.getId()));
             out.println("<li><b>creationTime</b> = " +
                            new Date(session.getCreationTime()));
             out.println("<li><b>lastAccessedTime</b> = " +
@@ -1293,7 +1293,7 @@ public final class CGIServlet extends HttpServlet {
 
             sb.append("<tr><td>Working Directory</td><td>");
             if (workingDirectory != null) {
-                sb.append(workingDirectory.toString());
+                sb.append(htmlEntityEncoder.encode(workingDirectory.toString()));
             }
             sb.append("</td></tr>");
 

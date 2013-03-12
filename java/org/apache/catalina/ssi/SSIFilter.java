@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,6 +22,7 @@ package org.apache.catalina.ssi;
 
 
 import org.apache.catalina.Globals;
+import org.glassfish.web.util.HtmlEntityEncoder;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -117,7 +118,7 @@ public class SSIFilter implements Filter {
                 new SSIServletExternalResolver(config.getServletContext(), req,
                         res, isVirtualWebappRelative, debug, encoding);
             SSIProcessor ssiProcessor = new SSIProcessor(ssiExternalResolver,
-                    debug);
+                    debug, new HtmlEntityEncoder());
             
             // prepare readers/writers
             Reader reader =

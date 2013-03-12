@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,6 +20,7 @@
 
 package org.apache.catalina.ssi;
 
+import org.glassfish.web.util.HtmlEntityEncoder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,6 +38,11 @@ public final class SSIFsize implements SSICommand {
     private final static int ONE_KILOBYTE = 1024;
     private final static int ONE_MEGABYTE = 1024 * 1024;
 
+    protected HtmlEntityEncoder htmlEntityEncoder;
+
+    public SSIFsize(HtmlEntityEncoder htmlEntityEncoder) {
+        this.htmlEntityEncoder = htmlEntityEncoder;
+    }
 
     /**
      * @see SSICommand
@@ -44,7 +50,7 @@ public final class SSIFsize implements SSICommand {
     public long process(SSIMediator ssiMediator, String commandName,
             String[] paramNames, String[] paramValues, PrintWriter writer) {
         long lastModified = 0;
-        String configErrMsg = ssiMediator.getConfigErrMsg();
+        String configErrMsg = null;
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
             String paramValue = paramValues[i];
@@ -62,11 +68,17 @@ public final class SSIFsize implements SSICommand {
                     writer.write(formatSize(size, configSizeFmt));
                 } else {
                     ssiMediator.log("#fsize--Invalid attribute: " + paramName);
+                    if (configErrMsg == null) {
+                        configErrMsg = getEncodedConfigErrorMessage(ssiMediator);
+                    }
                     writer.write(configErrMsg);
                 }
             } catch (IOException e) {
                 ssiMediator.log("#fsize--Couldn't get size for file: "
                         + substitutedValue, e);
+                if (configErrMsg == null) {
+                    configErrMsg = getEncodedConfigErrorMessage(ssiMediator);
+                }
                 writer.write(configErrMsg);
             }
         }
@@ -124,5 +136,13 @@ public final class SSIFsize implements SSICommand {
             retString = padLeft(retString, 5);
         }
         return retString;
+    }
+
+    private String getEncodedConfigErrorMessage(SSIMediator ssiMediator) {
+        String errorMessage = ssiMediator.getConfigErrMsg();
+        if (errorMessage != null && errorMessage.length() > 0) {
+            errorMessage = htmlEntityEncoder.encode(errorMessage);
+        }
+        return errorMessage;
     }
 }
