@@ -34,12 +34,6 @@ import java.io.PrintWriter;
  * @version $Revision: 1.4 $, $Date: 2007/05/05 05:32:20 $
  */
 public final class SSIInclude implements SSICommand {
-    protected HtmlEntityEncoder htmlEntityEncoder;
-
-    public SSIInclude(HtmlEntityEncoder htmlEntityEncoder) {
-        this.htmlEntityEncoder = htmlEntityEncoder;
-    }
-
     /**
      * @see SSICommand
      */
@@ -84,7 +78,7 @@ public final class SSIInclude implements SSICommand {
     private String getEncodedConfigErrorMessage(SSIMediator ssiMediator) {
         String errorMessage = ssiMediator.getConfigErrMsg();
         if (errorMessage != null && errorMessage.length() > 0) {
-            errorMessage = htmlEntityEncoder.encode(errorMessage);
+            errorMessage = HtmlEntityEncoder.encodeXSS(errorMessage);
         }
         return errorMessage;
     }

@@ -1446,8 +1446,7 @@ public class Response
             setContentType("text/html");
             setLocale(Locale.getDefault());
 
-            HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
-            String href = htmlEntityEncoder.encode(absolute);
+            String href = HtmlEntityEncoder.encodeXSS(absolute);
             StringBuilder sb = new StringBuilder(150 + href.length());
 
             sb.append("<html>\r\n");

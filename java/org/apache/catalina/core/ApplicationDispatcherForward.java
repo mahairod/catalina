@@ -175,8 +175,7 @@ class ApplicationDispatcherForward {
                 if (message == null) {
                     message = "";
                 } else {
-                    HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
-                    message = htmlEntityEncoder.encode(message);
+                    message = HtmlEntityEncoder.encodeXSS(message);
                 }
                 prepareRequestForDispatch(request,
                                           wrapper,
@@ -343,8 +342,7 @@ class ApplicationDispatcherForward {
         if (message == null) {
             message = "";
         } else {
-            HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
-            message = htmlEntityEncoder.encode(message);
+            message = HtmlEntityEncoder.encodeXSS(message);
         }
 
         // Do nothing if there is no report for the specified status code

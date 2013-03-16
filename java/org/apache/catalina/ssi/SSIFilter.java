@@ -118,7 +118,7 @@ public class SSIFilter implements Filter {
                 new SSIServletExternalResolver(config.getServletContext(), req,
                         res, isVirtualWebappRelative, debug, encoding);
             SSIProcessor ssiProcessor = new SSIProcessor(ssiExternalResolver,
-                    debug, new HtmlEntityEncoder());
+                    debug);
             
             // prepare readers/writers
             Reader reader =

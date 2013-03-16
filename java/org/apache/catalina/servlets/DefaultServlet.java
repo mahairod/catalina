@@ -1414,7 +1414,6 @@ public class DefaultServlet
 
             // rewriteUrl(contextPath) is expensive. cache result for later reuse
             String rewrittenContextPath =  rewriteUrl(contextPath);
-            HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
 
             while (enumeration.hasMoreElements()) {
 
@@ -1451,7 +1450,7 @@ public class DefaultServlet
                   .append("'");
 
                 sb.append(">");
-                sb.append(htmlEntityEncoder.encode(trimmed));
+                sb.append(HtmlEntityEncoder.encodeXSS(trimmed));
                 if (childCacheEntry.context != null)
                     sb.append("/");
                 sb.append("</entry>");
@@ -1619,7 +1618,6 @@ public class DefaultServlet
             }
 
             boolean shade = false;
-            HtmlEntityEncoder htmlEntityEncoder = new HtmlEntityEncoder();
             while (enumeration.hasMoreElements()) {
 
                 NameClassPair ncPair = enumeration.nextElement();
@@ -1649,7 +1647,7 @@ public class DefaultServlet
                 if (childCacheEntry.context != null)
                     sb.append("/");
                 sb.append("\"><tt>");
-                sb.append(htmlEntityEncoder.encode(trimmed));
+                sb.append(HtmlEntityEncoder.encodeXSS(trimmed));
                 if (childCacheEntry.context != null)
                     sb.append("/");
                 sb.append("</tt></a></td>\r\n");
@@ -1837,7 +1835,7 @@ public class DefaultServlet
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     * @param resourceInfo File object
+     * @param resourceAttributes File object
      * @return boolean true if the resource meets the specified condition,
      * and false if the condition is not satisfied, in which case request
      * processing is stopped
@@ -1882,7 +1880,7 @@ public class DefaultServlet
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     * @param resourceInfo File object
+     * @param resourceAttributes File object
      * @return boolean true if the resource meets the specified condition,
      * and false if the condition is not satisfied, in which case request
      * processing is stopped
@@ -1920,7 +1918,7 @@ public class DefaultServlet
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     * @param resourceInfo File object
+     * @param resourceAttributes File object
      * @return boolean true if the resource meets the specified condition,
      * and false if the condition is not satisfied, in which case request
      * processing is stopped
@@ -1979,7 +1977,7 @@ public class DefaultServlet
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     * @param resourceInfo File object
+     * @param resourceAttributes File object
      * @return boolean true if the resource meets the specified condition,
      * and false if the condition is not satisfied, in which case request
      * processing is stopped
@@ -2012,7 +2010,8 @@ public class DefaultServlet
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param resourceInfo The resource information
+     * @param cacheEntry The CacheEntry object
+     * @param is The InputStream
      * @param ostream The output stream to write to
      *
      * @exception IOException if an input/output error occurs
@@ -2060,7 +2059,8 @@ public class DefaultServlet
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param resourceInfo The resource info
+     * @param cacheEntry The cache entry
+     * @param is The InputStream
      * @param writer The writer to write to
      *
      * @exception IOException if an input/output error occurs
@@ -2104,7 +2104,7 @@ public class DefaultServlet
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param resourceInfo The ResourceInfo object
+     * @param cacheEntry The CacheEntry object
      * @param ostream The output stream to write to
      * @param range Range the client wanted to retrieve
      * @exception IOException if an input/output error occurs
@@ -2137,7 +2137,7 @@ public class DefaultServlet
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param resourceInfo The ResourceInfo object
+     * @param cacheEntry The CacheEntry object
      * @param writer The writer to write to
      * @param range Range the client wanted to retrieve
      * @exception IOException if an input/output error occurs
@@ -2175,7 +2175,7 @@ public class DefaultServlet
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param resourceInfo The ResourceInfo object
+     * @param cacheEntry The CacheEntry object
      * @param ostream The output stream to write to
      * @param ranges Enumeration of the ranges the client wanted to retrieve
      * @param contentType Content type of the resource
@@ -2233,7 +2233,7 @@ public class DefaultServlet
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param resourceInfo The ResourceInfo object
+     * @param cacheEntry The CacheEntry object
      * @param writer The writer to write to
      * @param ranges Enumeration of the ranges the client wanted to retrieve
      * @param contentType Content type of the resource
