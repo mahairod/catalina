@@ -39,7 +39,6 @@ public class SSISet implements SSICommand {
             String[] paramNames, String[] paramValues, PrintWriter writer)
             throws SSIStopProcessingException {
         long lastModified = 0;
-        String errorMessage = null;
         String variableName = null;
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
@@ -55,17 +54,13 @@ public class SSISet implements SSICommand {
                     lastModified = System.currentTimeMillis();
                 } else {
                     ssiMediator.log("#set--no variable specified");
-                    if (errorMessage == null) {
-                        errorMessage = getEncodedConfigErrorMessage(ssiMediator);
-                    }
+                    String errorMessage = getEncodedConfigErrorMessage(ssiMediator);
                     writer.write(errorMessage);
                     throw new SSIStopProcessingException();
                 }
             } else {
                 ssiMediator.log("#set--Invalid attribute: " + paramName);
-                if (errorMessage == null) {
-                        errorMessage = getEncodedConfigErrorMessage(ssiMediator);
-                }
+                String errorMessage = getEncodedConfigErrorMessage(ssiMediator);
                 writer.write(errorMessage);
                 throw new SSIStopProcessingException();
             }
@@ -75,9 +70,6 @@ public class SSISet implements SSICommand {
 
     private String getEncodedConfigErrorMessage(SSIMediator ssiMediator) {
         String errorMessage = ssiMediator.getConfigErrMsg();
-        if (errorMessage != null && errorMessage.length() > 0) {
-            errorMessage = HtmlEntityEncoder.encodeXSS(errorMessage);
-        }
-        return errorMessage;
+        return HtmlEntityEncoder.encodeXSS(errorMessage);
     }
 }
