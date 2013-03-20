@@ -21,6 +21,10 @@
 package org.apache.catalina;
 
 
+import org.apache.catalina.HttpRequest;
+
+import javax.servlet.ServletException;
+
 /**
  * An <b>Authenticator</b> is a component (usually a Valve or Container) that
  * provides some sort of authentication service.  The interface itself has no
@@ -33,6 +37,6 @@ package org.apache.catalina;
  */
 
 public interface Authenticator {
-
-
+    public void login(String userName, char[] password, HttpRequest request)
+            throws ServletException;
 }
