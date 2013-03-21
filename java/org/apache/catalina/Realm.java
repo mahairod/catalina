@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -30,6 +30,8 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 /**
  * A <b>Realm</b> is a read-only facade for an underlying security realm
  * used to authenticate individual users, and identify the security roles
@@ -369,5 +371,21 @@ public interface Realm {
      * @param hreq HTTP servlet request.
      */
     public Principal authenticate(HttpServletRequest hreq);
+    
+    /**
+     * Returns whether the specified ServletContext indicates that security
+     * extension is enabled.
+     * 
+     * @param servletContext the ServletContext
+     * @return true if security extension is enabled; false otherwise
+     */
+    public boolean isSecurityExtensionEnabled(ServletContext servletContext);
 
+    /**
+     * Logs out.
+     * 
+     * @param hreq the request
+     * @param hres the response
+     */
+    public void logout(HttpServletRequest hreq, HttpServletResponse hres);
 }

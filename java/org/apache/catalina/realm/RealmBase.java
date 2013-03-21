@@ -51,6 +51,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.enterprise.util.Utility;
+import javax.servlet.ServletContext;
 import org.glassfish.logging.annotation.LogMessageInfo;
 // END SJSWS 6324431
 
@@ -1423,6 +1424,16 @@ public abstract class RealmBase
     
     public void destroy() {
         // no op
+    }
+
+    @Override
+    public void logout(HttpServletRequest hreq, HttpServletResponse hres) {
+        // no-op
+    }
+
+    @Override
+    public boolean isSecurityExtensionEnabled(ServletContext servletContext) {
+        return false;
     }
 
     // ------------------------------------------------------ Protected Methods
