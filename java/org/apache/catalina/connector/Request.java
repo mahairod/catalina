@@ -4350,6 +4350,10 @@ public class Request
             asyncContext.notifyAsyncListeners(
                     AsyncContextImpl.AsyncEventType.TIMEOUT, null);
         }
+        inputBuffer.disableReadHandler();
+        if (response instanceof Response) {
+            ((Response)response).disableWriteHandler();
+        }
         errorDispatchAndComplete(null);
     }
 

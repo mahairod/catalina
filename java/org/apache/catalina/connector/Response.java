@@ -2088,5 +2088,9 @@ public class Response
     public void setUpgrade(boolean upgrade) {
         this.upgrade = upgrade;
     }
+
+    void disableWriteHandler() {
+        outputBuffer.disableWriteHandler();
+    }
 }
 

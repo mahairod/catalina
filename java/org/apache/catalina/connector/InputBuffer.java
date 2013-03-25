@@ -22,6 +22,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.channels.InterruptedByTimeoutException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ResourceBundle;
@@ -277,6 +278,14 @@ public class InputBuffer extends Reader
         }
     }
 
+    void disableReadHandler() {
+        if (readHandler != null) {
+            synchronized(readHandler) {
+                readHandler.onError(new InterruptedByTimeoutException());
+            }
+        }
+    }
+
     // ------------------------------------------------- Chars Handling Methods
 
 
@@ -389,7 +398,7 @@ public class InputBuffer extends Reader
 
     class ReadHandlerImpl implements ReadHandler {
         private ReadListener readListener = null;
-        private Object lk = new Object();
+        private volatile boolean disable = false;
 
         private ReadHandlerImpl(ReadListener listener) {
             readListener = listener;
@@ -397,6 +406,9 @@ public class InputBuffer extends Reader
 
         @Override
         public void onDataAvailable() {
+            if (disable) {
+                return;
+            }
             if (!Boolean.TRUE.equals(IS_READY_SCOPE.get())) {
                 processDataAvailable();
             } else {
@@ -427,11 +439,12 @@ public class InputBuffer extends Reader
                     Thread.currentThread().setContextClassLoader(newCL);
                 }
 
-                synchronized(lk) {
+                synchronized(this) {
                     prevIsReady = true;
                     try {
                         readListener.onDataAvailable();
                     } catch(Throwable t) {
+                        disable = true;
                         readListener.onError(t);
                     }
                 }
@@ -447,6 +460,9 @@ public class InputBuffer extends Reader
 
         @Override
         public void onAllDataRead() {
+            if (disable) {
+                return;
+            }
             if (!Boolean.TRUE.equals(IS_READY_SCOPE.get())) {
                 processAllDataRead();
             } else {
@@ -477,11 +493,12 @@ public class InputBuffer extends Reader
                     Thread.currentThread().setContextClassLoader(newCL);
                 }
 
-                synchronized(lk) {
+                synchronized(this) {
                     prevIsReady = true;
                     try {
                         readListener.onAllDataRead();
                     } catch(Throwable t) {
+                        disable = true;
                         readListener.onError(t);
                     }
                 }
@@ -497,6 +514,11 @@ public class InputBuffer extends Reader
 
         @Override
         public void onError(final Throwable t) {
+            if (disable) {
+                return;
+            }
+            disable = true;
+
             if (!Boolean.TRUE.equals(IS_READY_SCOPE.get())) {
                 processError(t);
             } else {
@@ -527,16 +549,16 @@ public class InputBuffer extends Reader
                     Thread.currentThread().setContextClassLoader(newCL);
                 }
 
-                synchronized(lk) {
+                synchronized(this) {
                     // Get isUpgrade and WebConnection before calling onError
                     // Just in case onError will complete the async processing.
                     final boolean isUpgrade = request.isUpgrade();
                     final WebConnection wc = request.getWebConnection();
-                    
-                    readListener.onError(t);
-                    
-                    if (isUpgrade) {
-                        if (wc != null) {
+
+                    try {
+                        readListener.onError(t);
+                    } finally {
+                        if (isUpgrade && wc != null) {
                             try {
                                 wc.close();
                             } catch (Exception ignored) {
