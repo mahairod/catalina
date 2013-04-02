@@ -104,6 +104,8 @@ import org.glassfish.grizzly.http.util.CharChunk;
 import org.glassfish.grizzly.http.util.DataChunk;
 import org.glassfish.grizzly.http.util.FastHttpDateFormat;
 import org.glassfish.grizzly.http.util.MessageBytes;
+import org.glassfish.grizzly.memory.Buffers;
+import org.glassfish.grizzly.utils.Charsets;
 import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
 
@@ -1188,7 +1190,7 @@ public class Request
      */
     @Override
     public void setContentLength(int length) {
-        // Not used
+        coyoteRequest.getRequest().setContentLength(length);
     }
 
     /**
@@ -2253,7 +2255,7 @@ public class Request
      */
     @Override
     public void addHeader(String name, String value) {
-        // Not used
+        coyoteRequest.getRequest().getHeaders().addValue(name).setString(value);
     }
 
     /**
@@ -2294,7 +2296,7 @@ public class Request
      */
     @Override
     public void clearHeaders() {
-        // Not used
+        coyoteRequest.getRequest().getHeaders().recycle();
     }
 
     /**
@@ -2306,11 +2308,24 @@ public class Request
     }
 
     /**
-     * Clear the collection of parameters associated with this Request.
+     * Clear the collection of parameters associated with this Request
+     * and reset the query string encoding charset.
      */
     @Override
     public void clearParameters() {
-        // Not used
+        coyoteRequest.getParameters().recycle();
+        coyoteRequest.getParameters().setQueryStringEncoding(
+                Charsets.lookupCharset(getConnector().getURIEncoding()));
+    }
+
+    @Override
+    public void replayPayload(byte[] payloadByteArray) {
+        if (payloadByteArray == null) {
+            return;
+        }
+
+        coyoteRequest.replayPayload(Buffers.wrap(
+                coyoteRequest.getContext().getMemoryManager(), payloadByteArray));
     }
 
     /**

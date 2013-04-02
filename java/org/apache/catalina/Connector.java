@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -322,4 +322,20 @@ public interface Connector {
      */
     HttpHandler getHandler();
     // END SJSAS 6363251
+
+    /**
+     * Set the maximum size of a POST which will be automatically
+     * parsed by the container.
+     *
+     * @param maxPostSize The new maximum size in bytes of a POST which will
+     * be automatically parsed by the container
+     */
+    void setMaxPostSize(int maxPostSize);
+
+
+    /**
+     * Return the maximum size of a POST which will be saved by the container
+     * during authentication.
+     */
+    int getMaxSavePostSize();
 }

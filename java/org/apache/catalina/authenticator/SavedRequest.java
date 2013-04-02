@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
+import org.glassfish.grizzly.http.util.ByteChunk;
 
 /**
  * Object that saves the critical information from a request so that
@@ -171,5 +172,39 @@ public final class SavedRequest {
         this.requestURI = requestURI;
     }
 
+    /**
+     * The body of this request.
+     */
+    private ByteChunk body = null;
 
+    public ByteChunk getBody() {
+        return (this.body);
+    }
+
+    public void setBody(ByteChunk body) {
+        this.body = body;
+    }
+
+    /**
+     * The content type of the request, used if this is a POST.
+     */
+    private String contentType = null;
+
+    public String getContentType() {
+        return (this.contentType);
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    private int contentLength = -1;
+
+    public int getContentLenght() {
+        return contentLength;
+    }
+
+    public void setContentLength(int contentLength) {
+        this.contentLength = contentLength;
+    }
 }

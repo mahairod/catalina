@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -101,6 +101,9 @@ public interface HttpRequest extends Request {
      * Clear the collection of parameters associated with this Request.
      */
     void clearParameters();
+
+
+    void replayPayload(byte[] payloadByteArray);
 
 
     /**

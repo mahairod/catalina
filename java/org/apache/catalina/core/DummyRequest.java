@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -227,6 +227,7 @@ public class DummyRequest implements HttpRequest, HttpServletRequest {
     public void clearHeaders() {}
     public void clearLocales() {}
     public void clearParameters() {}
+    public void replayPayload(byte[] payloadByteArray) {}
     public void recycle() {}
     public void setAuthType(String authType) {}
     /* START PWC 4707989
