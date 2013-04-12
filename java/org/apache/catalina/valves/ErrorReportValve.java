@@ -277,7 +277,7 @@ public class ErrorReportValve
             report = sm.getString("http." + statusCode, message);
             */
             // START SJSAS 6412710
-            report = sm.getString("http." + statusCode, message,
+            report = sm.getString("http." + statusCode,
                                   hres.getLocale());
             // END SJSAS 6412710
         } catch (Throwable t) {
