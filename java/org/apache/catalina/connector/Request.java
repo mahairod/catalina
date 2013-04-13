@@ -599,6 +599,8 @@ public class Request
     // Has AsyncContext.complete been called?
     private boolean isAsyncComplete;
     private Thread asyncStartedThread;
+    private volatile boolean delayAsyncDispatchAndComplete = true;
+
     /**
      * Multi-Part support
      */
@@ -780,6 +782,7 @@ public class Request
         isAsyncSupported = true;
         asyncStarted.set(false);
         isAsyncComplete = false;
+        delayAsyncDispatchAndComplete = true;
         asyncStartedThread = null;
     }
 
@@ -4319,6 +4322,14 @@ public class Request
         return asyncContext;
     }
 
+    boolean isDelayAsyncDispatchAndComplete() {
+        return delayAsyncDispatchAndComplete;
+    }
+
+    void setDelayAsyncDispatchAndComplete(boolean delayAsync) {
+        delayAsyncDispatchAndComplete = delayAsync;
+    }
+
     /*
      * Invokes any registered AsyncListener instances at their
      * <tt>onComplete</tt> method
@@ -4328,6 +4339,13 @@ public class Request
             throw new IllegalStateException(rb.getString(REQUEST_ALREADY_RELEASED_EXCEPTION));
         }
         isAsyncComplete = true;
+
+        if (!delayAsyncDispatchAndComplete) {
+            processAsyncComplete();
+        }
+    }
+
+    void processAsyncComplete() {
         asyncStarted.set(false);
         
         if (asyncStartedThread != Thread.currentThread() ||
@@ -4341,6 +4359,10 @@ public class Request
             suspendContext.markResumed();
             suspendContext.getSuspendStatus().reset();
         }
+    }
+
+    boolean isAsyncComplete() {
+        return isAsyncComplete;
     }
 
     /*
@@ -4376,6 +4398,16 @@ public class Request
                         asyncContext.getTimeout(), TimeUnit.MILLISECONDS);
             }
 
+            delayAsyncDispatchAndComplete = false;
+            processAsyncOperations();
+        }
+    }
+
+    void processAsyncOperations() {
+        if (asyncContext.isDispatchInScope()) {
+            asyncContext.invokeDelayDispatch();
+        } else if (isAsyncComplete) {
+            processAsyncComplete();
         }
     }
 
