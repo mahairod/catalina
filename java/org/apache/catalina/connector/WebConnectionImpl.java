@@ -70,6 +70,7 @@ public class WebConnectionImpl implements WebConnection {
             if ((request != null) && (request.isUpgrade())) {
                 HttpUpgradeHandler httpUpgradeHandler =
                         request.getHttpUpgradeHandler();
+                Exception exception = null;
                 try {
                     httpUpgradeHandler.destroy();
                     request.setUpgrade(false);
@@ -77,20 +78,19 @@ public class WebConnectionImpl implements WebConnection {
                         response.setUpgrade(false);
                     }
                 } finally {
+                    try {
+                        inputStream.close();
+                    } catch(Exception ex) {
+                        exception = ex;
+                    }
+                    try {
+                        outputStream.close();
+                    } catch(Exception ex) {
+                        exception = ex;
+                    }
                     (request.getContext()).fireContainerEvent(
                         ContainerEvent.PRE_DESTROY, httpUpgradeHandler);
                     request.getCoyoteRequest().getResponse().resume();
-                }
-                Exception exception = null;
-                try {
-                    inputStream.close();
-                } catch(Exception ex) {
-                    exception = ex;
-                }
-                try {
-                    outputStream.close();
-                } catch(Exception ex) {
-                    exception = ex;
                 }
                 if (exception != null) {
                     throw exception;
