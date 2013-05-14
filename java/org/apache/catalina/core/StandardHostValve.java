@@ -67,7 +67,7 @@ final class StandardHostValve
     public static final String REMOTE_CLIENT_ABORTED_EXCEPTION = "AS-WEB-CORE-00229";
 
     @LogMessageInfo(
-        message = "The error-page {0} does not exist",
+        message = "The error-page {0} or {1} does not exist",
         level = "WARNING"
     )
     public static final String ERROR_PAGE_NOT_EXIST = "AS-WEB-CORE-00230";
@@ -331,7 +331,11 @@ final class StandardHostValve
             if (errorPage.getLocation() != null) {
                 File file = new File(context.getDocBase(), errorPage.getLocation());
                 if (!file.exists()) {
-                    log.log(Level.WARNING, ERROR_PAGE_NOT_EXIST, file.getAbsolutePath());
+                    File file2 = new File(errorPage.getLocation());
+                    if (!file2.exists()) {
+                        log.log(Level.WARNING, ERROR_PAGE_NOT_EXIST,
+                                new Object[]{file.getAbsolutePath(), file2.getAbsolutePath()});
+                    }
                 }
             }
             setErrorPageContentType(response, errorPage.getLocation(), context);
@@ -348,8 +352,12 @@ final class StandardHostValve
             if (errorPage != null) {
                 if (errorPage.getLocation() != null) {
                     File file = new File(context.getDocBase(), errorPage.getLocation());
-                    if (!file.exists()) {
-                        log.log(Level.WARNING, ERROR_PAGE_NOT_EXIST, file.getAbsolutePath());
+                    if (!file.exists()) { 
+                        File file2 = new File(errorPage.getLocation());
+                        if (!file2.exists()) {
+                            log.log(Level.WARNING, ERROR_PAGE_NOT_EXIST,
+                                    new Object[]{file.getAbsolutePath(), file2.getAbsolutePath()});
+                        }
                     }
                 }
                 try {
