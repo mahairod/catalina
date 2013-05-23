@@ -38,6 +38,7 @@ import org.apache.naming.ContextBindings;
 import org.apache.naming.resources.BaseDirContext;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.FileDirContext;
+import org.apache.naming.resources.WebDirContext;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.WARDirContext;
@@ -568,6 +569,11 @@ public class StandardContext
      * The alternate deployment descriptor name.
      */
     private String altDDName = null;
+
+    /**
+     * The antiJARLocking flag for this Context.
+     */
+    private boolean antiJARLocking = false;
 
     /**
      * Associated host name.
@@ -1317,6 +1323,30 @@ public class StandardContext
         this.available = available;
         support.firePropertyChange("available", Boolean.valueOf(oldAvailable),
             Boolean.valueOf(this.available));
+    }
+
+    /**
+     * Return the antiJARLocking flag for this Context.
+     */
+    public boolean getAntiJARLocking() {
+
+        return (this.antiJARLocking);
+
+    }
+
+    /**
+     * Set the antiJARLocking feature for this Context.
+     *
+     * @param antiJARLocking The new flag value
+     */
+    public void setAntiJARLocking(boolean antiJARLocking) {
+
+        boolean oldAntiJARLocking = this.antiJARLocking;
+        this.antiJARLocking = antiJARLocking;
+        support.firePropertyChange("antiJARLocking",
+                oldAntiJARLocking,
+                this.antiJARLocking);
+
     }
 
     /**
@@ -5712,7 +5742,7 @@ public class StandardContext
                         (!(new File(docBase).isDirectory())))
                     setResources(new WARDirContext());
                 else
-                    setResources(new FileDirContext());
+                    setResources(new WebDirContext());
             } catch (IllegalArgumentException e) {
                 throw new LifecycleException(rb.getString(INIT_RESOURCES_EXCEPTION), e);
             }
@@ -6342,7 +6372,6 @@ public class StandardContext
         }
         return (new File(base));
     }
-
 
     // -------------------------------------------------------- Private Methods
 
@@ -7317,11 +7346,17 @@ public class StandardContext
             try {
                 // Try looking up resource in
                 // WEB-INF/lib/[*.jar]/META-INF/resources
-                URL u = getMetaInfResource(path);
-                return (u != null ? u.getPath() : file.getAbsolutePath());
+                File f = getExtractedMetaInfResourcePath(path);
+                if (f != null && f.exists()) {
+                    file = f;
+                }
             } catch (Exception e) {
-                return null;
+                // ignore
             }
+        }
+
+        if (!file.exists()) {
+            return null;
         } else {
             return file.getAbsolutePath();
         }
@@ -7409,14 +7444,7 @@ public class StandardContext
                 if (resource instanceof Resource)
                     return (((Resource) resource).streamContent());
             } catch (Exception e) {
-                try {
-                    // Try looking up resource in
-                    // WEB-INF/lib/[*.jar]/META-INF/resources
-                    URL u = getMetaInfResource(path);
-                    return (u != null ? u.openStream() : null);
-                } catch (Exception ee) {
-                    // do nothing
-                }
+                // do nothing
             }
         }
         return (null);
@@ -7484,13 +7512,7 @@ public class StandardContext
                         // END SJSAS 6318494
 		         new DirContextURLStreamHandler(resources));
                 } catch (Exception e) {
-                    try {
-                        // Try looking up resource in
-                        // WEB-INF/lib/[*.jar]/META-INF/resources
-                        return getMetaInfResource(path);
-                    } catch (Exception ee) {
-                        // do nothing
-                    }
+                    // do nothing
                 }
             }
         }
@@ -8062,7 +8084,8 @@ public class StandardContext
                 childPath.append("/");
             childPath.append(name);
             Object object = binding.getObject();
-            if (object instanceof DirContext) {
+            if (object instanceof DirContext &&
+                    childPath.charAt(childPath.length() -1) != '/') {
                 childPath.append("/");
             }
             set.add(childPath.toString());
@@ -8098,22 +8121,6 @@ public class StandardContext
     /**
      * Get resource from META-INF/resources/ in jars.
      */
-    private URL getMetaInfResource(String path) {
-
-        path = Globals.META_INF_RESOURCES + path;
-
-        ClassLoader cl = getLoader().getClassLoader();
-        if (cl instanceof WebappClassLoader) {
-            return ((WebappClassLoader)cl).getResourceFromJars(path);
-        }
-
-        // This probably won't happen
-        return cl.getResource(path);
-    }
-
-    /**
-     * Get resource from META-INF/resources/ in jars.
-     */
     private File getExtractedMetaInfResourcePath(String path) {
         path = Globals.META_INF_RESOURCES + path;
 
@@ -8121,7 +8128,6 @@ public class StandardContext
         if (cl instanceof WebappClassLoader) {
             return ((WebappClassLoader)cl).getExtractedResourcePath(path);
         }
-        
         return null;
     }
 }
