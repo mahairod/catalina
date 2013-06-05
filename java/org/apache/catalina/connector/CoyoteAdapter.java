@@ -251,9 +251,10 @@ public class CoyoteAdapter
         }
         // END SJSAS 6331392
 
-        if (connector.isXpoweredBy()) {
-            response.addHeader("X-Powered-By", POWERED_BY);
-        }
+////            "X-Powered-By" header is set by GlassfishHttpCodecFilter
+//        if (connector.isXpoweredBy()) {
+//            response.addHeader("X-Powered-By", POWERED_BY);
+//        }
 
 
         // Parse and set Catalina and configuration specific 
@@ -288,10 +289,11 @@ public class CoyoteAdapter
                     
             }
             // END S1AS 6188932
-            
-            if (serverName != null && !serverName.isEmpty()) {
-                response.addHeader("Server", serverName);
-            }
+
+////            "Server" header is set by GlassfishHttpCodecFilter
+//            if (serverName != null && !serverName.isEmpty()) {
+//                response.addHeader("Server", serverName);
+//            }
                 
             // Invoke the web container
             connector.requestStartEvent(request.getRequest(),
