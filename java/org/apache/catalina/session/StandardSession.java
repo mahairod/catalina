@@ -1338,9 +1338,8 @@ public class StandardSession
             throw new IllegalStateException
                 ("getAttributeNames: " + rb.getString(SESSION_INVALIDATED_EXCEPTION));
 
-        synchronized (attributes) {
-            return (new Enumerator<String>(attributes.keySet(), true));
-        }
+
+        return (new Enumerator<String>(attributes.keySet(), true));
 
     }
 
