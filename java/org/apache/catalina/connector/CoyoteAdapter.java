@@ -87,8 +87,10 @@ import org.glassfish.grizzly.http.util.ByteChunk;
 import org.glassfish.grizzly.http.util.CharChunk;
 import org.glassfish.grizzly.http.util.DataChunk;
 import org.glassfish.grizzly.http.util.MessageBytes;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
+import org.glassfish.web.valve.ServletContainerInterceptor;
 
 /**
  * Implementation of a request processor which delegates the processing to a
@@ -134,6 +136,22 @@ public class CoyoteAdapter
     )
     public static final String NO_HOST_MATCHES_SERVER_NAME_INFO = "AS-WEB-CORE-00040";
 
+    @LogMessageInfo(
+            message = "Internal Error",
+            level = "SEVERE",
+            cause = "Error during invoke the servlet application",
+            action = "Trying to invoke the servlet application"
+    )
+    public static final String INTERNAL_ERROR = "AS-WEB-CORE-00493";
+    
+    @LogMessageInfo(
+            message = "Failed to initialize the interceptor",
+            level = "SEVERE",
+            cause = "Error in initializing the servlet application",
+            action = "initialize the servlet interceptor"
+    )
+    public static final String FAILED_TO_INITIALIZE_THE_INTERCEPTOR = "AS-WEB-CORE-00494";
+    
     // -------------------------------------------------------------- Constants
     private static final String POWERED_BY = "Servlet/3.1 JSP/2.3 " +
             "(" + ServerInfo.getServerInfo() + " Java/" +
@@ -148,6 +166,8 @@ public class CoyoteAdapter
 //    public static final int ADAPTER_NOTES = 1;
 
     static final String JVM_ROUTE = System.getProperty("jvmRoute");
+
+    private Collection<ServletContainerInterceptor> interceptors = null;
 
     protected static final boolean ALLOW_BACKSLASH =
         Boolean.valueOf(System.getProperty("org.glassfish.grizzly.tcp.tomcat5.CoyoteAdapter.ALLOW_BACKSLASH", "false"));
@@ -194,6 +214,7 @@ public class CoyoteAdapter
     public CoyoteAdapter(Connector connector) {
         super();
         this.connector = connector;
+        initServletInterceptors();
     }
 
 
@@ -268,6 +289,39 @@ public class CoyoteAdapter
         }
     }
 
+    private void enteringServletContainer(Request req, Response res) {
+        if (interceptors == null)
+            return;
+        for(ServletContainerInterceptor interceptor:interceptors) {
+            try{
+                interceptor.preInvoke(req, res);
+            } catch (Throwable th) {
+                log.log(Level.SEVERE, INTERNAL_ERROR, th);
+            }
+        }
+    }
+
+    private void leavingServletContainer(Request req, Response res) {
+        if (interceptors == null)
+            return;
+        for(ServletContainerInterceptor interceptor:interceptors) {
+            try{
+                interceptor.postInvoke(req, res);
+            } catch (Throwable th) {
+                log.log(Level.SEVERE, INTERNAL_ERROR, th);
+            }
+        }
+    }
+
+    private void initServletInterceptors() {
+        try {
+            ServiceLocator services = org.glassfish.internal.api.Globals.getDefaultHabitat();
+            interceptors = services.getAllServices(ServletContainerInterceptor.class);
+        } catch (Throwable th) {
+            log.log(Level.SEVERE, FAILED_TO_INITIALIZE_THE_INTERCEPTOR, th);
+        }
+    }
+    
 
     private void doService(final org.glassfish.grizzly.http.server.Request req,
                            final Request request,
@@ -337,6 +391,7 @@ public class CoyoteAdapter
             connector.requestStartEvent(request.getRequest(),
                 request.getHost(), request.getContext());
             Container container = connector.getContainer();
+            enteringServletContainer(request, response);
             try {
                 request.lockSession();
                 if (container.getPipeline().hasNonBasicValves() ||
@@ -369,7 +424,11 @@ public class CoyoteAdapter
                         request.getHost(), request.getContext(),
                         response.getStatus());
                 } finally {
-                    request.unlockSession();
+                    try {
+                        request.unlockSession();
+                    } finally {
+                        leavingServletContainer(request, response);
+                    }
                 }
             }
         }
