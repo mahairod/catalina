@@ -102,7 +102,7 @@ public abstract class AuthenticatorBase
             level = "WARNING"
     )
 
-    public static final String LOGIN_FAIL = "AS-WEB-CORE-000535";
+    public static final String LOGIN_FAIL = "AS-WEB-CORE-00535";
 
     /**
      * Descriptive information about this implementation.
