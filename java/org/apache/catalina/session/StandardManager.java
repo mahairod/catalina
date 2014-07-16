@@ -1,15 +1,16 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
- * Copyright 2004 The Apache Software Foundation
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -128,19 +129,19 @@ public class StandardManager
         }                       
     }
         
-    private class PrivilegedDoUnloadToFile
+    private class PrivilegedDoUnload
         implements PrivilegedExceptionAction<Void> {
 
         private boolean expire;
         private boolean isShutdown;
 
-        PrivilegedDoUnloadToFile(boolean expire, boolean shutDown) {
+        PrivilegedDoUnload(boolean expire, boolean shutDown) {
             this.expire = expire;
             isShutdown = shutDown;
         }
 
         public Void run() throws Exception{
-            doUnloadToFile(expire, isShutdown);
+            doUnload(expire, isShutdown);
             return null;
         }            
            
@@ -600,7 +601,7 @@ public class StandardManager
         if (SecurityUtil.isPackageProtectionEnabled()){       
             try {
                 AccessController.doPrivileged(
-                    new PrivilegedDoUnloadToFile(doExpire, isShutdown));
+                    new PrivilegedDoUnload(doExpire, isShutdown));
             } catch (PrivilegedActionException ex){
                 Exception exception = ex.getException();
                 if (exception instanceof IOException){
@@ -610,7 +611,7 @@ public class StandardManager
                     log.log(Level.FINE, "Unreported exception in unLoad() " + exception);
             }
         } else {
-            doUnloadToFile(doExpire, isShutdown);
+            doUnload(doExpire, isShutdown);
         }       
     }
         
@@ -623,7 +624,7 @@ public class StandardManager
      *
      * @exception IOException if an input/output error occurs
      */
-    private void doUnloadToFile(boolean doExpire, boolean isShutdown) throws IOException {
+    private void doUnload(boolean doExpire, boolean isShutdown) throws IOException {
         if(isShutdown) {
             if(log.isLoggable(Level.FINE)) {
                 log.log(Level.FINE, "Unloading persisted sessions");

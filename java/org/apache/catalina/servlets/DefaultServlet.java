@@ -3,13 +3,14 @@
  *
  *
  *
- * Copyright 2004 The Apache Software Foundation
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +36,7 @@ import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.naming.InitialContext;
@@ -69,6 +71,8 @@ import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
+import org.apache.tomcat.util.security.PrivilegedGetTccl;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 import org.glassfish.grizzly.http.server.util.AlternateDocBase;
 import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.util.HtmlEntityEncoder;
@@ -1467,8 +1471,24 @@ public class DefaultServlet
 
         sb.append("</listing>");
 
-
+        // Prevent possible memory leak. Ensure Transformer and
+        // TransformerFactory are not loaded from the web application.
+        ClassLoader original;
+        if (Globals.IS_SECURITY_ENABLED) {
+            PrivilegedGetTccl pa = new PrivilegedGetTccl();
+            original = AccessController.doPrivileged(pa);
+        } else {
+            original = Thread.currentThread().getContextClassLoader();
+        }
         try {
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedSetTccl pa =
+                        new PrivilegedSetTccl(DefaultServlet.class.getClassLoader());
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(
+                        DefaultServlet.class.getClassLoader());
+            }
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Source xmlSource = new StreamSource(new StringReader(sb.toString()));
             Transformer transformer = tFactory.newTransformer(xsltSource);
@@ -1482,6 +1502,13 @@ public class DefaultServlet
         } catch (Exception e) {
             log("directory transform failure: " + e.getMessage());
             return renderHtml(contextPath, cacheEntry);
+        } finally {
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(original);
+            }
         }
     }
 
