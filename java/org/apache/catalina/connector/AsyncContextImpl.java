@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  */
 
@@ -8,7 +8,6 @@ package org.apache.catalina.connector;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.Globals;
 import org.apache.catalina.core.*;
-import org.apache.catalina.util.StringManager;
 import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.*;
@@ -19,7 +18,6 @@ import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.apache.catalina.connector.Request.REQUEST_ALREADY_RELEASED_EXCEPTION;
 
 class AsyncContextImpl implements AsyncContext {
     // Note...this constant is also defined in org.glassfish.weld.WeldDeployer.  If it changes here it must
@@ -130,6 +129,11 @@ class AsyncContextImpl implements AsyncContext {
     // The number of times this AsyncContext has been reinitialized via a call
     // to ServletRequest#startAsync
     private AtomicInteger startAsyncCounter = new AtomicInteger(0);
+    // Has AsyncContext.complete been called?
+    private final AtomicBoolean isAsyncCompleteCalled = new AtomicBoolean();
+    // Has AsyncContext.complete been really completed?
+    private final AtomicBoolean isAsyncCompleted = new AtomicBoolean();
+    private volatile boolean delayAsyncDispatchAndComplete = true;
 
     private ThreadLocal<Boolean> isStartAsyncInScope = new ThreadLocal<Boolean>() {
         @Override
@@ -216,7 +220,7 @@ class AsyncContextImpl implements AsyncContext {
         isDispatchInScope.set(true);
         if (dispatcher != null) {
             if (isDispatchInProgress.compareAndSet(false, true)) {
-                if (origRequest.isDelayAsyncDispatchAndComplete()) {
+                if (delayAsyncDispatchAndComplete) {
                     handler = new Handler(this, dispatcher);
                 } else {
                     pool.execute(new Handler(this, dispatcher));
@@ -249,18 +253,75 @@ class AsyncContextImpl implements AsyncContext {
     boolean isDispatchInScope() {
         return isDispatchInScope.get();
     }
-
+    
     boolean getAndResetDispatchInScope() {
         final boolean flag = isDispatchInScope.get();
         isDispatchInScope.set(Boolean.FALSE);
         return flag;
     }
 
-    @Override
-    public void complete() {
-        origRequest.asyncComplete();
+
+    boolean isDelayAsyncDispatchAndComplete() {
+        return delayAsyncDispatchAndComplete;
     }
 
+    void setDelayAsyncDispatchAndComplete(boolean delayAsync) {
+        delayAsyncDispatchAndComplete = delayAsync;
+    }
+
+    boolean isAsyncComplete() {
+        return isAsyncCompleteCalled.get();
+    }
+
+    @Override
+    public void complete() {
+        tryComplete(true);
+    }
+
+    /**
+     * Try to complete the AsyncContext, if it hasn't completed yet
+     * and if service() thread doesn't rely on request/response existence.
+     * @param failIfCompleted 
+     */
+    void tryComplete(final boolean failIfCompleted) {
+        if (isAsyncCompleteCalled.compareAndSet(false, true)) {
+            if (delayAsyncDispatchAndComplete) {
+                return;
+            }
+            
+            doComplete();
+        } else if (failIfCompleted) {
+            throw new IllegalStateException(rb.getString(
+                    REQUEST_ALREADY_RELEASED_EXCEPTION));
+        }
+    }
+
+    private void doComplete() {
+        if (isAsyncCompleted.compareAndSet(false, true)) {
+            origRequest.asyncComplete();
+        }
+    }
+    
+    void processAsyncOperations() {
+        if (isDispatchInScope()) {
+            invokeDelayDispatch();
+        } else if (isAsyncComplete()) {
+            doComplete();
+        }
+    }
+
+    
+    /**
+     * The method is called once service thread finished with the
+     * request/response processing and doesn't rely on its existence anymore.
+     * 
+     * Now it's safe to finish async request/response processing.
+     */
+    void onExitService() {
+        delayAsyncDispatchAndComplete = false;
+        processAsyncOperations();
+    }
+    
     @Override
     public void start(Runnable run) {
         ClassLoader oldCL = null;
@@ -478,15 +539,15 @@ class AsyncContextImpl implements AsyncContext {
             origRequest.setAsyncStarted(false);
             int startAsyncCurrent = asyncContext.startAsyncCounter.get();
             try {
-                origRequest.setDelayAsyncDispatchAndComplete(true);
+                asyncContext.setDelayAsyncDispatchAndComplete(true);
                 dispatcher.dispatch(asyncContext.getRequest(),
                     asyncContext.getResponse(), DispatcherType.ASYNC);
 
-                origRequest.setDelayAsyncDispatchAndComplete(false);
+                asyncContext.setDelayAsyncDispatchAndComplete(false);
 
-                origRequest.processAsyncOperations();
+                asyncContext.processAsyncOperations();
 
-                if ((!origRequest.isAsyncComplete()) &&
+                if ((!asyncContext.isAsyncComplete()) &&
                         asyncContext.startAsyncCounter.compareAndSet(
                         startAsyncCurrent, startAsyncCurrent)) {
                     /*
@@ -502,7 +563,7 @@ class AsyncContextImpl implements AsyncContext {
                     origRequest.setAsyncTimeout(asyncContext.getTimeout());
                 }
             } catch (Throwable t) {
-                origRequest.setDelayAsyncDispatchAndComplete(false);
+                asyncContext.setDelayAsyncDispatchAndComplete(false);
                 asyncContext.notifyAsyncListeners(AsyncEventType.ERROR, t);
                 origRequest.errorDispatchAndComplete(t);
             } finally {
