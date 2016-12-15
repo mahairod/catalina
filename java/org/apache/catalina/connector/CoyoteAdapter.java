@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -74,9 +74,9 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
 import org.glassfish.grizzly.http.Method;
@@ -89,7 +89,6 @@ import org.glassfish.grizzly.http.util.CharChunk;
 import org.glassfish.grizzly.http.util.DataChunk;
 import org.glassfish.grizzly.http.util.MessageBytes;
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
 import org.glassfish.web.valve.ServletContainerInterceptor;
 
@@ -106,53 +105,9 @@ public class CoyoteAdapter
     implements Adapter 
  {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
 
-    @LogMessageInfo(
-            message = "An exception or error occurred in the container during the request processing",
-            level = "SEVERE",
-            cause = "Could not process the request in the container",
-            action = "Verify certificate chain retrieved from the request header and the correctness of request"
-    )
-    public static final String REQUEST_PROCESSING_EXCEPTION = "AS-WEB-CORE-00037";
-
-    @LogMessageInfo(
-            message = "HTTP listener on port {0} has been disabled",
-            level = "FINE"
-    )
-    public static final String HTTP_LISTENER_DISABLED = "AS-WEB-CORE-00038";
-
-    @LogMessageInfo(
-            message = "Error parsing client cert chain into array of java.security.cert.X509Certificate instances",
-            level = "SEVERE",
-            cause = "Could not get the SSL client certificate chain",
-            action = "Verify certificate chain and the request"
-    )
-    public static final String PARSING_CLIENT_CERT_EXCEPTION = "AS-WEB-CORE-00039";
-
-    @LogMessageInfo(
-            message = "No Host matches server name {0}",
-            level = "INFO"
-    )
-    public static final String NO_HOST_MATCHES_SERVER_NAME_INFO = "AS-WEB-CORE-00040";
-
-    @LogMessageInfo(
-            message = "Internal Error",
-            level = "SEVERE",
-            cause = "Error during invoke the servlet application",
-            action = "Trying to invoke the servlet application"
-    )
-    public static final String INTERNAL_ERROR = "AS-WEB-CORE-00493";
-    
-    @LogMessageInfo(
-            message = "Failed to initialize the interceptor",
-            level = "SEVERE",
-            cause = "Error in initializing the servlet application",
-            action = "initialize the servlet interceptor"
-    )
-    public static final String FAILED_TO_INITIALIZE_THE_INTERCEPTOR = "AS-WEB-CORE-00494";
-    
     // -------------------------------------------------------------- Constants
     private static final String POWERED_BY = "Servlet/3.1 JSP/2.3 " +
             "(" + ServerInfo.getServerInfo() + " Java/" +
@@ -286,7 +241,7 @@ public class CoyoteAdapter
             // Request may want to initialize async processing
             request.onExitService();
         } catch (Throwable t) {
-            log.log(Level.SEVERE, REQUEST_PROCESSING_EXCEPTION, t);
+            log.log(Level.SEVERE, LogFacade.REQUEST_PROCESSING_EXCEPTION, t);
         }
     }
 
@@ -297,7 +252,7 @@ public class CoyoteAdapter
             try{
                 interceptor.preInvoke(req, res);
             } catch (Throwable th) {
-                log.log(Level.SEVERE, INTERNAL_ERROR, th);
+                log.log(Level.SEVERE, LogFacade.INTERNAL_ERROR, th);
             }
         }
     }
@@ -309,7 +264,7 @@ public class CoyoteAdapter
             try{
                 interceptor.postInvoke(req, res);
             } catch (Throwable th) {
-                log.log(Level.SEVERE, INTERNAL_ERROR, th);
+                log.log(Level.SEVERE, LogFacade.INTERNAL_ERROR, th);
             }
         }
     }
@@ -319,7 +274,7 @@ public class CoyoteAdapter
             ServiceLocator services = org.glassfish.internal.api.Globals.getDefaultHabitat();
             interceptors = services.getAllServices(ServletContainerInterceptor.class);
         } catch (Throwable th) {
-            log.log(Level.SEVERE, FAILED_TO_INITIALIZE_THE_INTERCEPTOR, th);
+            log.log(Level.SEVERE, LogFacade.FAILED_TO_INITIALIZE_THE_INTERCEPTOR, th);
         }
     }
     
@@ -334,7 +289,7 @@ public class CoyoteAdapter
         // START SJSAS 6331392
         // Check connector for disabled state
         if (!connector.isEnabled()) {
-            String msg = MessageFormat.format(rb.getString(HTTP_LISTENER_DISABLED),
+            String msg = MessageFormat.format(rb.getString(LogFacade.HTTP_LISTENER_DISABLED),
                                               String.valueOf(connector.getPort()));
             if (log.isLoggable(Level.FINE)) {
                 log.log(Level.FINE, msg);
@@ -372,7 +327,7 @@ public class CoyoteAdapter
                     certs = proxyHandler.getSSLClientCertificateChain(
                                 request.getRequest());
                 } catch (CertificateException ce) {
-                    log.log(Level.SEVERE, PARSING_CLIENT_CERT_EXCEPTION,
+                    log.log(Level.SEVERE, LogFacade.PARSING_CLIENT_CERT_EXCEPTION,
                             ce);
                 }
                 if (certs != null) {
@@ -404,7 +359,7 @@ public class CoyoteAdapter
                     if (host == null) {
                         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 
-                        String msg = MessageFormat.format(rb.getString(NO_HOST_MATCHES_SERVER_NAME_INFO),
+                        String msg = MessageFormat.format(rb.getString(LogFacade.NO_HOST_MATCHES_SERVER_NAME_INFO),
                                                           request.getRequest().getServerName());
                         response.setDetailMessage(msg);
                         return;
@@ -999,7 +954,7 @@ public class CoyoteAdapter
                 ((ContainerBase)connector.getContainer())
                     .fireContainerEvent(type,data);
             } catch (Throwable t){
-                log.log(Level.SEVERE, REQUEST_PROCESSING_EXCEPTION, t);
+                log.log(Level.SEVERE, LogFacade.REQUEST_PROCESSING_EXCEPTION, t);
             }
         }
     }
@@ -1061,7 +1016,7 @@ public class CoyoteAdapter
                         servletResponse.setUpgrade(servletRequest.isUpgrade());
                     }
                 } catch (Exception e) {
-                    log.log(Level.SEVERE, REQUEST_PROCESSING_EXCEPTION, e);
+                    log.log(Level.SEVERE, LogFacade.REQUEST_PROCESSING_EXCEPTION, e);
                 } finally {
                     try {
                         servletRequest.unlockSession();
