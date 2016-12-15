@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,9 +22,9 @@ package org.apache.catalina.core;
 
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.InstanceSupport;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -51,14 +51,8 @@ import static org.apache.catalina.InstanceEvent.EventType.BEFORE_FILTER_EVENT;
 
 final class ApplicationFilterChain implements FilterChain {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-        message = "Filter execution threw an exception",
-        level = "WARNING"
-    )
-    public static final String FILTER_EXECUTION_EXCEPTION = "AS-WEB-CORE-00097";
 
 
     // -------------------------------------------------------------- Constants
@@ -240,7 +234,7 @@ final class ApplicationFilterChain implements FilterChain {
                     support.fireInstanceEvent(AFTER_FILTER_EVENT,
                                               filter, request, response, e);
                 throw new ServletException
-                        (rb.getString(FILTER_EXECUTION_EXCEPTION), e);
+                        (rb.getString(LogFacade.FILTER_EXECUTION_EXCEPTION), e);
             }
             return;
         }

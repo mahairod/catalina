@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -50,6 +50,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.catalina.util.RequestUtil;
@@ -58,7 +59,6 @@ import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
 import org.glassfish.grizzly.http.util.FastHttpDateFormat;
-import org.glassfish.logging.annotation.LogMessageInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -123,17 +123,6 @@ public class WebdavServlet
     extends DefaultServlet {
 
 
-    @LogMessageInfo(
-            message = "JAXP initialization failed",
-            level = "WARNING"
-    )
-    public static final String JAXP_INTI_FAILED = "AS-WEB-CORE-00335";
-
-    @LogMessageInfo(
-            message = "Ignored external entity, publicID: {0}, systemID: {1}",
-            level = "INFO"
-    )
-    public static final String IGNORED_EXTERNAL_ENTITY_INFO = "AS-WEB-CORE-00336";
     // -------------------------------------------------------------- Constants
 
 
@@ -315,7 +304,7 @@ public class WebdavServlet
                     new WebdavResolver(this.getServletContext()));
         } catch(ParserConfigurationException e) {
             throw new ServletException
-                (rb.getString(JAXP_INTI_FAILED));
+                (rb.getString(LogFacade.JAXP_INTI_FAILED));
         }
         return documentBuilder;
     }
@@ -2815,7 +2804,7 @@ public class WebdavServlet
         }
      
         public InputSource resolveEntity (String publicId, String systemId) {
-            String msg = MessageFormat.format(rb.getString(IGNORED_EXTERNAL_ENTITY_INFO),
+            String msg = MessageFormat.format(rb.getString(LogFacade.IGNORED_EXTERNAL_ENTITY_INFO),
                                               new Object[] {publicId, systemId});
             context.log(msg);
             return new InputSource(

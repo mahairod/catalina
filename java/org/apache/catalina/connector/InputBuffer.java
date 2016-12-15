@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -34,13 +34,12 @@ import javax.servlet.http.WebConnection;
 
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.Context;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.Globals;
-import org.apache.catalina.core.StandardServer;
 import org.glassfish.grizzly.ReadHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.util.ByteChunk.ByteInputChannel;
 import org.glassfish.grizzly.http.util.CharChunk;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 /**
  * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3
@@ -54,32 +53,8 @@ public class InputBuffer extends Reader
     implements ByteInputChannel, CharChunk.CharInputChannel,
                CharChunk.CharOutputChannel {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "Stream closed",
-            level = "WARNING"
-    )
-    public static final String STREAM_CLOSED = "AS-WEB-CORE-00045";
-
-    @LogMessageInfo(
-            message = "Already set read listener",
-            level = "WARNING"
-    )
-    public static final String ALREADY_SET_READ_LISTENER = "AS-WEB-CORE-00046";
-
-    @LogMessageInfo(
-            message = "Cannot set ReaderListener for non-async or non-upgrade request",
-            level = "WARNING"
-    )
-    public static final String NON_ASYNC_UPGRADE_EXCEPTION = "AS-WEB-CORE-00047";
-
-    @LogMessageInfo(
-            message = "Error in invoking ReadListener.onDataAvailable",
-            level = "WARNING"
-     )
-    public static final String READ_LISTENER_ON_DATA_AVAILABLE_ERROR = "AS-WEB-CORE-00048";
 
     // -------------------------------------------------------------- Constants
 
@@ -215,7 +190,7 @@ public class InputBuffer extends Reader
     public int readByte()
         throws IOException {
         if (grizzlyInputBuffer.isClosed())
-            throw new IOException(rb.getString(STREAM_CLOSED));
+            throw new IOException(rb.getString(LogFacade.STREAM_CLOSED));
 
         return grizzlyInputBuffer.readByte();
     }
@@ -224,7 +199,7 @@ public class InputBuffer extends Reader
     public int read(final byte[] b, final int off, final int len)
         throws IOException {
         if (grizzlyInputBuffer.isClosed())
-            throw new IOException(rb.getString(STREAM_CLOSED));
+            throw new IOException(rb.getString(LogFacade.STREAM_CLOSED));
 
         return grizzlyInputBuffer.read(b, off, len);
     }
@@ -262,11 +237,11 @@ public class InputBuffer extends Reader
 
     public void setReadListener(ReadListener readListener) {
         if (readHandler != null) {
-            throw new IllegalStateException(rb.getString(ALREADY_SET_READ_LISTENER));
+            throw new IllegalStateException(rb.getString(LogFacade.ALREADY_SET_READ_LISTENER));
         }
 
         if (!(request.isAsyncStarted() || request.isUpgrade())) {
-            throw new IllegalStateException(rb.getString(NON_ASYNC_UPGRADE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.NON_ASYNC_UPGRADE_READER_EXCEPTION));
         }
 
         readHandler = new ReadHandlerImpl(readListener);
@@ -275,7 +250,7 @@ public class InputBuffer extends Reader
             try {
                 readHandler.onDataAvailable();
             } catch(Throwable t) {
-                log.log(Level.WARNING, READ_LISTENER_ON_DATA_AVAILABLE_ERROR, t);
+                log.log(Level.WARNING, LogFacade.READ_LISTENER_ON_DATA_AVAILABLE_ERROR, t);
             }
         }
     }
@@ -323,7 +298,7 @@ public class InputBuffer extends Reader
         throws IOException {
 
         if (grizzlyInputBuffer.isClosed())
-            throw new IOException(rb.getString(STREAM_CLOSED));
+            throw new IOException(rb.getString(LogFacade.STREAM_CLOSED));
 
         return grizzlyInputBuffer.readChar();
     }
@@ -340,7 +315,7 @@ public class InputBuffer extends Reader
         throws IOException {
 
         if (grizzlyInputBuffer.isClosed())
-            throw new IOException(rb.getString(STREAM_CLOSED));
+            throw new IOException(rb.getString(LogFacade.STREAM_CLOSED));
 
         return grizzlyInputBuffer.read(cbuf, off, len);
     }
@@ -350,7 +325,7 @@ public class InputBuffer extends Reader
         throws IOException {
 
         if (grizzlyInputBuffer.isClosed())
-            throw new IOException(rb.getString(STREAM_CLOSED));
+            throw new IOException(rb.getString(LogFacade.STREAM_CLOSED));
 
         if (n < 0) {
             throw new IllegalArgumentException();
@@ -364,7 +339,7 @@ public class InputBuffer extends Reader
         throws IOException {
 
         if (grizzlyInputBuffer.isClosed())
-            throw new IOException(rb.getString(STREAM_CLOSED));
+            throw new IOException(rb.getString(LogFacade.STREAM_CLOSED));
 
         return grizzlyInputBuffer.ready();
     }
@@ -385,7 +360,7 @@ public class InputBuffer extends Reader
         throws IOException {
 
         if (grizzlyInputBuffer.isClosed())
-            throw new IOException(rb.getString(STREAM_CLOSED));
+            throw new IOException(rb.getString(LogFacade.STREAM_CLOSED));
         grizzlyInputBuffer.reset();
     }
 

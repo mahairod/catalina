@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -25,8 +25,7 @@ import java.util.HashMap;
 */
 // START PWC 6057385
 
-import org.apache.catalina.core.StandardServer;
-import org.glassfish.logging.annotation.LogMessageInfo;
+import org.apache.catalina.LogFacade;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -51,13 +50,7 @@ public final class ParameterMap extends HashMap {
 public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 // END PWC 6057385
 
-    private static final ResourceBundle rb = StandardServer.log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "Map is currently locked",
-            level = "WARNING"
-    )
-    public static final String MAP_IS_LOCKED_EXCEPTION = "AS-WEB-CORE-00489";
+    private static final ResourceBundle rb = LogFacade.getLogger().getResourceBundle();
 
     // ----------------------------------------------------------- Constructors
 
@@ -158,7 +151,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
+                (rb.getString(LogFacade.MAP_IS_LOCKED_EXCEPTION));
         super.clear();
 
     }
@@ -182,7 +175,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
+                (rb.getString(LogFacade.MAP_IS_LOCKED_EXCEPTION));
         return (super.put(key, value));
 
     }
@@ -202,7 +195,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
+                (rb.getString(LogFacade.MAP_IS_LOCKED_EXCEPTION));
         super.putAll(map);
 
     }
@@ -223,7 +216,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
         if (locked)
             throw new IllegalStateException
-                (rb.getString(MAP_IS_LOCKED_EXCEPTION));
+                (rb.getString(LogFacade.MAP_IS_LOCKED_EXCEPTION));
         return (super.remove(key));
 
     }

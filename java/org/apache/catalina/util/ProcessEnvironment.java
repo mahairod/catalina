@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,7 +20,7 @@
 
 package org.apache.catalina.util;
 
-import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.LogFacade;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  */
 public class ProcessEnvironment {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
 
     /** context of the enclosing servlet */
     private ServletContext context = null;

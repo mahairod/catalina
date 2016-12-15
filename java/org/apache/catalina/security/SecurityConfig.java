@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,7 +20,7 @@
 
 package org.apache.catalina.security;
 
-import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.startup.CatalinaProperties;
 
 import java.security.Security;
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 public final class SecurityConfig{
     private static volatile SecurityConfig singleton = null;
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
 
     
     private final static String PACKAGE_ACCESS =  "sun.,"

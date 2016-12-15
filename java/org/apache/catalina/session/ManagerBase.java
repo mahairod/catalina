@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -25,8 +25,6 @@ import com.sun.enterprise.util.uuid.UuidGeneratorImpl;
 import org.apache.catalina.*;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.core.StandardServer;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.management.ObjectName;
 import javax.servlet.ServletException;
@@ -59,48 +57,8 @@ import java.util.logging.Logger;
  */
 
 public abstract class ManagerBase implements Manager {
-    protected static final Logger log = StandardServer.log;
+    protected static final Logger log = LogFacade.getLogger();
     protected static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "Exception initializing random number generator of class {0}",
-            level = "SEVERE",
-            cause = "Could not construct and seed a new random number generator",
-            action = "Verify if the current random number generator class is "
-    )
-    public static final String INIT_RANDOM_NUMBER_GENERATOR_EXCEPTION = "AS-WEB-CORE-00351";
-
-    @LogMessageInfo(
-            message = "Seeding random number generator class {0}",
-            level = "FINE"
-    )
-    public static final String SEEDING_RANDOM_NUMBER_GENERATOR_CLASS = "AS-WEB-CORE-00352";
-
-    @LogMessageInfo(
-            message = "Failed to close randomIS.",
-            level = "WARNING"
-    )
-    public static final String FAILED_CLOSE_RANDOMIS_EXCEPTION = "AS-WEB-CORE-00353";
-
-    @LogMessageInfo(
-            message = "Error registering ",
-            level = "SEVERE",
-            cause = "Could not construct an object name",
-            action = "Verify the format of domain, path, host. And make sure they are no null"
-    )
-    public static final String ERROR_REGISTERING_EXCEPTION = "AS-WEB-CORE-00354";
-
-    @LogMessageInfo(
-            message = "setAttribute: Non-serializable attribute with name {0}",
-            level = "WARNING"
-    )
-    public static final String NON_SERIALIZABLE_ATTRIBUTE_EXCEPTION = "AS-WEB-CORE-00355";
-
-    @LogMessageInfo(
-            message = "Session not found {0}",
-            level = "INFO"
-    )
-    public static final String SESSION_NOT_FOUND = "AS-WEB-CORE-00356";
 
     // ----------------------------------------------------- Instance Variables
 
@@ -558,7 +516,7 @@ public abstract class ManagerBase implements Manager {
                  this.random.setSeed(seed);
             } catch (Exception e) {
                  // Fall back to the simple case
-                String msg = MessageFormat.format(rb.getString(INIT_RANDOM_NUMBER_GENERATOR_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.INIT_RANDOM_NUMBER_GENERATOR_EXCEPTION),
                                                   randomClass);
                  log.log(Level.SEVERE, msg, e);
                  this.random = new java.util.Random();
@@ -567,7 +525,7 @@ public abstract class ManagerBase implements Manager {
             long t2=System.currentTimeMillis();
             if( (t2-t1) > 100 )
                  if (log.isLoggable(Level.FINE)) {
-                     String msg = MessageFormat.format(rb.getString(SEEDING_RANDOM_NUMBER_GENERATOR_CLASS),
+                     String msg = MessageFormat.format(rb.getString(LogFacade.SEEDING_RANDOM_NUMBER_GENERATOR_CLASS),
                                                        randomClass);
                      log.log(Level.FINE, msg + " " + (t2-t1));
                  }
@@ -641,7 +599,7 @@ public abstract class ManagerBase implements Manager {
                 randomIS.close();
             } catch (IOException ioe) {
                 if (log.isLoggable(Level.WARNING)) {
-                    log.log(Level.WARNING, FAILED_CLOSE_RANDOMIS_EXCEPTION);
+                    log.log(Level.WARNING, LogFacade.FAILED_CLOSE_RANDOMIS_EXCEPTION);
                 }
             }
             randomIS=null;
@@ -667,7 +625,7 @@ public abstract class ManagerBase implements Manager {
                 oname=new ObjectName(domain + ":type=Manager,path="
                 + path + ",host=" + hst.getName());
             } catch (Exception e) {
-                log.log(Level.SEVERE, ERROR_REGISTERING_EXCEPTION, e);
+                log.log(Level.SEVERE, LogFacade.ERROR_REGISTERING_EXCEPTION_SEVERE, e);
             }
         }
         if (log.isLoggable(Level.FINE)) {
@@ -792,7 +750,7 @@ public abstract class ManagerBase implements Manager {
     @Override
     public void checkSessionAttribute(String name, Object value) {
         if (getDistributable() && !StandardSession.isSerializable(value)) {
-            String msg = MessageFormat.format(rb.getString(NON_SERIALIZABLE_ATTRIBUTE_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.NON_SERIALIZABLE_ATTRIBUTE_EXCEPTION),
                                               name);
             throw new IllegalArgumentException(msg);
         }
@@ -1202,7 +1160,7 @@ public abstract class ManagerBase implements Manager {
         Session s = sessions.get(sessionId);
         if( s==null ) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, SESSION_NOT_FOUND, sessionId);
+                log.log(Level.INFO, LogFacade.SESSION_NOT_FOUND, sessionId);
             }
             return null;
         }
@@ -1216,7 +1174,7 @@ public abstract class ManagerBase implements Manager {
         Session s=sessions.get(sessionId);
         if( s==null ) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, SESSION_NOT_FOUND, sessionId);
+                log.log(Level.INFO, LogFacade.SESSION_NOT_FOUND, sessionId);
             }
             return;
         }
@@ -1228,7 +1186,7 @@ public abstract class ManagerBase implements Manager {
         Session s=sessions.get(sessionId);
         if( s==null ) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, SESSION_NOT_FOUND, sessionId);
+                log.log(Level.INFO, LogFacade.SESSION_NOT_FOUND, sessionId);
             }
             return "";
         }

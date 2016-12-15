@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,9 +20,8 @@
 
 package org.apache.catalina.connector;
 
-import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.security.SecurityUtil;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -42,19 +41,7 @@ import java.util.ResourceBundle;
 public class CoyoteInputStream
     extends ServletInputStream {
 
-    private static final ResourceBundle rb = StandardServer.log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "Cannot use this object outside a servlet's service method or outside a filter's doFilter method",
-            level = "WARNING"
-    )
-    public static final String OBJECT_INVALID_SCOPE_EXCEPTION = "AS-WEB-CORE-00041";
-
-    @LogMessageInfo(
-            message = "Cannot set a null ReadListener object",
-            level = "WARNING"
-    )
-    public static final String NULL_READ_LISTENER_EXCEPTION = "AS-WEB-CORE-00042";
+    private static final ResourceBundle rb = LogFacade.getLogger().getResourceBundle();
 
     // ----------------------------------------------------- Instance Variables
 
@@ -101,7 +88,7 @@ public class CoyoteInputStream
 
         // Disallow operation if the object has gone out of scope
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
 
         }
     
@@ -135,7 +122,7 @@ public class CoyoteInputStream
     public int available() throws IOException {
         // Disallow operation if the object has gone out of scope
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -167,7 +154,7 @@ public class CoyoteInputStream
     public int read(final byte[] b) throws IOException {
         // Disallow operation if the object has gone out of scope
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -203,7 +190,7 @@ public class CoyoteInputStream
 
         // Disallow operation if the object has gone out of scope
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
         
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -237,7 +224,7 @@ public class CoyoteInputStream
     public int readLine(byte[] b, int off, int len) throws IOException {
         // Disallow operation if the object has gone out of scope
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         return super.readLine(b, off, len);
@@ -246,7 +233,7 @@ public class CoyoteInputStream
 
     public boolean isFinished() {
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         return ib.isFinished();
@@ -255,7 +242,7 @@ public class CoyoteInputStream
 
     public boolean isReady() {
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         return ib.isReady();
@@ -264,11 +251,11 @@ public class CoyoteInputStream
 
     public void setReadListener(ReadListener readListener) {
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (readListener == null) {
-            throw new NullPointerException(rb.getString(NULL_READ_LISTENER_EXCEPTION));
+            throw new NullPointerException(rb.getString(LogFacade.NULL_READ_LISTENER_EXCEPTION));
         }
 
         ib.setReadListener(readListener);
@@ -283,7 +270,7 @@ public class CoyoteInputStream
     public void close() throws IOException {
         // Disallow operation if the object has gone out of scope
         if (ib == null) {
-            throw new IllegalStateException(rb.getString(OBJECT_INVALID_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.OBJECT_INVALID_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,7 +22,6 @@ package org.apache.catalina.valves;
 
 
 import org.apache.catalina.*;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -115,14 +114,6 @@ public final class AccessLogValve
     // START CR 6411114
     extends ValveBase {
     // END CR 6411114
-
-    @LogMessageInfo(
-            message = "Could not create a new directory: {0}",
-            level = "SEVERE",
-            cause = "Could not create a new directory",
-            action = "Verify if file is directory, and access permission"
-    )
-    public static final String CREATING_DIR_EXCEPTION = "AS-WEB-CORE-00491";
 
     // ----------------------------------------------------------- Constructors
 
@@ -812,7 +803,7 @@ public final class AccessLogValve
         if (!dir.isAbsolute())
             dir = new File(System.getProperty("catalina.base"), directory);
         if (!dir.mkdirs() && !dir.isDirectory()) {
-            log.log(Level.SEVERE, CREATING_DIR_EXCEPTION, dir);
+            log.log(Level.SEVERE, LogFacade.CREATING_DIR_EXCEPTION, dir);
         }
 
         // Open the current log file

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -29,7 +29,6 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.session.StandardManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
-import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -59,158 +58,9 @@ public class ContextConfig
 // END OF SJAS 8.0 BUG 5046959
     implements LifecycleListener {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
 
-    @LogMessageInfo(
-            message = "Lifecycle event data object {0} is not a Context",
-            level = "WARNING"
-    )
-    public static final String EVENT_DATA_IS_NOT_CONTEXT_EXCEPTION = "AS-WEB-CORE-00408";
-
-    @LogMessageInfo(
-            message = "alt-dd file {0} not found",
-            level = "WARNING"
-    )
-    public static final String ALT_DD_FILE_NOT_FOUND_EXCEPTION = "AS-WEB-CORE-00409";
-
-    @LogMessageInfo(
-            message = "Missing application web.xml, using defaults only {0}",
-            level = "FINE"
-    )
-    public static final String MISSING_APP_WEB_XML_FINE = "AS-WEB-CORE-00410";
-
-    @LogMessageInfo(
-            message = "Parse error in application web.xml at line {0} and column {1}",
-            level = "WARNING"
-    )
-    public static final String PARSE_ERROR_IN_APP_WEB_XML_EXCEPTION = "AS-WEB-CORE-00411";
-
-    @LogMessageInfo(
-            message = "Parse error in application web.xml",
-            level = "WARNING"
-    )
-    public static final String PARSE_ERROR_IN_APP_WEB_XML = "AS-WEB-CORE-00412";
-
-    @LogMessageInfo(
-            message = "Error closing application web.xml",
-            level = "SEVERE",
-            cause = "Could not close this input stream and releases any system resources " +
-                    "associated with the stream.",
-            action = "Verify if any I/O errors occur"
-    )
-    public static final String ERROR_CLOSING_APP_WEB_XML_EXCEPTION = "AS-WEB-CORE-00413";
-
-    @LogMessageInfo(
-            message = "No Realm has been configured to authenticate against",
-            level = "WARNING"
-    )
-    public static final String NO_REALM_BEEN_CONFIGURED_EXCEPTION = "AS-WEB-CORE-00414";
-
-    @LogMessageInfo(
-            message = "Cannot configure an authenticator for method {0}",
-            level = "WARNING"
-    )
-    public static final String CANNOT_CONFIG_AUTHENTICATOR_EXCEPTION = "AS-WEB-CORE-00415";
-
-    @LogMessageInfo(
-            message = "Cannot instantiate an authenticator of class {0}",
-            level = "WARNING"
-    )
-    public static final String CANNOT_INSTANTIATE_AUTHENTICATOR_EXCEPTION = "AS-WEB-CORE-00416";
-
-    @LogMessageInfo(
-            message = "Configured an authenticator for method {0}",
-            level = "FINE"
-    )
-    public static final String CONFIGURED_AUTHENTICATOR_FINE = "AS-WEB-CORE-00417";
-
-    @LogMessageInfo(
-            message = "No default web.xml",
-            level = "INFO"
-    )
-    public static final String NO_DEFAULT_WEB_XML_INFO = "AS-WEB-CORE-00418";
-
-    @LogMessageInfo(
-            message = "Missing default web.xml, using application web.xml only {0} {1}",
-            level = "WARNING"
-    )
-    public static final String MISSING_DEFAULT_WEB_XML_EXCEPTION = "AS-WEB-CORE-00419";
-
-    @LogMessageInfo(
-            message = "Parse error in default web.xml at line {0} and column {1}",
-            level = "SEVERE",
-            cause = "Could not parse the content of the specified input source using this Digester",
-            action = "Verify the input parameter, if any I/O errors occur"
-    )
-    public static final String PARSE_ERROR_IN_DEFAULT_WEB_XML_EXCEPTION = "AS-WEB-CORE-00420";
-
-    @LogMessageInfo(
-            message = "Parse error in default web.xml",
-            level = "SEVERE",
-            cause = "Could not parse the content of the specified input source using this Digester",
-            action = "Verify the input parameter, if any I/O errors occur"
-    )
-    public static final String PARSE_ERROR_IN_DEFAULT_WEB_XML = "AS-WEB-CORE-00421";
-
-    @LogMessageInfo(
-            message = "Error closing default web.xml",
-            level = "SEVERE",
-            cause = "Could not close this input stream and releases any system resources " +
-                    "associated with the stream.",
-            action = "Verify if any I/O errors occur"
-    )
-    public static final String ERROR_CLOSING_DEFAULT_WEB_XML_EXCEPTION = "AS-WEB-CORE-00422";
-
-    @LogMessageInfo(
-            message = "ContextConfig: Initializing",
-            level = "FINE"
-    )
-    public static final String CONTEXT_CONFIG_INIT_FINE = "AS-WEB-CORE-00423";
-
-    @LogMessageInfo(
-            message = "Exception fixing docBase",
-            level = "SEVERE",
-            cause = "Could not adjust docBase",
-            action = "Verify if any I/O errors occur"
-    )
-    public static final String FIXING_DOC_BASE_EXCEPTION = "AS-WEB-CORE-00424";
-
-    @LogMessageInfo(
-            message = "ContextConfig: Processing START",
-            level = "FINEST"
-    )
-    public static final String PROCESSING_START_FINEST = "AS-WEB-CORE-00425";
-
-    @LogMessageInfo(
-            message = "ContextConfig: Processing STOP",
-            level = "FINEST"
-    )
-    public static final String PROCESSING_STOP_FINEST = "AS-WEB-CORE-00426";
-
-    @LogMessageInfo(
-            message = "Security role name {0} used in an <auth-constraint> without being defined in a <security-role> in context [{1}]",
-            level = "INFO"
-    )
-    public static final String SECURITY_ROLE_NAME_USED_IN_AUTH_WITHOUT_DEFINITION = "AS-WEB-CORE-00427";
-
-    @LogMessageInfo(
-            message = "Security role name {0} used in a <run-as> without being defined in a <security-role> in context [{1}]",
-            level = "INFO"
-    )
-    public static final String SECURITY_ROLE_NAME_USED_IN_RUNAS_WITHOUT_DEFINITION = "AS-WEB-CORE-00428";
-
-    @LogMessageInfo(
-            message = "Security role name {0} used in a <role-link> without being defined in a <security-role> in context [{1}]",
-            level = "INFO"
-    )
-    public static final String SECURITY_ROLE_NAME_USED_IN_LINK_WITHOUT_DEFINITION = "AS-WEB-CORE-00429";
-
-    @LogMessageInfo(
-            message = "No web.xml, using defaults {0}",
-            level = "INFO"
-    )
-    public static final String NO_WEB_XML_INFO = "AS-WEB-CORE-00430";
     // --------------------------------------------------- Instance Variables
 
 
@@ -437,7 +287,7 @@ public class ContextConfig
         try {
             context = (Context) event.getLifecycle();
         } catch (ClassCastException e) {
-            String msg = MessageFormat.format(rb.getString(EVENT_DATA_IS_NOT_CONTEXT_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.EVENT_DATA_IS_NOT_CONTEXT_EXCEPTION),
                                               event.getLifecycle());
             throw new LifecycleException(msg, e);
         }
@@ -476,7 +326,7 @@ public class ContextConfig
                 try {
                     stream = new FileInputStream(altDDName);
                 } catch (FileNotFoundException e) {
-                    String msg = MessageFormat.format(rb.getString(ALT_DD_FILE_NOT_FOUND_EXCEPTION),
+                    String msg = MessageFormat.format(rb.getString(LogFacade.ALT_DD_FILE_NOT_FOUND_EXCEPTION),
                                                       altDDName);
                     throw new LifecycleException(msg);
                 }
@@ -493,7 +343,7 @@ public class ContextConfig
             */
             // START PWC 6296257
             if (log.isLoggable(Level.FINE)) {
-                log.log(Level.FINE, MISSING_APP_WEB_XML_FINE, context);
+                log.log(Level.FINE, LogFacade.MISSING_APP_WEB_XML_FINE, context);
             }
             // END PWC 6296257
             return;
@@ -524,20 +374,20 @@ public class ContextConfig
                     webDigester.parse(is);
                 } else {
                     if (log.isLoggable(Level.INFO)) {
-                        log.log(Level.INFO, NO_WEB_XML_INFO);
+                        log.log(Level.INFO, LogFacade.NO_WEB_XML_INFO);
                     }
                 }
             } catch (SAXParseException e) {
-                String msg = MessageFormat.format(rb.getString(PARSE_ERROR_IN_APP_WEB_XML_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.PARSE_ERROR_IN_APP_WEB_XML_EXCEPTION),
                                                   new Object[] {e.getLineNumber(), e.getColumnNumber()});
                 throw new LifecycleException(msg, e);
             } catch (Exception e) {
-                throw new LifecycleException(rb.getString(PARSE_ERROR_IN_APP_WEB_XML), e);
+                throw new LifecycleException(rb.getString(LogFacade.PARSE_ERROR_IN_APP_WEB_XML), e);
             } finally {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    log.log(Level.SEVERE, ERROR_CLOSING_APP_WEB_XML_EXCEPTION,
+                    log.log(Level.SEVERE, LogFacade.ERROR_CLOSING_APP_WEB_XML_EXCEPTION,
                             e);
                 }
                 webDigester.push(null);
@@ -617,7 +467,7 @@ public class ContextConfig
         Realm rlm = context.getRealm();
         if (rlm == null) {
         // END IASRI 4856062
-            throw new LifecycleException(rb.getString(NO_REALM_BEEN_CONFIGURED_EXCEPTION));
+            throw new LifecycleException(rb.getString(LogFacade.NO_REALM_BEEN_CONFIGURED_EXCEPTION));
         }
 
         // BEGIN IASRI 4856062
@@ -646,7 +496,7 @@ public class ContextConfig
                     && customAuthenticators.containsKey(loginMethod)) {
                 authenticator = getGlassFishValveAuthenticator(loginMethod);
                 if (authenticator == null) {
-                    String msg = MessageFormat.format(rb.getString(CANNOT_CONFIG_AUTHENTICATOR_EXCEPTION),
+                    String msg = MessageFormat.format(rb.getString(LogFacade.CANNOT_CONFIG_AUTHENTICATOR_EXCEPTION),
                                                       loginMethod);
                     throw new LifecycleException(msg);
                 }
@@ -673,7 +523,7 @@ public class ContextConfig
             */
 
             if (authenticatorName == null) {
-                String msg = MessageFormat.format(rb.getString(CANNOT_CONFIG_AUTHENTICATOR_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.CANNOT_CONFIG_AUTHENTICATOR_EXCEPTION),
                                                   loginConfig.getAuthMethod());
                 throw new LifecycleException(msg);
             }
@@ -683,7 +533,7 @@ public class ContextConfig
                 Class authenticatorClass = Class.forName(authenticatorName);
                 authenticator = (GlassFishValve) authenticatorClass.newInstance();
             } catch (Throwable t) {
-                String msg = MessageFormat.format(rb.getString(CANNOT_INSTANTIATE_AUTHENTICATOR_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.CANNOT_INSTANTIATE_AUTHENTICATOR_EXCEPTION),
                                                   authenticatorName);
                 throw new LifecycleException(msg, t);
             }
@@ -694,7 +544,7 @@ public class ContextConfig
             if (pipeline != null) {
                 ((ContainerBase) context).addValve(authenticator);
                 if (log.isLoggable(Level.FINE)) {
-                    log.log(Level.FINE, CONFIGURED_AUTHENTICATOR_FINE, loginConfig.getAuthMethod());
+                    log.log(Level.FINE, LogFacade.CONFIGURED_AUTHENTICATOR_FINE, loginConfig.getAuthMethod());
                 }
             }
         }
@@ -805,7 +655,7 @@ public class ContextConfig
 
                 if( stream== null ) {
                     if (log.isLoggable(Level.INFO)) {
-                        log.log(Level.INFO, NO_DEFAULT_WEB_XML_INFO);
+                        log.log(Level.INFO, LogFacade.NO_DEFAULT_WEB_XML_INFO);
                     }
                     // no default web.xml
                     return;
@@ -816,7 +666,7 @@ public class ContextConfig
                 stream = new FileInputStream(file);
             }
         } catch (Exception e) {
-            String msg = MessageFormat.format(rb.getString(MISSING_DEFAULT_WEB_XML_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.MISSING_DEFAULT_WEB_XML_EXCEPTION),
                                               new Object[] {defaultWebXml, file});
             throw new LifecycleException(msg, e);
         }
@@ -835,18 +685,18 @@ public class ContextConfig
                 webDigester.push(context);
                 webDigester.parse(source);
             } catch (SAXParseException e) {
-                String msg = MessageFormat.format(rb.getString(PARSE_ERROR_IN_DEFAULT_WEB_XML_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.PARSE_ERROR_IN_DEFAULT_WEB_XML_EXCEPTION),
                                                   new Object[] {e.getLineNumber(), e.getColumnNumber()});
                 throw new LifecycleException(msg, e);
             } catch (Exception e) {
-                throw new LifecycleException(rb.getString(PARSE_ERROR_IN_DEFAULT_WEB_XML), e);
+                throw new LifecycleException(rb.getString(LogFacade.PARSE_ERROR_IN_DEFAULT_WEB_XML), e);
             } finally {
                 try {
                     if (stream != null) {
                         stream.close();
                     }
                 } catch (IOException e) {
-                    log.log(Level.SEVERE, ERROR_CLOSING_DEFAULT_WEB_XML_EXCEPTION, e);
+                    log.log(Level.SEVERE, LogFacade.ERROR_CLOSING_DEFAULT_WEB_XML_EXCEPTION, e);
                 }
             }
         }
@@ -912,7 +762,7 @@ public class ContextConfig
                 context.addWatchedResource(file.getAbsolutePath());
             }
         } catch (Exception e) {
-            String msg = MessageFormat.format(rb.getString(MISSING_DEFAULT_WEB_XML_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.MISSING_DEFAULT_WEB_XML_EXCEPTION),
                                               new Object[] {resourceName, file});
             log.log(Level.SEVERE, msg, e);
         }
@@ -922,7 +772,7 @@ public class ContextConfig
                 try {
                     stream.close();
                 } catch(IOException e) {
-                    log.log(Level.SEVERE, ERROR_CLOSING_DEFAULT_WEB_XML_EXCEPTION, e);
+                    log.log(Level.SEVERE, LogFacade.ERROR_CLOSING_DEFAULT_WEB_XML_EXCEPTION, e);
                 }
             }
 
@@ -946,13 +796,13 @@ public class ContextConfig
                             context.getName() + "] configuration file " +
                             baseDir + " " + resourceName);
             } catch (SAXParseException e) {
-                String msg = MessageFormat.format(rb.getString(PARSE_ERROR_IN_DEFAULT_WEB_XML_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.PARSE_ERROR_IN_DEFAULT_WEB_XML_EXCEPTION),
                                                   new Object[] {e.getLineNumber(), e.getColumnNumber()});
-                log.log(Level.SEVERE, PARSE_ERROR_IN_DEFAULT_WEB_XML, e);
+                log.log(Level.SEVERE, LogFacade.PARSE_ERROR_IN_DEFAULT_WEB_XML, e);
                 log.log(Level.SEVERE, msg);
                 ok = false;
             } catch (Exception e) {
-                log.log(Level.SEVERE, PARSE_ERROR_IN_DEFAULT_WEB_XML, e);
+                log.log(Level.SEVERE, LogFacade.PARSE_ERROR_IN_DEFAULT_WEB_XML, e);
                 ok = false;
             } finally {
                 //contextDigester.reset();
@@ -962,7 +812,7 @@ public class ContextConfig
                         stream.close();
                     }
                 } catch (IOException e) {
-                    log.log(Level.SEVERE, ERROR_CLOSING_DEFAULT_WEB_XML_EXCEPTION, e);
+                    log.log(Level.SEVERE, LogFacade.ERROR_CLOSING_DEFAULT_WEB_XML_EXCEPTION, e);
                 }
             }
         }
@@ -1130,7 +980,7 @@ public class ContextConfig
         // Called from StandardContext.init()
 
         if (log.isLoggable(Level.FINE))
-            log.log(Level.FINE, CONTEXT_CONFIG_INIT_FINE);
+            log.log(Level.FINE, LogFacade.CONTEXT_CONFIG_INIT_FINE);
         context.setConfigured(false);
         ok = true;
 
@@ -1139,7 +989,7 @@ public class ContextConfig
         try {
             fixDocBase();
         } catch (IOException e) {
-            log.log(Level.SEVERE, FIXING_DOC_BASE_EXCEPTION, e);
+            log.log(Level.SEVERE, LogFacade.FIXING_DOC_BASE_EXCEPTION, e);
         }
 
 
@@ -1152,7 +1002,7 @@ public class ContextConfig
      */
     protected synchronized void start() throws LifecycleException {
         if (log.isLoggable(Level.FINEST)) {
-            log.log(Level.FINEST, PROCESSING_START_FINEST);
+            log.log(Level.FINEST, LogFacade.PROCESSING_START_FINEST);
         }
 
         context.setConfigured(false);
@@ -1218,7 +1068,7 @@ public class ContextConfig
     protected synchronized void stop() {
 
         if (log.isLoggable(Level.FINEST))
-            log.log(Level.FINEST, PROCESSING_STOP_FINEST);
+            log.log(Level.FINEST, LogFacade.PROCESSING_STOP_FINEST);
 
         int i;
 
@@ -1353,7 +1203,7 @@ public class ContextConfig
                 if (!"*".equals(role) &&
                         !context.hasSecurityRole(role)) {
                     if (log.isLoggable(Level.INFO)) {
-                        log.log(Level.INFO, SECURITY_ROLE_NAME_USED_IN_AUTH_WITHOUT_DEFINITION,
+                        log.log(Level.INFO, LogFacade.SECURITY_ROLE_NAME_USED_IN_AUTH_WITHOUT_DEFINITION,
                                 new Object[] {role, context.getName()});
                     }
                     context.addSecurityRole(role);
@@ -1368,7 +1218,7 @@ public class ContextConfig
             String runAs = wrapper.getRunAs();
             if ((runAs != null) && !context.hasSecurityRole(runAs)) {
                 if (log.isLoggable(Level.INFO)) {
-                    log.log(Level.INFO, SECURITY_ROLE_NAME_USED_IN_RUNAS_WITHOUT_DEFINITION,
+                    log.log(Level.INFO, LogFacade.SECURITY_ROLE_NAME_USED_IN_RUNAS_WITHOUT_DEFINITION,
                             new Object[] {runAs, context.getName()});
                 }
                 context.addSecurityRole(runAs);
@@ -1378,7 +1228,7 @@ public class ContextConfig
                 String link = wrapper.findSecurityReference(names[j]);
                 if ((link != null) && !context.hasSecurityRole(link)) {
                     if (log.isLoggable(Level.INFO)) {
-                        log.log(Level.INFO, SECURITY_ROLE_NAME_USED_IN_LINK_WITHOUT_DEFINITION,
+                        log.log(Level.INFO, LogFacade.SECURITY_ROLE_NAME_USED_IN_LINK_WITHOUT_DEFINITION,
                                 new Object[] {link, context.getName()});
                     }
                     context.addSecurityRole(link);

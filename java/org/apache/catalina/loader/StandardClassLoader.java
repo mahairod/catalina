@@ -20,7 +20,7 @@
 
 package org.apache.catalina.loader;
 
-import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.LogFacade;
 import org.apache.naming.JndiPermission;
 import org.glassfish.web.loader.Reloader;
 
@@ -64,7 +64,7 @@ public class StandardClassLoader
     extends URLClassLoader
     implements Reloader {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
 
 
     // ----------------------------------------------------------- Constructors

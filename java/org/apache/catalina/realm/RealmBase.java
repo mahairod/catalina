@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -24,7 +24,6 @@ import org.apache.catalina.*;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
@@ -52,7 +51,6 @@ import java.util.logging.Logger;
 
 import com.sun.enterprise.util.Utility;
 import javax.servlet.ServletContext;
-import org.glassfish.logging.annotation.LogMessageInfo;
 // END SJSWS 6324431
 
 /**
@@ -67,75 +65,8 @@ import org.glassfish.logging.annotation.LogMessageInfo;
 public abstract class RealmBase
     implements Lifecycle, Realm {
 
-    protected static final Logger log = StandardServer.log;
+    protected static final Logger log = LogFacade.getLogger();
     protected static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "Illegal digestEncoding: {0}",
-            level = "SEVERE",
-            cause = "Could not convert the char array to byte array with respect to given charset",
-            action = "Verify the current charset"
-    )
-    public static final String ILLEGAL_DIGEST_ENCODING_EXCEPTION = "AS-WEB-CORE-00312";
-
-    @LogMessageInfo(
-            message = "Access to the requested resource has been denied",
-            level = "WARNING"
-    )
-    public static final String ACCESS_RESOURCE_DENIED = "AS-WEB-CORE-00313";
-
-    @LogMessageInfo(
-            message = "Configuration error: Cannot perform access control without an authenticated principal",
-            level = "WARNING"
-    )
-    public static final String CONFIG_ERROR_NOT_AUTHENTICATED = "AS-WEB-CORE-00314";
-
-    @LogMessageInfo(
-            message = "Username {0} has role {1}",
-            level = "FINE"
-    )
-    public static final String USERNAME_HAS_ROLE = "AS-WEB-CORE-00315";
-
-    @LogMessageInfo(
-            message = "Username {0} does NOT have role {1}",
-            level = "FINE"
-    )
-    public static final String USERNAME_NOT_HAVE_ROLE = "AS-WEB-CORE-00316";
-
-    @LogMessageInfo(
-            message = "This Realm has already been started",
-            level = "INFO"
-    )
-    public static final String REALM_BEEN_STARTED = "AS-WEB-CORE-00317";
-
-    @LogMessageInfo(
-            message = "Invalid message digest algorithm {0} specified",
-            level = "WARNING"
-    )
-    public static final String INVALID_ALGORITHM_EXCEPTION = "AS-WEB-CORE-00318";
-
-    @LogMessageInfo(
-            message = "This Realm has not yet been started",
-            level = "INFO"
-    )
-    public static final String REALM_NOT_BEEN_STARTED = "AS-WEB-CORE-00319";
-
-    @LogMessageInfo(
-            message = "Error digesting user credentials",
-            level = "SEVERE",
-            cause = "Could not digest user credentials",
-            action = "Verify the current credential"
-    )
-    public static final String ERROR_DIGESTING_USER_CREDENTIAL_EXCEPTION = "AS-WEB-CORE-00320";
-
-    @LogMessageInfo(
-            message = "Couldn't get MD5 digest",
-            level = "SEVERE",
-            cause = "Could not get instance of MessageDigest based on MD5",
-            action = "Verify if it supports a MessageDigestSpi implementation " +
-                     "for the specified algorithm"
-    )
-    public static final String CANNOT_GET_MD5_DIGEST_EXCEPTION = "AS-WEB-CORE-00321";
 
 
     //START SJSAS 6202703
@@ -460,7 +391,7 @@ public abstract class RealmBase
             valueBytes = Utility.convertCharArrayToByteArray(
                     serverDigestValue, getDigestEncoding());
         } catch (CharacterCodingException cce) {
-            String msg = MessageFormat.format(rb.getString(ILLEGAL_DIGEST_ENCODING_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.ILLEGAL_DIGEST_ENCODING_EXCEPTION),
                                               getDigestEncoding());
             log.log(Level.SEVERE, msg, cce);
             throw new IllegalArgumentException(cce.getMessage());
@@ -994,7 +925,7 @@ public abstract class RealmBase
                     // BEGIN S1AS 4878272
                     ((HttpServletResponse) response.getResponse()).sendError
                         (HttpServletResponse.SC_FORBIDDEN);
-                    response.setDetailMessage(rb.getString(ACCESS_RESOURCE_DENIED));
+                    response.setDetailMessage(rb.getString(LogFacade.ACCESS_RESOURCE_DENIED));
                     // END S1AS 4878272
 
                     if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "No roles ");
@@ -1012,7 +943,7 @@ public abstract class RealmBase
                 // BEGIN S1AS 4878272
                 ((HttpServletResponse) response.getResponse()).sendError
                     (HttpServletResponse.SC_FORBIDDEN);
-                response.setDetailMessage(rb.getString(CONFIG_ERROR_NOT_AUTHENTICATED));
+                response.setDetailMessage(rb.getString(LogFacade.CONFIG_ERROR_NOT_AUTHENTICATED));
                 // END S1AS 4878272
                 return (false);
             }
@@ -1036,7 +967,7 @@ public abstract class RealmBase
         // BEGIN S1AS 4878272
         ((HttpServletResponse) response.getResponse()).sendError
             (HttpServletResponse.SC_FORBIDDEN);
-        response.setDetailMessage(rb.getString(ACCESS_RESOURCE_DENIED));
+        response.setDetailMessage(rb.getString(LogFacade.ACCESS_RESOURCE_DENIED));
         // END S1AS 4878272
         return (false);
 
@@ -1165,10 +1096,10 @@ public abstract class RealmBase
         if (log.isLoggable(Level.FINE)) {
             String name = principal.getName();
             if (result) {
-                log.log(Level.FINE, USERNAME_HAS_ROLE, new Object[] {name, role});
+                log.log(Level.FINE, LogFacade.USERNAME_HAS_ROLE, new Object[] {name, role});
             }
             else {
-                log.log(Level.FINE, USERNAME_NOT_HAVE_ROLE, new Object[] {name, role});
+                log.log(Level.FINE, LogFacade.USERNAME_NOT_HAVE_ROLE, new Object[] {name, role});
             }
         }
         return (result);
@@ -1372,7 +1303,7 @@ public abstract class RealmBase
         // Validate and update our current component state
         if (started) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.FINE, REALM_BEEN_STARTED);
+                log.log(Level.FINE, LogFacade.REALM_BEEN_STARTED);
             }
             return;
         }
@@ -1384,7 +1315,7 @@ public abstract class RealmBase
             try {
                 md = MessageDigest.getInstance(digest);
             } catch (NoSuchAlgorithmException e) {
-                String msg = MessageFormat.format(rb.getString(INVALID_ALGORITHM_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.INVALID_ALGORITHM_EXCEPTION),
                                                   digest);
                 throw new LifecycleException(msg, e);
             }
@@ -1408,7 +1339,7 @@ public abstract class RealmBase
         // Validate and update our current component state
         if (!started) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, REALM_NOT_BEEN_STARTED);
+                log.log(Level.INFO, LogFacade.REALM_NOT_BEEN_STARTED);
             }
             return;
         }
@@ -1463,7 +1394,7 @@ public abstract class RealmBase
                     bytes = Utility.convertCharArrayToByteArray(
                             credentials, getDigestEncoding());
                 } catch(CharacterCodingException cce) {
-                    String msg = MessageFormat.format(rb.getString(ILLEGAL_DIGEST_ENCODING_EXCEPTION),
+                    String msg = MessageFormat.format(rb.getString(LogFacade.ILLEGAL_DIGEST_ENCODING_EXCEPTION),
                                                       getDigestEncoding());
                     log.log(Level.SEVERE, msg, cce);
                         throw new IllegalArgumentException(cce.getMessage());
@@ -1472,7 +1403,7 @@ public abstract class RealmBase
 
                 return (HexUtils.convert(md.digest()));
             } catch (Exception e) {
-                log.log(Level.SEVERE, ERROR_DIGESTING_USER_CREDENTIAL_EXCEPTION, e);
+                log.log(Level.SEVERE, LogFacade.ERROR_DIGESTING_USER_CREDENTIAL_EXCEPTION, e);
                 return (credentials);
             }
         }
@@ -1491,7 +1422,7 @@ public abstract class RealmBase
             try {
                 md5Helper = MessageDigest.getInstance("MD5");
             } catch (NoSuchAlgorithmException e) {
-                log.log(Level.SEVERE, CANNOT_GET_MD5_DIGEST_EXCEPTION, e);
+                log.log(Level.SEVERE, LogFacade.CANNOT_GET_MD5_DIGEST_EXCEPTION, e);
                 throw new IllegalStateException(e.getMessage());
             }
         }
@@ -1528,7 +1459,7 @@ public abstract class RealmBase
             valueBytes = Utility.convertCharArrayToByteArray(
                 digestValue, getDigestEncoding());
         } catch(CharacterCodingException cce) {
-            String msg = MessageFormat.format(rb.getString(ILLEGAL_DIGEST_ENCODING_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.ILLEGAL_DIGEST_ENCODING_EXCEPTION),
                                              getDigestEncoding());
             log.log(Level.SEVERE, msg, cce);
             throw new IllegalArgumentException(cce.getMessage());

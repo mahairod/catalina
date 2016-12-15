@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,7 +22,7 @@ package org.apache.catalina.logger;
 
 
 import org.apache.catalina.LifecycleException;
-import org.glassfish.logging.annotation.LogMessageInfo;
+import org.apache.catalina.LogFacade;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -43,17 +43,6 @@ import java.sql.Timestamp;
 public class FileLogger
     extends LoggerBase {
 
-    @LogMessageInfo(
-            message = "File Logger has already been started",
-            level = "WARNING"
-    )
-    public static final String FILE_LOGGER_STARTED = "AS-WEB-CORE-00300";
-
-    @LogMessageInfo(
-            message = "File Logger has not yet been started",
-            level = "WARNING"
-    )
-    public static final String FILE_LOGGER_NOT_STARTED = "AS-WEB-CORE-00301";
     // ----------------------------------------------------- Instance Variables
 
 
@@ -308,7 +297,7 @@ public class FileLogger
         // Validate and update our current component state
         if (started)
             throw new LifecycleException
-                (rb.getString(FILE_LOGGER_STARTED));
+                (rb.getString(LogFacade.FILE_LOGGER_STARTED));
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
         
@@ -330,7 +319,7 @@ public class FileLogger
         // Validate and update our current component state
         if (!started)
             throw new LifecycleException
-                (rb.getString(FILE_LOGGER_NOT_STARTED));
+                (rb.getString(LogFacade.FILE_LOGGER_NOT_STARTED));
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         started = false;
 

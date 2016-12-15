@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -28,8 +28,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.catalina.core.StandardServer;
-import org.glassfish.logging.annotation.LogMessageInfo;
+import org.apache.catalina.LogFacade;
 
 /**
  * <p> Low level API for processing file uploads.
@@ -94,13 +93,7 @@ import org.glassfish.logging.annotation.LogMessageInfo;
  */
 public class MultipartStream {
 
-    private static final Logger log = StandardServer.log;
-
-    @LogMessageInfo(
-            message = "Failed to skip {0} bytes in the underlying buffer of MultipartStream on close().",
-            level = "WANING"
-    )
-    public static final String FAILED_SKIP_BYTES_MULTIPART_STREAM_CLOSE_EXCEPTION = "AS-WEB-CORE-00284";
+    private static final Logger log = LogFacade.getLogger();
 
     /**
      * Internal class, which is used to invoke the
@@ -890,7 +883,7 @@ public class MultipartStream {
                         }
                     }
                     if (skip(av) != av && log.isLoggable(Level.WARNING)) {
-                        log.log(Level.WARNING, FAILED_SKIP_BYTES_MULTIPART_STREAM_CLOSE_EXCEPTION, av);
+                        log.log(Level.WARNING, LogFacade.FAILED_SKIP_BYTES_MULTIPART_STREAM_CLOSE_EXCEPTION, av);
                     }
                 }
             }

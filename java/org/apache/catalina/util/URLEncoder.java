@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,8 +20,7 @@
 
 package org.apache.catalina.util;
 
-import org.apache.catalina.core.StandardServer;
-import org.glassfish.logging.annotation.LogMessageInfo;
+import org.apache.catalina.LogFacade;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,13 +44,7 @@ import java.util.logging.Logger;
  */
 public class URLEncoder {
 
-    private static final Logger log = StandardServer.log;
-
-    @LogMessageInfo(
-            message = "UTF8 not supported",
-            level = "WARNING"
-    )
-    public static final String UTF8_NOT_SUPPORTED_EXCEPTION = "AS-WEB-CORE-00490";
+    private static final Logger log = LogFacade.getLogger();
 
     static final char[] hexadecimal =
     {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -85,7 +78,7 @@ public class URLEncoder {
         try {
             writer = new OutputStreamWriter(buf, "UTF8");
         } catch (UnsupportedEncodingException e) {
-            log.log(Level.WARNING, UTF8_NOT_SUPPORTED_EXCEPTION, e);
+            log.log(Level.WARNING, LogFacade.UTF8_NOT_SUPPORTED_EXCEPTION, e);
             writer = new OutputStreamWriter(buf);
         }
 

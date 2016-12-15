@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -31,8 +31,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
-import org.apache.catalina.core.StandardServer;
-import org.glassfish.logging.annotation.LogMessageInfo;
+import org.apache.catalina.LogFacade;
 import org.glassfish.web.util.IntrospectionUtils;
 
 /**
@@ -44,13 +43,7 @@ import org.glassfish.web.util.IntrospectionUtils;
  */
 public abstract class FilterBase implements Filter {
 
-    protected  static final ResourceBundle rb = StandardServer.log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "The property \"{0}\" is not defined for filters of type \"{1}\"",
-            level = "WARNING"
-    )
-    public static final String PROPERTY_NOT_DEFINED_EXCEPTION = "AS-WEB-CORE-00287";
+    protected  static final ResourceBundle rb = LogFacade.getLogger().getResourceBundle();
 
     protected abstract Logger getLogger();
 
@@ -61,7 +54,7 @@ public abstract class FilterBase implements Filter {
             String paramName = paramNames.nextElement();
             if (!IntrospectionUtils.setProperty(this, paramName,
                     filterConfig.getInitParameter(paramName))) {
-                String msg = MessageFormat.format(rb.getString(PROPERTY_NOT_DEFINED_EXCEPTION),
+                String msg = MessageFormat.format(rb.getString(LogFacade.PROPERTY_NOT_DEFINED_EXCEPTION),
                                                   new Object[] {paramName, this.getClass().getName()});
                 if (isConfigProblemFatal()) {
                     throw new ServletException(msg);

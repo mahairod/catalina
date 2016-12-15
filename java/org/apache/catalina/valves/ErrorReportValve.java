@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,12 +22,12 @@ package org.apache.catalina.valves;
 
 
 import org.apache.catalina.HttpResponse;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.Logger;
 import org.apache.catalina.Request;
 import org.apache.catalina.Response;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
-import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.util.HtmlEntityEncoder;
 
 import javax.servlet.RequestDispatcher;
@@ -59,12 +59,6 @@ import java.util.logging.Level;
 
 public class ErrorReportValve
     extends ValveBase {
-
-    @LogMessageInfo(
-            message = "status.setContentType",
-            level = "WARNING"
-    )
-    public static final String SET_CONTENT_TYPE_EXCEPTION = "AS-WEB-CORE-00492";
 
     /**
      * The descriptive information related to this implementation.
@@ -313,7 +307,7 @@ public class ErrorReportValve
             */
         } catch (Throwable t) {
             if (debug >= 1)
-                log(rb.getString(SET_CONTENT_TYPE_EXCEPTION), t);
+                log(rb.getString(LogFacade.SET_CONTENT_TYPE_EXCEPTION), t);
         }
 
         try {

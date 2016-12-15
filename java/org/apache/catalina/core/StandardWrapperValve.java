@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -38,13 +38,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.HttpRequest;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.Request;
 import org.apache.catalina.Response;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.valves.ValveBase;
 import org.glassfish.grizzly.http.util.DataChunk;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 /**
  * Valve that implements the default basic behavior for the
@@ -56,68 +56,8 @@ import org.glassfish.logging.annotation.LogMessageInfo;
 
 final class StandardWrapperValve extends ValveBase {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-        message = "This application is not currently available",
-        level = "WARNING"
-    )
-    public static final String APP_UNAVAILABLE = "AS-WEB-CORE-00274";
-
-    @LogMessageInfo(
-        message = "Servlet {0} is currently unavailable",
-        level = "WARNING"
-    )
-    public static final String SERVLET_UNAVAILABLE  = "AS-WEB-CORE-00275";
-
-    @LogMessageInfo(
-        message = "Servlet {0} is not available",
-        level = "WARNING"
-    )
-    public static final String SERVLET_NOT_FOUND = "AS-WEB-CORE-00276";
-
-    @LogMessageInfo(
-        message = "Allocate exception for servlet {0}",
-        level = "WARNING"
-    )
-    public static final String SERVLET_ALLOCATE_EXCEPTION = "AS-WEB-CORE-00277";
-
-    @LogMessageInfo(
-        message = "Exception for sending acknowledgment of a request: {0}",
-        level = "WARNING"
-    )
-    public static final String SEND_ACKNOWLEDGEMENT_EXCEPTION = "AS-WEB-CORE-00278";
-
-    @LogMessageInfo(
-        message = "Servlet.service() for servlet {0} threw exception",
-        level = "WARNING"
-    )
-    public static final String SERVLET_SERVICE_EXCEPTION = "AS-WEB-CORE-00279";
-
-    @LogMessageInfo(
-        message = "Release filters exception for servlet {0}",
-        level = "WARNING"
-    )
-    public static final String RELEASE_FILTERS_EXCEPTION = "AS-WEB-CORE-00280";
-
-    @LogMessageInfo(
-        message = "Deallocate exception for servlet {0}",
-        level = "WARNING"
-    )
-    public static final String DEALLOCATE_EXCEPTION = "AS-WEB-CORE-00281";
-
-    @LogMessageInfo(
-        message = "Servlet {0} threw unload() exception",
-        level = "WARNING"
-    )
-    public static final String SERVLET_UNLOAD_EXCEPTION = "AS-WEB-CORE-00282";
-
-    @LogMessageInfo(
-        message = "StandardWrapperValve[{0}]: {1}",
-        level = "INFO"
-    )
-    public static final String STANDARD_WRAPPER_VALVE = "AS-WEB-CORE-00283";
 
     // --------------------------------------------------------- Public Methods
 
@@ -162,14 +102,14 @@ final class StandardWrapperValve extends ValveBase {
         if (!context.getAvailable()) {
             // BEGIN S1AS 4878272
             hres.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            response.setDetailMessage(rb.getString(APP_UNAVAILABLE));
+            response.setDetailMessage(rb.getString(LogFacade.APP_UNAVAILABLE));
             // END S1AS 4878272
             unavailable = true;
         }
 
         // Check for the servlet being marked unavailable
         if (!unavailable && wrapper.isUnavailable()) {
-            String msg = MessageFormat.format(rb.getString(SERVLET_UNAVAILABLE), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_UNAVAILABLE), wrapper.getName());
             log(msg);
             if (hres == null) {
                 ;       // NOTE - Not much we can do generically
@@ -185,7 +125,7 @@ final class StandardWrapperValve extends ValveBase {
                 } else if (available == Long.MAX_VALUE) {
                     // BEGIN S1AS 4878272
                     hres.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    msg = MessageFormat.format(rb.getString(SERVLET_NOT_FOUND), wrapper.getName());
+                    msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_NOT_FOUND), wrapper.getName());
                     response.setDetailMessage(msg);
                     // END S1AS 4878272
                 }
@@ -203,7 +143,7 @@ final class StandardWrapperValve extends ValveBase {
                 // BEGIN S1AS 4878272
                 hres.sendError(HttpServletResponse.SC_NOT_FOUND);
 
-                String msg = MessageFormat.format(rb.getString(SERVLET_NOT_FOUND), wrapper.getName());
+                String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_NOT_FOUND), wrapper.getName());
                 response.setDetailMessage(msg);
 
                 // END S1AS 4878272
@@ -211,13 +151,13 @@ final class StandardWrapperValve extends ValveBase {
                 hres.setDateHeader("Retry-After", e.getUnavailableSeconds());
                 // BEGIN S1AS 4878272
                 hres.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                String msg = MessageFormat.format(rb.getString(SERVLET_UNAVAILABLE), wrapper.getName());
+                String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_UNAVAILABLE), wrapper.getName());
                 response.setDetailMessage(msg);
                 // END S1AS 4878272
             }
         } catch (ServletException e) {
 
-            String msg = MessageFormat.format(rb.getString(SERVLET_ALLOCATE_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_ALLOCATE_EXCEPTION), wrapper.getName());
             log(msg, StandardWrapper.getRootCause(e));
 
             throwable = e;
@@ -225,7 +165,7 @@ final class StandardWrapperValve extends ValveBase {
             servlet = null;
         } catch (Throwable e) {
 
-            String msg = MessageFormat.format(rb.getString(SERVLET_ALLOCATE_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_ALLOCATE_EXCEPTION), wrapper.getName());
             log(msg, e);
 
             throwable = e;
@@ -237,12 +177,12 @@ final class StandardWrapperValve extends ValveBase {
         try {
             response.sendAcknowledgement();
         } catch (IOException e) {
-            String msg = MessageFormat.format(rb.getString(SEND_ACKNOWLEDGEMENT_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SEND_ACKNOWLEDGEMENT_EXCEPTION), wrapper.getName());
             log(msg, e);
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
-            String msg = MessageFormat.format(rb.getString(SEND_ACKNOWLEDGEMENT_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SEND_ACKNOWLEDGEMENT_EXCEPTION), wrapper.getName());
             log(msg, e);
             throwable = e;
             exception(request, response, e);
@@ -285,12 +225,12 @@ final class StandardWrapperValve extends ValveBase {
             throwable = e;
             exception(request, response, e);
         } catch (IOException e) {
-            String msg = MessageFormat.format(rb.getString(SERVLET_SERVICE_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_SERVICE_EXCEPTION), wrapper.getName());
             log(msg, e);
             throwable = e;
             exception(request, response, e);
         } catch (UnavailableException e) {
-            String msg = MessageFormat.format(rb.getString(SERVLET_SERVICE_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_SERVICE_EXCEPTION), wrapper.getName());
             log(msg, e);
             //            throwable = e;
             //            exception(request, response, e);
@@ -300,13 +240,13 @@ final class StandardWrapperValve extends ValveBase {
                 hres.setDateHeader("Retry-After", available);
                 // BEGIN S1AS 4878272
                 hres.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                String msgServletUnavailable = MessageFormat.format(rb.getString(SERVLET_UNAVAILABLE), wrapper.getName());
+                String msgServletUnavailable = MessageFormat.format(rb.getString(LogFacade.SERVLET_UNAVAILABLE), wrapper.getName());
                 response.setDetailMessage(msgServletUnavailable);
                 // END S1AS 4878272
             } else if (available == Long.MAX_VALUE) {
                 // BEGIN S1AS 4878272
                 hres.sendError(HttpServletResponse.SC_NOT_FOUND);
-                String msgServletNotFound = MessageFormat.format(rb.getString(SERVLET_NOT_FOUND), wrapper.getName());
+                String msgServletNotFound = MessageFormat.format(rb.getString(LogFacade.SERVLET_NOT_FOUND), wrapper.getName());
                 response.setDetailMessage(msgServletNotFound);
                 // END S1AS 4878272
             }
@@ -315,13 +255,13 @@ final class StandardWrapperValve extends ValveBase {
         } catch (ServletException e) {
             Throwable rootCause = StandardWrapper.getRootCause(e);
             if (!(rootCause instanceof ClientAbortException)) {
-                String msg = MessageFormat.format(rb.getString(SERVLET_SERVICE_EXCEPTION), wrapper.getName());
+                String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_SERVICE_EXCEPTION), wrapper.getName());
                 log(msg, rootCause);
             }
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
-            String msg = MessageFormat.format(rb.getString(SERVLET_SERVICE_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_SERVICE_EXCEPTION), wrapper.getName());
             log(msg, e);
             throwable = e;
             exception(request, response, e);
@@ -332,7 +272,7 @@ final class StandardWrapperValve extends ValveBase {
             if (filterChain != null)
                 filterChain.release();
         } catch (Throwable e) {
-            String msg = MessageFormat.format(rb.getString(RELEASE_FILTERS_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.RELEASE_FILTERS_EXCEPTION), wrapper.getName());
             log(msg, e);
             if (throwable == null) {
                 throwable = e;
@@ -346,7 +286,7 @@ final class StandardWrapperValve extends ValveBase {
                 wrapper.deallocate(servlet);
             }
         } catch (Throwable e) {
-            String msg = MessageFormat.format(rb.getString(DEALLOCATE_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.DEALLOCATE_EXCEPTION), wrapper.getName());
             log(msg, e);
             if (throwable == null) {
                 throwable = e;
@@ -362,7 +302,7 @@ final class StandardWrapperValve extends ValveBase {
                 wrapper.unload();
             }
         } catch (Throwable e) {
-            String msg = MessageFormat.format(rb.getString(SERVLET_UNLOAD_EXCEPTION), wrapper.getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_UNLOAD_EXCEPTION), wrapper.getName());
             log(msg, e);
             if (throwable == null) {
                 exception(request, response, e);
@@ -404,7 +344,7 @@ final class StandardWrapperValve extends ValveBase {
                        message);
         } else {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, STANDARD_WRAPPER_VALVE, new Object[] {containerName, message});
+                log.log(Level.INFO, LogFacade.STANDARD_WRAPPER_VALVE, new Object[] {containerName, message});
             }
         }
     }
@@ -427,7 +367,7 @@ final class StandardWrapperValve extends ValveBase {
             logger.log("StandardWrapperValve[" + containerName + "]: " +
                 message, t, org.apache.catalina.Logger.WARNING);
         } else {
-            String msg = MessageFormat.format(rb.getString(STANDARD_WRAPPER_VALVE),
+            String msg = MessageFormat.format(rb.getString(LogFacade.STANDARD_WRAPPER_VALVE),
                                               new Object[] {containerName, message});
             log.log(Level.WARNING, msg, t);
         }

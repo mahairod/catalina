@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -24,8 +24,6 @@ package org.apache.catalina.startup;
 import org.apache.catalina.*;
 import org.apache.catalina.Logger;
 import org.apache.catalina.core.StandardEngine;
-import org.apache.catalina.core.StandardServer;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
@@ -45,32 +43,8 @@ public final class EngineConfig
 
     // ----------------------------------------------------- Static Variables
 
-    private static final java.util.logging.Logger log = StandardServer.log;
+    private static final java.util.logging.Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "Lifecycle event data object {0} is not an Engine",
-            level = "WARNING"
-    )
-    public static final String LIFECYCLE_EVENT_DATA_IS_NOT_ENGINE_EXCEPTION = "AS-WEB-CORE-00440";
-
-    @LogMessageInfo(
-            message = "EngineConfig: {0}",
-            level = "WARNING"
-    )
-    public static final String ENGINE_CONFIG = "AS-WEB-CORE-00441";
-
-    @LogMessageInfo(
-            message = "EngineConfig: Processing START",
-            level = "INFO"
-    )
-    public static final String ENGINE_CONFIG_PROCESSING_START_INFO = "AS-WEB-CORE-00442";
-
-    @LogMessageInfo(
-            message = "EngineConfig: Processing STOP",
-            level = "INFO"
-    )
-    public static final String ENGINE_CONFIG_PROCESSING_STOP_INFO = "AS-WEB-CORE-00443";
 
 
     // ----------------------------------------------------- Instance Variables
@@ -127,7 +101,7 @@ public final class EngineConfig
                     this.debug = engineDebug;
             }
         } catch (ClassCastException e) {
-            String msg = MessageFormat.format(rb.getString(LIFECYCLE_EVENT_DATA_IS_NOT_ENGINE_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.LIFECYCLE_EVENT_DATA_IS_NOT_ENGINE_EXCEPTION),
                                               event.getLifecycle());
             log(msg, e);
             return;
@@ -159,7 +133,7 @@ public final class EngineConfig
             logger.log("EngineConfig: " + message);
         } else {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, ENGINE_CONFIG, message);
+                log.log(Level.INFO, LogFacade.ENGINE_CONFIG, message);
             }
         }
     }
@@ -179,7 +153,7 @@ public final class EngineConfig
         if (logger != null) {
             logger.log("EngineConfig: " + message, t, Logger.WARNING);
         } else {
-            String msg = MessageFormat.format(rb.getString(ENGINE_CONFIG),
+            String msg = MessageFormat.format(rb.getString(LogFacade.ENGINE_CONFIG),
                                               message);
             log.log(Level.WARNING, msg, t);
         }
@@ -192,7 +166,7 @@ public final class EngineConfig
     private void start() {
 
         if (debug > 0)
-            log(rb.getString(ENGINE_CONFIG_PROCESSING_START_INFO));
+            log(rb.getString(LogFacade.ENGINE_CONFIG_PROCESSING_START_INFO));
 
     }
 
@@ -203,7 +177,7 @@ public final class EngineConfig
     private void stop() {
 
         if (debug > 0)
-            log(rb.getString(ENGINE_CONFIG_PROCESSING_STOP_INFO));
+            log(rb.getString(LogFacade.ENGINE_CONFIG_PROCESSING_STOP_INFO));
 
     }
 

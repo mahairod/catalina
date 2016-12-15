@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -21,6 +21,7 @@
 package org.apache.catalina.core;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.security.SecurityUtil;
 
 import javax.servlet.*;
@@ -49,7 +50,7 @@ import java.util.logging.Logger;
 public final class ApplicationContextFacade
     implements ServletContext {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
         
     // ---------------------------------------------------------- Attributes
     /**

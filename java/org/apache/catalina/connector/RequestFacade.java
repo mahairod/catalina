@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,11 +20,10 @@
 
 package org.apache.catalina.connector;
 
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.Globals;
 import org.apache.catalina.core.RequestFacadeHelper;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.security.SecurityUtil;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -50,14 +49,8 @@ import java.util.*;
 public class RequestFacade 
     implements HttpServletRequest {
 
-    private static final ResourceBundle rb = StandardServer.log.getResourceBundle();
+    private static final ResourceBundle rb = LogFacade.getLogger().getResourceBundle();
 
-    @LogMessageInfo(
-            message = " Must not use request object outside the scope of a servlet's service or a filter's doFilter method",
-            level = "WARNING"
-    )
-    public static final String CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION = "AS-WEB-CORE-00074";
-        
         
     // ----------------------------------------------------------- DoPrivileged
     
@@ -309,7 +302,7 @@ public class RequestFacade
     public Object getAttribute(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getAttribute(name);
@@ -319,7 +312,7 @@ public class RequestFacade
     public Enumeration<String> getAttributeNames() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -334,7 +327,7 @@ public class RequestFacade
     public String getCharacterEncoding() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -350,7 +343,7 @@ public class RequestFacade
             throws java.io.UnsupportedEncodingException {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         request.setCharacterEncoding(env);
@@ -360,7 +353,7 @@ public class RequestFacade
     public int getContentLength() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getContentLength();
@@ -370,7 +363,7 @@ public class RequestFacade
     public long getContentLengthLong() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getContentLengthLong();
@@ -380,7 +373,7 @@ public class RequestFacade
     public String getContentType() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getContentType();
@@ -390,7 +383,7 @@ public class RequestFacade
     public ServletInputStream getInputStream() throws IOException {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getInputStream();
@@ -400,7 +393,7 @@ public class RequestFacade
     public String getParameter(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -415,7 +408,7 @@ public class RequestFacade
     public Enumeration<String> getParameterNames() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -430,7 +423,7 @@ public class RequestFacade
     public String[] getParameterValues(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         String[] ret = null;
@@ -456,7 +449,7 @@ public class RequestFacade
     public Map<String, String[]> getParameterMap() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -471,7 +464,7 @@ public class RequestFacade
     public String getProtocol() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getProtocol();
@@ -481,7 +474,7 @@ public class RequestFacade
     public String getScheme() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getScheme();
@@ -491,7 +484,7 @@ public class RequestFacade
     public String getServerName() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getServerName();
@@ -501,7 +494,7 @@ public class RequestFacade
     public int getServerPort() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getServerPort();
@@ -511,7 +504,7 @@ public class RequestFacade
     public BufferedReader getReader() throws IOException {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getReader();
@@ -521,7 +514,7 @@ public class RequestFacade
     public String getRemoteAddr() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRemoteAddr();
@@ -531,7 +524,7 @@ public class RequestFacade
     public String getRemoteHost() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRemoteHost();
@@ -541,7 +534,7 @@ public class RequestFacade
     public void setAttribute(String name, Object o) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         request.setAttribute(name, o);
@@ -551,7 +544,7 @@ public class RequestFacade
     public void removeAttribute(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         request.removeAttribute(name);
@@ -561,7 +554,7 @@ public class RequestFacade
     public Locale getLocale() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -576,7 +569,7 @@ public class RequestFacade
     public Enumeration<Locale> getLocales() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -591,7 +584,7 @@ public class RequestFacade
     public boolean isSecure() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.isSecure();
@@ -601,7 +594,7 @@ public class RequestFacade
     public RequestDispatcher getRequestDispatcher(String path) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -616,7 +609,7 @@ public class RequestFacade
     public String getRealPath(String path) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRealPath(path);
@@ -626,7 +619,7 @@ public class RequestFacade
     public String getAuthType() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getAuthType();
@@ -636,7 +629,7 @@ public class RequestFacade
     public Cookie[] getCookies() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         Cookie[] ret = null;
@@ -662,7 +655,7 @@ public class RequestFacade
     public long getDateHeader(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getDateHeader(name);
@@ -672,7 +665,7 @@ public class RequestFacade
     public String getHeader(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getHeader(name);
@@ -682,7 +675,7 @@ public class RequestFacade
     public Enumeration<String> getHeaders(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -697,7 +690,7 @@ public class RequestFacade
     public Enumeration<String> getHeaderNames() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -712,7 +705,7 @@ public class RequestFacade
     public int getIntHeader(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getIntHeader(name);
@@ -722,7 +715,7 @@ public class RequestFacade
     public String getMethod() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getMethod();
@@ -732,7 +725,7 @@ public class RequestFacade
     public String getPathInfo() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getPathInfo();
@@ -742,7 +735,7 @@ public class RequestFacade
     public String getPathTranslated() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getPathTranslated();
@@ -763,7 +756,7 @@ public class RequestFacade
 
     public String getContextPath() {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.getContextPath(maskDefaultContextMapping);
     }
@@ -771,7 +764,7 @@ public class RequestFacade
 
     public String getContextPath(boolean maskDefaultContextMapping) {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.getContextPath(maskDefaultContextMapping);
     }
@@ -780,7 +773,7 @@ public class RequestFacade
     public String getQueryString() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getQueryString();
@@ -790,7 +783,7 @@ public class RequestFacade
     public String getRemoteUser() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRemoteUser();
@@ -800,7 +793,7 @@ public class RequestFacade
     public boolean isUserInRole(String role) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.isUserInRole(role);
@@ -810,7 +803,7 @@ public class RequestFacade
     public java.security.Principal getUserPrincipal() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getUserPrincipal();
@@ -820,7 +813,7 @@ public class RequestFacade
     public String getRequestedSessionId() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRequestedSessionId();
@@ -830,7 +823,7 @@ public class RequestFacade
     public String getRequestURI() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRequestURI(maskDefaultContextMapping);
@@ -840,7 +833,7 @@ public class RequestFacade
     public StringBuffer getRequestURL() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRequestURL(maskDefaultContextMapping);
@@ -850,7 +843,7 @@ public class RequestFacade
     public String getServletPath() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getServletPath();
@@ -860,7 +853,7 @@ public class RequestFacade
     public HttpSession getSession(boolean create) {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -874,7 +867,7 @@ public class RequestFacade
     public HttpSession getSession() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return getSession(true);
@@ -883,7 +876,7 @@ public class RequestFacade
     public String changeSessionId() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -898,7 +891,7 @@ public class RequestFacade
     public boolean isRequestedSessionIdValid() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.isRequestedSessionIdValid();
@@ -908,7 +901,7 @@ public class RequestFacade
     public boolean isRequestedSessionIdFromCookie() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.isRequestedSessionIdFromCookie();
@@ -918,7 +911,7 @@ public class RequestFacade
     public boolean isRequestedSessionIdFromURL() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.isRequestedSessionIdFromURL();
@@ -928,7 +921,7 @@ public class RequestFacade
     public boolean isRequestedSessionIdFromUrl() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.isRequestedSessionIdFromURL();
@@ -938,7 +931,7 @@ public class RequestFacade
     public String getLocalAddr() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getLocalAddr();
@@ -948,7 +941,7 @@ public class RequestFacade
     public String getLocalName() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getLocalName();
@@ -958,7 +951,7 @@ public class RequestFacade
     public int getLocalPort() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getLocalPort();
@@ -968,7 +961,7 @@ public class RequestFacade
     public int getRemotePort() {
 
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
 
         return request.getRemotePort();
@@ -977,7 +970,7 @@ public class RequestFacade
 
     public DispatcherType getDispatcherType() {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.getDispatcherType();
     }
@@ -988,7 +981,7 @@ public class RequestFacade
      */
     public AsyncContext startAsync() throws IllegalStateException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.startAsync();
     }
@@ -1001,7 +994,7 @@ public class RequestFacade
                                    ServletResponse sresp)
             throws IllegalStateException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.startAsync(sreq, sresp);
     }
@@ -1012,7 +1005,7 @@ public class RequestFacade
      */
     public boolean isAsyncStarted() {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.isAsyncStarted();
     }
@@ -1023,7 +1016,7 @@ public class RequestFacade
      */
     public boolean isAsyncSupported() {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.isAsyncSupported();
     }
@@ -1034,7 +1027,7 @@ public class RequestFacade
      */
     public AsyncContext getAsyncContext() {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.getAsyncContext();
     }
@@ -1043,7 +1036,7 @@ public class RequestFacade
     @Override
     public Collection<Part> getParts() throws IOException, ServletException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.getParts();
     }
@@ -1052,7 +1045,7 @@ public class RequestFacade
     @Override
     public Part getPart(String name) throws IOException, ServletException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.getPart(name);
     }
@@ -1061,7 +1054,7 @@ public class RequestFacade
     public boolean authenticate(HttpServletResponse response)
             throws IOException, ServletException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.authenticate(response);
     }
@@ -1070,7 +1063,7 @@ public class RequestFacade
     public void login(String username, String password)
             throws ServletException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         request.login(username, password);
     }
@@ -1078,7 +1071,7 @@ public class RequestFacade
 
     public void logout() throws ServletException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         request.logout();
     }
@@ -1086,7 +1079,7 @@ public class RequestFacade
 
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
         if (request == null) {
-            throw new IllegalStateException(rb.getString(CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
+            throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.upgrade(handlerClass);
     }

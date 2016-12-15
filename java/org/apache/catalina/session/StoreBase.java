@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -21,9 +21,7 @@
 package org.apache.catalina.session;
 
 import org.apache.catalina.*;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.LifecycleSupport;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -46,20 +44,8 @@ import java.util.logging.Level;
 public abstract class StoreBase
     implements Lifecycle, Store {
 
-    private static final java.util.logging.Logger log = StandardServer.log;
+    private static final java.util.logging.Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "StoreBase has already been started",
-            level = "WARNING"
-    )
-    public static final String STORE_BASE_STARTED_EXCEPTION = "AS-WEB-CORE-00396";
-
-    @LogMessageInfo(
-            message = "StoreBase has not been started",
-            level = "WARNING"
-    )
-    public static final String STORE_BASE_NOT_STARTED_EXCEPTION = "AS-WEB-CORE-00397";
 
     // ----------------------------------------------------- Instance Variables
 
@@ -406,7 +392,7 @@ public abstract class StoreBase
         // Validate and update our current component state
         if (started)
             throw new LifecycleException
-                (rb.getString(STORE_BASE_STARTED_EXCEPTION));
+                (rb.getString(LogFacade.STORE_BASE_STARTED_EXCEPTION));
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
 
@@ -425,7 +411,7 @@ public abstract class StoreBase
         // Validate and update our current component state
         if (!started)
             throw new LifecycleException
-                (rb.getString(STORE_BASE_NOT_STARTED_EXCEPTION));
+                (rb.getString(LogFacade.STORE_BASE_NOT_STARTED_EXCEPTION));
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         started = false;
 

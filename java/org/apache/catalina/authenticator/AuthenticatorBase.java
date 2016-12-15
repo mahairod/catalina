@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,11 +22,9 @@ package org.apache.catalina.authenticator;
 
 import org.apache.catalina.*;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.valves.ValveBase;
-import org.glassfish.logging.annotation.LogMessageInfo;
 import org.glassfish.web.valve.GlassFishValve;
 
 import javax.servlet.ServletException;
@@ -74,35 +72,8 @@ public abstract class AuthenticatorBase
     
     // ----------------------------------------------------- Static Variables
 
-    protected static final Logger log = StandardServer.log;
+    protected static final Logger log = LogFacade.getLogger();
     protected static final ResourceBundle rb = log.getResourceBundle();
-
-    @LogMessageInfo(
-            message = "Configuration error:  Must be attached to a Context",
-            level = "WARNING"
-    )
-    public static final String CONFIG_ERROR_MUST_ATTACH_TO_CONTEXT = "AS-WEB-CORE-00001";
-
-    @LogMessageInfo(
-            message = "Authenticator[{0}]: {1}",
-            level = "INFO"
-    )
-    public static final String AUTHENTICATOR_INFO = "AS-WEB-CORE-00002";
-
-    @LogMessageInfo(
-            message = "Exception getting debug value",
-            level = "SEVERE",
-            cause = "Could not get the method or invoke underlying method",
-            action = "Verify the existence of such method and access permission"
-    )
-    public static final String GETTING_DEBUG_VALUE_EXCEPTION = "AS-WEB-CORE-00003";
-
-    @LogMessageInfo(
-            message = "Login failed",
-            level = "WARNING"
-    )
-
-    public static final String LOGIN_FAIL = "AS-WEB-CORE-00535";
 
     /**
      * Descriptive information about this implementation.
@@ -267,7 +238,7 @@ public abstract class AuthenticatorBase
         
         if (!(container instanceof Context))
             throw new IllegalArgumentException
-                    (rb.getString(CONFIG_ERROR_MUST_ATTACH_TO_CONTEXT));
+                    (rb.getString(LogFacade.CONFIG_ERROR_MUST_ATTACH_TO_CONTEXT));
         
         super.setContainer(container);
         this.context = (Context) container;
@@ -798,7 +769,7 @@ public abstract class AuthenticatorBase
                     message);
         } else {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, AUTHENTICATOR_INFO, new Object[] {context.getPath(), message});
+                log.log(Level.INFO, LogFacade.AUTHENTICATOR_INFO, new Object[] {context.getPath(), message});
             }
         }
     }
@@ -816,7 +787,7 @@ public abstract class AuthenticatorBase
             logger.log("Authenticator[" + context.getPath() + "]: " +
                 message, t, org.apache.catalina.Logger.WARNING);
         } else {
-            String msg = MessageFormat.format(rb.getString(AUTHENTICATOR_INFO),
+            String msg = MessageFormat.format(rb.getString(LogFacade.AUTHENTICATOR_INFO),
                                               new Object[] {context.getPath(), message});
             log.log(Level.WARNING, msg, t);
         }
@@ -942,7 +913,7 @@ public abstract class AuthenticatorBase
                                 char[] password) throws ServletException {
         Principal p = context.getRealm().authenticate(username, password);
         if (p == null) {
-            throw new ServletException(rb.getString(LOGIN_FAIL));
+            throw new ServletException(rb.getString(LogFacade.LOGIN_FAIL));
         }
         return p;
     }
@@ -1054,7 +1025,7 @@ public abstract class AuthenticatorBase
                 Integer result = (Integer) method.invoke(context, paramValues);
                 setDebug(result.intValue());
             } catch (Exception e) {
-                log.log(Level.SEVERE, GETTING_DEBUG_VALUE_EXCEPTION, e);
+                log.log(Level.SEVERE, LogFacade.GETTING_DEBUG_VALUE_EXCEPTION, e);
             }
         }
         /** CR 6411114 (Lifecycle implementation moved to ValveBase)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -20,7 +20,7 @@
 
 package org.apache.catalina.startup;
 
-import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.loader.StandardClassLoader;
 
 import java.io.File;
@@ -58,7 +58,7 @@ public final class ClassLoaderFactory {
 
     // ------------------------------------------------------- Static Variables
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
     /**
      * Debugging detail level for processing the startup.
      */

@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  */
 
 package org.apache.catalina.core;
 
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
@@ -24,25 +24,7 @@ public class FilterRegistrationImpl implements FilterRegistration {
     protected FilterDef filterDef;
     protected StandardContext ctx;
 
-    private static final ResourceBundle rb = StandardServer.log.getResourceBundle();
-
-    @LogMessageInfo(
-        message = "Unable to configure {0} for filter {1} of servlet context {2}, because this servlet context has already been initialized",
-        level = "WARNING"
-    )
-    public static final String FILTER_REGISTRATION_ALREADY_INIT = "AS-WEB-CORE-00117";
-
-    @LogMessageInfo(
-        message = "Unable to configure mapping for filter {0} of servlet context {1}, because servlet names are null or empty",
-        level = "WARNING"
-    )
-    public static final String FILTER_REGISTRATION_MAPPING_SERVLET_NAME_EXCEPTION = "AS-WEB-CORE-00118";
-
-    @LogMessageInfo(
-        message = "Unable to configure mapping for filter {0} of servlet context {1}, because URL patterns are null or empty",
-        level = "WARNING"
-    )
-    public static final String FILTER_REGISTRATION_MAPPING_URL_PATTERNS_EXCEPTION = "AS-WEB-CORE-00119";
+    private static final ResourceBundle rb = LogFacade.getLogger().getResourceBundle();
 
     /**
      * Constructor
@@ -70,7 +52,7 @@ public class FilterRegistrationImpl implements FilterRegistration {
 
     public boolean setInitParameter(String name, String value) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(FILTER_REGISTRATION_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.FILTER_REGISTRATION_ALREADY_INIT),
                                               new Object[] {"init parameter", filterDef.getFilterName(),
                                                             ctx.getName()});
             throw new IllegalStateException(msg);
@@ -100,14 +82,14 @@ public class FilterRegistrationImpl implements FilterRegistration {
             String... servletNames) {
 
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(FILTER_REGISTRATION_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.FILTER_REGISTRATION_ALREADY_INIT),
                                               new Object[] {"servlet-name mapping", filterDef.getFilterName(),
                                                             ctx.getName()});
             throw new IllegalStateException(msg);
         }
 
         if ((servletNames==null) || (servletNames.length==0)) {
-            String msg = MessageFormat.format(rb.getString(FILTER_REGISTRATION_MAPPING_SERVLET_NAME_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.FILTER_REGISTRATION_MAPPING_SERVLET_NAME_EXCEPTION),
                                               new Object[]  {filterDef.getFilterName(), ctx.getName()});
             throw new IllegalArgumentException(msg);
         }
@@ -133,14 +115,14 @@ public class FilterRegistrationImpl implements FilterRegistration {
             String... urlPatterns) {
 
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(FILTER_REGISTRATION_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.FILTER_REGISTRATION_ALREADY_INIT),
                                               new Object[] {"url-pattern mapping", filterDef.getFilterName(),
                                                             ctx.getName()});
             throw new IllegalStateException(msg);
         }
 
         if ((urlPatterns==null) || (urlPatterns.length==0)) {
-            String msg = MessageFormat.format(rb.getString(FILTER_REGISTRATION_MAPPING_URL_PATTERNS_EXCEPTION),
+            String msg = MessageFormat.format(rb.getString(LogFacade.FILTER_REGISTRATION_MAPPING_URL_PATTERNS_EXCEPTION),
                                               new Object[] {filterDef.getFilterName(), ctx.getName()});
             throw new IllegalArgumentException(msg);
         }

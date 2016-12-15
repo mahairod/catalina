@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -23,7 +23,6 @@ package org.apache.catalina.core;
 
 import org.apache.catalina.*;
 import org.apache.catalina.util.LifecycleSupport;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
@@ -48,48 +47,8 @@ public class StandardService
         implements Lifecycle, Service
  {
 
-     private static final Logger log = StandardServer.log;
+     private static final Logger log = LogFacade.getLogger();
      private static final ResourceBundle rb = log.getResourceBundle();
-
-     @LogMessageInfo(
-         message = "This service has already been started",
-         level = "INFO"
-     )
-     public static final String SERVICE_STARTED = "AS-WEB-CORE-00251";
-
-     @LogMessageInfo(
-         message = "Starting service {0}",
-         level = "INFO"
-     )
-     public static final String STARTING_SERVICE = "AS-WEB-CORE-00252";
-
-     @LogMessageInfo(
-         message = "Stopping service {0}",
-         level = "INFO"
-     )
-     public static final String STOPPING_SERVICE = "AS-WEB-CORE-00253";
-
-     @LogMessageInfo(
-         message = "This service has already been initialized",
-         level = "INFO"
-     )
-     public static final String SERVICE_HAS_BEEN_INIT = "AS-WEB-CORE-00254";
-
-     @LogMessageInfo(
-         message = "Error registering Service at domain {0}",
-         level = "SEVERE",
-         cause = "Could not register service",
-         action = "Verify the domain name and service name"
-     )
-     public static final String ERROR_REGISTER_SERVICE_EXCEPTION = "AS-WEB-CORE-00255";
-
-     @LogMessageInfo(
-         message = "Service initializing at {0} failed",
-         level = "SEVERE",
-         cause = "Could not pre-startup initialization",
-         action = "Verify if server was already initialized"
-     )
-     public static final String FAILED_SERVICE_INIT_EXCEPTION = "AS-WEB-CORE-00256";
 
     // ----------------------------------------------------- Instance Variables
 
@@ -551,7 +510,7 @@ public class StandardService
         // Validate and update our current component state
         if (started) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, SERVICE_STARTED);
+                log.log(Level.INFO, LogFacade.SERVICE_STARTED);
             }
         }
         
@@ -562,7 +521,7 @@ public class StandardService
         lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
 
         if (log.isLoggable(Level.INFO)) {
-            log.log(Level.INFO, STARTING_SERVICE, this.name);
+            log.log(Level.INFO, LogFacade.STARTING_SERVICE, this.name);
         }
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
@@ -612,7 +571,7 @@ public class StandardService
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
 
         if (log.isLoggable(Level.INFO)) {
-            log.log(Level.INFO, STOPPING_SERVICE, this.name);
+            log.log(Level.INFO, LogFacade.STOPPING_SERVICE, this.name);
         }
         started = false;
 
@@ -649,7 +608,7 @@ public class StandardService
         // Service shouldn't be used with embedded, so it doesn't matter
         if (initialized) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, SERVICE_HAS_BEEN_INIT);
+                log.log(Level.INFO, LogFacade.SERVICE_HAS_BEEN_INIT);
             }
             return;
         }
@@ -662,7 +621,7 @@ public class StandardService
                 domain=engine.getName();
                 oname=new ObjectName(domain + ":type=Service,serviceName="+name);
             } catch (Exception e) {
-                String msg = MessageFormat.format(rb.getString(ERROR_REGISTER_SERVICE_EXCEPTION), domain);
+                String msg = MessageFormat.format(rb.getString(LogFacade.ERROR_REGISTER_SERVICE_EXCEPTION), domain);
                 log.log(Level.SEVERE, msg, e);
             }
             
@@ -698,7 +657,7 @@ public class StandardService
         try {
             initialize();
         } catch( Throwable t ) {
-            String msg = MessageFormat.format(rb.getString(FAILED_SERVICE_INIT_EXCEPTION), domain);
+            String msg = MessageFormat.format(rb.getString(LogFacade.FAILED_SERVICE_INIT_EXCEPTION), domain);
             log.log(Level.SEVERE, msg, t);
         }
     }

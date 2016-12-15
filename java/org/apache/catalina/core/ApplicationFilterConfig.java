@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -22,9 +22,9 @@ package org.apache.catalina.core;
 
 
 import org.apache.catalina.ContainerEvent;
+import org.apache.catalina.LogFacade;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
-import org.glassfish.logging.annotation.LogMessageInfo;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -49,17 +49,9 @@ import java.util.ResourceBundle;
 
 final class ApplicationFilterConfig implements FilterConfig, Serializable {
 
-    private static final Logger log = StandardServer.log;
+    private static final Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
 
-    @LogMessageInfo(
-        message = "ApplicationFilterConfig.doAsPrivilege",
-        level = "SEVERE",
-        cause = "Could not release allocated filter instance",
-        action = "Verify the privilege"
-    )
-    public static final String DO_AS_PRIVILEGE = "AS-WEB-CORE-00098";
- 
     // ----------------------------------------------------------- Constructors
 
 
@@ -285,7 +277,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
                                                filter); 
                     SecurityUtil.remove(filter);
                 } catch(java.lang.Exception ex){
-                    String msg = rb.getString(DO_AS_PRIVILEGE);
+                    String msg = rb.getString(LogFacade.DO_AS_PRIVILEGE);
                     log.log(Level.SEVERE, msg, ex);
                 }
             } else { 
@@ -341,7 +333,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
                                                    filter);  
                         SecurityUtil.remove(filter);
                     } catch(java.lang.Exception ex){
-                        String msg = rb.getString(DO_AS_PRIVILEGE);
+                        String msg = rb.getString(LogFacade.DO_AS_PRIVILEGE);
                         log.log(Level.SEVERE, msg, ex);
                     }
                 } else { 

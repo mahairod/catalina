@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  */
 
 package org.apache.catalina.core;
 
 import org.apache.catalina.Globals;
-import org.glassfish.logging.annotation.LogMessageInfo;
+import org.apache.catalina.LogFacade;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
@@ -28,13 +28,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
     private StandardContext ctx;
     private int maxAge = -1;
 
-    private static final ResourceBundle rb = StandardServer.log.getResourceBundle();
-
-    @LogMessageInfo(
-        message = "Unable to configure {0} session tracking cookie property for servlet context {1}, because this servlet context has already been initialized",
-        level = "WARNING"
-    )
-    public static final String SESSION_COOKIE_CONFIG_ALREADY_INIT = "AS-WEB-CORE-00129";
+    private static final ResourceBundle rb = LogFacade.getLogger().getResourceBundle();
 
 
     /**
@@ -54,7 +48,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
      */
     public void setName(String name) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(SESSION_COOKIE_CONFIG_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.SESSION_COOKIE_CONFIG_ALREADY_INIT),
                                               new Object[] {"name", ctx.getName()});
             throw new IllegalStateException(msg);
         }
@@ -82,7 +76,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
      */
     public void setDomain(String domain) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(SESSION_COOKIE_CONFIG_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.SESSION_COOKIE_CONFIG_ALREADY_INIT),
                                               new Object[] {"dnmain", ctx.getName()});
             throw new IllegalStateException(msg);
         }
@@ -109,7 +103,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
      */
     public void setPath(String path) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(SESSION_COOKIE_CONFIG_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.SESSION_COOKIE_CONFIG_ALREADY_INIT),
                                               new Object[] {"path", ctx.getName()});
             throw new IllegalStateException(msg);
         }
@@ -138,7 +132,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
      */
     public void setComment(String comment) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(SESSION_COOKIE_CONFIG_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.SESSION_COOKIE_CONFIG_ALREADY_INIT),
                                               new Object[] {"comment", ctx.getName()});
             throw new IllegalStateException(msg);
         }
@@ -168,7 +162,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
      */
     public void setHttpOnly(boolean httpOnly) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(SESSION_COOKIE_CONFIG_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.SESSION_COOKIE_CONFIG_ALREADY_INIT),
                                               new Object[] {"httpOnly", ctx.getName()});
             throw new IllegalStateException(msg);
         }
@@ -202,7 +196,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
      */
     public void setSecure(boolean secure) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(SESSION_COOKIE_CONFIG_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.SESSION_COOKIE_CONFIG_ALREADY_INIT),
                                               new Object[] {"secure", ctx.getName()});
             throw new IllegalStateException(msg);
         }
@@ -227,7 +221,7 @@ public class SessionCookieConfigImpl implements SessionCookieConfig {
 
     public void setMaxAge(int maxAge) {
         if (ctx.isContextInitializedCalled()) {
-            String msg = MessageFormat.format(rb.getString(SESSION_COOKIE_CONFIG_ALREADY_INIT),
+            String msg = MessageFormat.format(rb.getString(LogFacade.SESSION_COOKIE_CONFIG_ALREADY_INIT),
                                               new Object[] {"maxAge", ctx.getName()});
             throw new IllegalStateException(msg);
         }
