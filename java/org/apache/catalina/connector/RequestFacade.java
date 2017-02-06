@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -26,8 +26,13 @@ import org.apache.catalina.core.RequestFacadeHelper;
 import org.apache.catalina.security.SecurityUtil;
 
 import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
+import javax.servlet.http.PushBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.security.AccessControlException;
@@ -298,7 +303,7 @@ public class RequestFacade
 
     // ------------------------------------------------- ServletRequest Methods
 
-
+    @Override
     public Object getAttribute(String name) {
 
         if (request == null) {
@@ -308,7 +313,7 @@ public class RequestFacade
         return request.getAttribute(name);
     }
 
-
+    @Override
     public Enumeration<String> getAttributeNames() {
 
         if (request == null) {
@@ -323,7 +328,7 @@ public class RequestFacade
         }
     }
 
-
+    @Override
     public String getCharacterEncoding() {
 
         if (request == null) {
@@ -338,7 +343,7 @@ public class RequestFacade
         }         
     }
 
-
+    @Override
     public void setCharacterEncoding(String env)
             throws java.io.UnsupportedEncodingException {
 
@@ -349,7 +354,7 @@ public class RequestFacade
         request.setCharacterEncoding(env);
     }
 
-
+    @Override
     public int getContentLength() {
 
         if (request == null) {
@@ -359,7 +364,7 @@ public class RequestFacade
         return request.getContentLength();
     }
 
-
+    @Override
     public long getContentLengthLong() {
 
         if (request == null) {
@@ -369,7 +374,7 @@ public class RequestFacade
         return request.getContentLengthLong();
     }
 
-
+    @Override
     public String getContentType() {
 
         if (request == null) {
@@ -379,7 +384,7 @@ public class RequestFacade
         return request.getContentType();
     }
 
-
+    @Override
     public ServletInputStream getInputStream() throws IOException {
 
         if (request == null) {
@@ -389,7 +394,7 @@ public class RequestFacade
         return request.getInputStream();
     }
 
-
+    @Override
     public String getParameter(String name) {
 
         if (request == null) {
@@ -404,7 +409,7 @@ public class RequestFacade
         }
     }
 
-
+    @Override
     public Enumeration<String> getParameterNames() {
 
         if (request == null) {
@@ -419,7 +424,7 @@ public class RequestFacade
         }
     }
 
-
+    @Override
     public String[] getParameterValues(String name) {
 
         if (request == null) {
@@ -445,7 +450,7 @@ public class RequestFacade
         return ret;
     }
 
-
+    @Override
     public Map<String, String[]> getParameterMap() {
 
         if (request == null) {
@@ -460,7 +465,7 @@ public class RequestFacade
         }
     }
 
-
+    @Override
     public String getProtocol() {
 
         if (request == null) {
@@ -470,7 +475,7 @@ public class RequestFacade
         return request.getProtocol();
     }
 
-
+    @Override
     public String getScheme() {
 
         if (request == null) {
@@ -480,7 +485,7 @@ public class RequestFacade
         return request.getScheme();
     }
 
-
+    @Override
     public String getServerName() {
 
         if (request == null) {
@@ -490,7 +495,7 @@ public class RequestFacade
         return request.getServerName();
     }
 
-
+    @Override
     public int getServerPort() {
 
         if (request == null) {
@@ -500,7 +505,7 @@ public class RequestFacade
         return request.getServerPort();
     }
 
-
+    @Override
     public BufferedReader getReader() throws IOException {
 
         if (request == null) {
@@ -510,7 +515,7 @@ public class RequestFacade
         return request.getReader();
     }
 
-
+    @Override
     public String getRemoteAddr() {
 
         if (request == null) {
@@ -520,7 +525,7 @@ public class RequestFacade
         return request.getRemoteAddr();
     }
 
-
+    @Override
     public String getRemoteHost() {
 
         if (request == null) {
@@ -530,7 +535,7 @@ public class RequestFacade
         return request.getRemoteHost();
     }
 
-
+    @Override
     public void setAttribute(String name, Object o) {
 
         if (request == null) {
@@ -540,7 +545,7 @@ public class RequestFacade
         request.setAttribute(name, o);
     }
 
-
+    @Override
     public void removeAttribute(String name) {
 
         if (request == null) {
@@ -550,7 +555,7 @@ public class RequestFacade
         request.removeAttribute(name);
     }
 
-
+    @Override
     public Locale getLocale() {
 
         if (request == null) {
@@ -565,7 +570,7 @@ public class RequestFacade
         }        
     }
 
-
+    @Override
     public Enumeration<Locale> getLocales() {
 
         if (request == null) {
@@ -580,7 +585,7 @@ public class RequestFacade
         }        
     }
 
-
+    @Override
     public boolean isSecure() {
 
         if (request == null) {
@@ -590,7 +595,7 @@ public class RequestFacade
         return request.isSecure();
     }
 
-
+    @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
         if (request == null) {
@@ -605,7 +610,7 @@ public class RequestFacade
         }
     }
 
-
+    @Override
     public String getRealPath(String path) {
 
         if (request == null) {
@@ -615,7 +620,7 @@ public class RequestFacade
         return request.getRealPath(path);
     }
 
-
+    @Override
     public String getAuthType() {
 
         if (request == null) {
@@ -625,7 +630,7 @@ public class RequestFacade
         return request.getAuthType();
     }
 
-
+    @Override
     public Cookie[] getCookies() {
 
         if (request == null) {
@@ -651,7 +656,7 @@ public class RequestFacade
         return ret;
     }
 
-
+    @Override
     public long getDateHeader(String name) {
 
         if (request == null) {
@@ -661,7 +666,7 @@ public class RequestFacade
         return request.getDateHeader(name);
     }
 
-
+    @Override
     public String getHeader(String name) {
 
         if (request == null) {
@@ -671,7 +676,7 @@ public class RequestFacade
         return request.getHeader(name);
     }
 
-
+    @Override
     public Enumeration<String> getHeaders(String name) {
 
         if (request == null) {
@@ -686,7 +691,7 @@ public class RequestFacade
         }         
     }
 
-
+    @Override
     public Enumeration<String> getHeaderNames() {
 
         if (request == null) {
@@ -701,7 +706,7 @@ public class RequestFacade
         }             
     }
 
-
+    @Override
     public int getIntHeader(String name) {
 
         if (request == null) {
@@ -711,7 +716,7 @@ public class RequestFacade
         return request.getIntHeader(name);
     }
 
-
+    @Override
     public String getMethod() {
 
         if (request == null) {
@@ -721,7 +726,7 @@ public class RequestFacade
         return request.getMethod();
     }
 
-
+    @Override
     public String getPathInfo() {
 
         if (request == null) {
@@ -731,7 +736,7 @@ public class RequestFacade
         return request.getPathInfo();
     }
 
-
+    @Override
     public String getPathTranslated() {
 
         if (request == null) {
@@ -749,11 +754,12 @@ public class RequestFacade
      * @return the servlet context to which this servlet request was last
      * dispatched
      */
+    @Override
     public ServletContext getServletContext() {
         return request.getServletContext();
     }
 
-
+    @Override
     public String getContextPath() {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
@@ -769,7 +775,7 @@ public class RequestFacade
         return request.getContextPath(maskDefaultContextMapping);
     }
 
-
+    @Override
     public String getQueryString() {
 
         if (request == null) {
@@ -779,7 +785,7 @@ public class RequestFacade
         return request.getQueryString();
     }
 
-
+    @Override
     public String getRemoteUser() {
 
         if (request == null) {
@@ -789,7 +795,7 @@ public class RequestFacade
         return request.getRemoteUser();
     }
 
-
+    @Override
     public boolean isUserInRole(String role) {
 
         if (request == null) {
@@ -799,7 +805,7 @@ public class RequestFacade
         return request.isUserInRole(role);
     }
 
-
+    @Override
     public java.security.Principal getUserPrincipal() {
 
         if (request == null) {
@@ -809,7 +815,7 @@ public class RequestFacade
         return request.getUserPrincipal();
     }
 
-
+    @Override
     public String getRequestedSessionId() {
 
         if (request == null) {
@@ -819,7 +825,7 @@ public class RequestFacade
         return request.getRequestedSessionId();
     }
 
-
+    @Override
     public String getRequestURI() {
 
         if (request == null) {
@@ -829,7 +835,7 @@ public class RequestFacade
         return request.getRequestURI(maskDefaultContextMapping);
     }
 
-
+    @Override
     public StringBuffer getRequestURL() {
 
         if (request == null) {
@@ -839,7 +845,7 @@ public class RequestFacade
         return request.getRequestURL(maskDefaultContextMapping);
     }
 
-
+    @Override
     public String getServletPath() {
 
         if (request == null) {
@@ -849,7 +855,7 @@ public class RequestFacade
         return request.getServletPath();
     }
 
-
+    @Override
     public HttpSession getSession(boolean create) {
 
         if (request == null) {
@@ -864,6 +870,7 @@ public class RequestFacade
         }
     }
 
+    @Override
     public HttpSession getSession() {
 
         if (request == null) {
@@ -873,6 +880,7 @@ public class RequestFacade
         return getSession(true);
     }
 
+    @Override
     public String changeSessionId() {
 
         if (request == null) {
@@ -887,7 +895,7 @@ public class RequestFacade
         }
     }
 
-
+    @Override
     public boolean isRequestedSessionIdValid() {
 
         if (request == null) {
@@ -897,7 +905,7 @@ public class RequestFacade
         return request.isRequestedSessionIdValid();
     }
 
-
+    @Override
     public boolean isRequestedSessionIdFromCookie() {
 
         if (request == null) {
@@ -907,7 +915,7 @@ public class RequestFacade
         return request.isRequestedSessionIdFromCookie();
     }
 
-
+    @Override
     public boolean isRequestedSessionIdFromURL() {
 
         if (request == null) {
@@ -917,7 +925,7 @@ public class RequestFacade
         return request.isRequestedSessionIdFromURL();
     }
 
-
+    @Override
     public boolean isRequestedSessionIdFromUrl() {
 
         if (request == null) {
@@ -927,7 +935,7 @@ public class RequestFacade
         return request.isRequestedSessionIdFromURL();
     }
 
-
+    @Override
     public String getLocalAddr() {
 
         if (request == null) {
@@ -937,7 +945,7 @@ public class RequestFacade
         return request.getLocalAddr();
     }
 
-
+    @Override
     public String getLocalName() {
 
         if (request == null) {
@@ -947,7 +955,7 @@ public class RequestFacade
         return request.getLocalName();
     }
 
-
+    @Override
     public int getLocalPort() {
 
         if (request == null) {
@@ -957,7 +965,7 @@ public class RequestFacade
         return request.getLocalPort();
     }
 
-
+    @Override
     public int getRemotePort() {
 
         if (request == null) {
@@ -967,7 +975,7 @@ public class RequestFacade
         return request.getRemotePort();
     }
 
-
+    @Override
     public DispatcherType getDispatcherType() {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
@@ -979,6 +987,7 @@ public class RequestFacade
     /**
      * Starts async processing on this request.
      */
+    @Override
     public AsyncContext startAsync() throws IllegalStateException {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
@@ -990,6 +999,7 @@ public class RequestFacade
     /**
      * Starts async processing on this request.
      */
+    @Override
     public AsyncContext startAsync(ServletRequest sreq,
                                    ServletResponse sresp)
             throws IllegalStateException {
@@ -1003,6 +1013,7 @@ public class RequestFacade
     /**
      * Checks whether async processing has started on this request.
      */
+    @Override
     public boolean isAsyncStarted() {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
@@ -1014,6 +1025,7 @@ public class RequestFacade
     /**
      * Checks whether this request supports async.
      */
+    @Override
     public boolean isAsyncSupported() {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
@@ -1025,6 +1037,7 @@ public class RequestFacade
     /**
      * Gets the AsyncContext of this request.
      */
+    @Override
     public AsyncContext getAsyncContext() {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
@@ -1050,7 +1063,7 @@ public class RequestFacade
         return request.getPart(name);
     }
 
-
+    @Override
     public boolean authenticate(HttpServletResponse response)
             throws IOException, ServletException {
         if (request == null) {
@@ -1059,7 +1072,7 @@ public class RequestFacade
         return request.authenticate(response);
     }
 
-
+    @Override
     public void login(String username, String password)
             throws ServletException {
         if (request == null) {
@@ -1068,7 +1081,7 @@ public class RequestFacade
         request.login(username, password);
     }
 
-
+    @Override
     public void logout() throws ServletException {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
@@ -1076,12 +1089,17 @@ public class RequestFacade
         request.logout();
     }
 
-
+    @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
         if (request == null) {
             throw new IllegalStateException(rb.getString(LogFacade.CANNOT_USE_REQUEST_OBJECT_OUTSIDE_SCOPE_EXCEPTION));
         }
         return request.upgrade(handlerClass);
+    }
+
+    @Override
+    public PushBuilder getPushBuilder() {
+        return request.getPushBuilder();
     }
 
 

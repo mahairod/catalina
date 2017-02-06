@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -647,6 +647,20 @@ public class ApplicationContext implements ServletContext {
         return context.addServlet(servletName, servletClass);
     }
 
+    /*
+     * Adds the servlet with the given name and jsp file to this
+     * servlet context.
+    */
+    @Override
+    public ServletRegistration.Dynamic addJspFile(
+            String servletName, String jspFile) {
+        if (isRestricted) {
+            throw new UnsupportedOperationException(
+                    rb.getString(LogFacade.UNSUPPORTED_OPERATION_EXCEPTION));
+        }
+        return context.addServlet(servletName, jspFile);
+    }
+
     /**
      * Instantiates the given Servlet class and performs any required
      * resource injection into the new Servlet instance before returning
@@ -922,6 +936,24 @@ public class ApplicationContext implements ServletContext {
                     rb.getString(LogFacade.UNSUPPORTED_OPERATION_EXCEPTION));
         }
         return context.getVirtualServerName();
+    }
+
+    @Override
+    public int getSessionTimeout() {
+        if (isRestricted) {
+            throw new UnsupportedOperationException(
+                    rb.getString(LogFacade.UNSUPPORTED_OPERATION_EXCEPTION));
+        }
+        return context.getSessionTimeout();
+    }
+
+    @Override
+    public void setSessionTimeout(int sessionTimeout) {
+        if (isRestricted) {
+            throw new UnsupportedOperationException(
+                    rb.getString(LogFacade.UNSUPPORTED_OPERATION_EXCEPTION));
+        }
+        context.setSessionTimeout(sessionTimeout);
     }
 
     // START PWC 1.2
