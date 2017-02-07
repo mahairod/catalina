@@ -658,7 +658,7 @@ public class ApplicationContext implements ServletContext {
             throw new UnsupportedOperationException(
                     rb.getString(LogFacade.UNSUPPORTED_OPERATION_EXCEPTION));
         }
-        return context.addServlet(servletName, jspFile);
+        return context.addJspFile(servletName, jspFile);
     }
 
     /**
