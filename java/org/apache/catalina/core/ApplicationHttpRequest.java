@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -35,6 +35,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.PushBuilder;
 import java.io.IOException;
 import java.util.*;
 // END GlassFish 896
@@ -650,6 +651,10 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
     }
 
+    @Override
+    public PushBuilder getPushBuilder() {
+        return ((HttpServletRequest)getRequest()).getPushBuilder();
+    }
 
     // -------------------------------------------------------- Package Methods
 
