@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -701,6 +701,17 @@ public class Request
             Pipeline p = context.getParent().getPipeline();
             if (p != null) {
                 hostValve = p.getBasic();
+            }
+            try {
+                String reqEncoding = this.servletContext.getRequestCharacterEncoding();
+                if (reqEncoding != null) {
+                    setCharacterEncoding(reqEncoding);
+                }
+                if (context.isResponseCharacterEncodingSet()) {
+                    getResponse().getResponse().setCharacterEncoding(this.servletContext.getResponseCharacterEncoding());
+                }
+            } catch(UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
             }
         }
         // START GlassFish 896

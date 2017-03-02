@@ -87,6 +87,7 @@ public class StandardContext
     extends ContainerBase
     implements Context, ServletContext
 {
+    private static final String DEFAULT_RESPONSE_CHARACTER_ENCODING = "ISO-8859-1";
 
     // have two similar messages
     // have two similar messages
@@ -204,12 +205,14 @@ public class StandardContext
     /**
      * The request character encoding.
      */
-    private String requestCharacterEncoding = "ISO-8859-1";
+    private String requestCharacterEncoding = null;
 
     /**
      * The response character encoding.
      */
     private String responseCharacterEncoding = "ISO-8859-1";
+
+    private boolean isResponseCharacterEncodingSet = false;
 
     /**
      * The path to a file to save this Context information.
@@ -982,6 +985,12 @@ public class StandardContext
     @Override
     public void setResponseCharacterEncoding(String encoding) {
         this.responseCharacterEncoding = encoding;
+        this.isResponseCharacterEncodingSet = true;
+    }
+
+    @Override
+    public boolean isResponseCharacterEncodingSet() {
+        return this.isResponseCharacterEncodingSet;
     }
 
     /**
@@ -5936,6 +5945,10 @@ public class StandardContext
         eventListeners.clear();
         contextListeners.clear();
         sessionListeners.clear();
+
+        requestCharacterEncoding = null;
+        responseCharacterEncoding = DEFAULT_RESPONSE_CHARACTER_ENCODING;
+        isResponseCharacterEncodingSet = false;
 
         if (log.isLoggable(Level.FINE)) {
             log.log(Level.FINE, "resetContext " + oname);
