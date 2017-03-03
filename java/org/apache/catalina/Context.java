@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  *
  *
@@ -91,12 +91,6 @@ public interface Context extends Container {
      * Return the Locale to character set mapper for this Context.
      */
     CharsetMapper getCharsetMapper();
-
-    /**
-     * Return the boolean to indicate whether the response character encoding is set
-     * @return boolean true if the response character encoding is set
-     */
-    boolean isResponseCharacterEncodingSet();
 
 
     /**
