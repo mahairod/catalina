@@ -38,6 +38,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.PushBuilder;
 import java.io.IOException;
 import java.util.*;
+import javax.servlet.http.ServletMapping;
+import org.apache.catalina.connector.MappingImpl;
 // END GlassFish 896
 
 /**
@@ -64,16 +66,19 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
         specials.add(RequestDispatcher.INCLUDE_REQUEST_URI);
         specials.add(RequestDispatcher.INCLUDE_CONTEXT_PATH);
         specials.add(RequestDispatcher.INCLUDE_SERVLET_PATH);
+        specials.add(RequestDispatcher.INCLUDE_MAPPING);
         specials.add(RequestDispatcher.INCLUDE_PATH_INFO);
         specials.add(RequestDispatcher.INCLUDE_QUERY_STRING);
         specials.add(RequestDispatcher.FORWARD_REQUEST_URI);
         specials.add(RequestDispatcher.FORWARD_CONTEXT_PATH);
         specials.add(RequestDispatcher.FORWARD_SERVLET_PATH);
+        specials.add(RequestDispatcher.FORWARD_MAPPING);
         specials.add(RequestDispatcher.FORWARD_PATH_INFO);
         specials.add(RequestDispatcher.FORWARD_QUERY_STRING);
         specials.add(AsyncContext.ASYNC_REQUEST_URI);
         specials.add(AsyncContext.ASYNC_CONTEXT_PATH);
         specials.add(AsyncContext.ASYNC_SERVLET_PATH);
+        specials.add(AsyncContext.ASYNC_MAPPING);
         specials.add(AsyncContext.ASYNC_PATH_INFO);
         specials.add(AsyncContext.ASYNC_QUERY_STRING);
     }
@@ -93,10 +98,12 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     public ApplicationHttpRequest(HttpServletRequest request,
                                   Context context,
                                   boolean crossContext,
+                                  ServletMapping mappingForDispatch,
                                   DispatcherType dispatcherType) {
         super(request);
         this.context = context;
         this.crossContext = crossContext;
+        this.mappingForDispatch = mappingForDispatch;
         this.dispatcherType = dispatcherType;
 
         setRequest(request);
@@ -133,6 +140,8 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * behavior.
      */
     protected boolean crossContext = false;
+    
+    private ServletMapping mappingForDispatch;
 
     /**
      * The dispatcher type.
@@ -488,6 +497,26 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
         return (url);
     }
 
+    @Override
+    public ServletMapping getServletMapping() {
+        ServletMapping result = null;
+        switch (dispatcherType) {
+        case INCLUDE:
+            // Safe to cast because we received this in the ctor 
+            // as an HttpServletRequest.
+            result = ((HttpServletRequest)getRequest()).getServletMapping();
+            break;
+        case ASYNC:
+        case FORWARD:
+        case ERROR:
+            result = mappingForDispatch;
+            break;
+        default: // REQUEST
+            break;
+        }
+        
+        return result;
+    }
 
     /**
      * Override the <code>getServletPath()</code> method of the wrapped
@@ -807,6 +836,7 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
                                String pathInfo,
                                String queryString) {
         specialAttributes = new HashMap<String, Object>(5);
+        ServletMapping originalMapping;        
 
         switch (dispatcherType) {
         case INCLUDE:
@@ -816,6 +846,8 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
                                   contextPath);
             specialAttributes.put(RequestDispatcher.INCLUDE_SERVLET_PATH,
                                   servletPath);
+            specialAttributes.put(RequestDispatcher.INCLUDE_MAPPING,
+                                  mappingForDispatch);
             specialAttributes.put(RequestDispatcher.INCLUDE_PATH_INFO,
                                   pathInfo);
             specialAttributes.put(RequestDispatcher.INCLUDE_QUERY_STRING,
@@ -833,6 +865,9 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
                                   pathInfo);
             specialAttributes.put(RequestDispatcher.FORWARD_QUERY_STRING,
                                   queryString);
+            // Safe to cast because we received it in the ctor as HttpServletRequest
+            originalMapping = ((HttpServletRequest)getRequest()).getServletMapping();
+            specialAttributes.put(RequestDispatcher.FORWARD_MAPPING, originalMapping);
             break;
         case ASYNC:
             specialAttributes.put(AsyncContext.ASYNC_REQUEST_URI,
@@ -841,6 +876,10 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
                                   contextPath);
             specialAttributes.put(AsyncContext.ASYNC_SERVLET_PATH,
                                   servletPath);
+            // Safe to cast because we received it in the ctor as HttpServletRequest
+            originalMapping = ((HttpServletRequest)getRequest()).getServletMapping();
+            specialAttributes.put(AsyncContext.ASYNC_MAPPING,
+                                  originalMapping);
             specialAttributes.put(AsyncContext.ASYNC_PATH_INFO,
                                   pathInfo);
             specialAttributes.put(AsyncContext.ASYNC_QUERY_STRING,
