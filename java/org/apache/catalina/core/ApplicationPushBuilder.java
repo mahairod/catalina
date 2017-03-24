@@ -269,7 +269,7 @@ public class ApplicationPushBuilder implements PushBuilder {
         while (nameIter.hasNext()) {
             names.add(nameIter.next());
         }
-        return Collections.unmodifiableSet(names);
+        return names;
     }
 
     @Override
