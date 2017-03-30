@@ -1107,8 +1107,8 @@ public class RequestFacade
     }
 
     @Override
-    public PushBuilder getPushBuilder() {
-        return request.getPushBuilder();
+    public PushBuilder newPushBuilder() {
+        return request.newPushBuilder();
     }
 
 

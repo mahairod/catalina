@@ -681,8 +681,8 @@ public class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
     @Override
-    public PushBuilder getPushBuilder() {
-        return ((HttpServletRequest)getRequest()).getPushBuilder();
+    public PushBuilder newPushBuilder() {
+        return ((HttpServletRequest)getRequest()).newPushBuilder();
     }
 
     // -------------------------------------------------------- Package Methods
