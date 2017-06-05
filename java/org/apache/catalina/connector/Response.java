@@ -1176,6 +1176,12 @@ public class Response
 
 
     @Override
+    public Supplier<Map<String, String>> getTrailerFields() {
+        return coyoteResponse.getTrailers();
+    }
+
+
+    @Override
     public void setTrailerFields(Supplier<Map<String, String>> supplier) {
         coyoteResponse.setTrailers(supplier);
     }
