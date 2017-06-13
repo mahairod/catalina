@@ -70,7 +70,6 @@ public class NamingRuleSet extends RuleSetBase {
     public NamingRuleSet(String prefix) {
 
         super();
-        this.namespaceURI = null;
         this.prefix = prefix;
 
     }

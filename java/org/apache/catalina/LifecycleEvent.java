@@ -83,7 +83,7 @@ public final class LifecycleEvent
     /**
      * The Lifecycle on which this event occurred.
      */
-    private Lifecycle lifecycle = null;
+    private transient Lifecycle lifecycle = null;
 
 
     /**

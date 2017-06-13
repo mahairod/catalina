@@ -1024,8 +1024,7 @@ public class ContextConfig
                     xmlNamespaceAware 
                                 = ((Host)container).getXmlNamespaceAware();
                 }
-                
-                container = container.getParent();
+
             }
         }
 

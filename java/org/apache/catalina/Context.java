@@ -20,7 +20,6 @@
 
 package org.apache.catalina;
 
-import com.sun.grizzly.util.http.mapper.Mapper;
 import org.apache.catalina.deploy.*;
 import org.apache.catalina.util.CharsetMapper;
 
@@ -28,6 +27,7 @@ import javax.servlet.*;
 import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
+import org.glassfish.grizzly.http.server.util.Mapper;
 
 
 /**

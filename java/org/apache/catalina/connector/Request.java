@@ -885,7 +885,9 @@ public class Request
     @Override
     public void setResponse(org.apache.catalina.Response response) {
         this.response = response;
-        sessionTracker.setResponse((Response) response);
+        if (response instanceof Response) {
+            sessionTracker.setResponse((Response) response);
+        }
     }
 
     /**
