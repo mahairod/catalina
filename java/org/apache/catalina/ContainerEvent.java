@@ -227,7 +227,7 @@ public final class ContainerEvent extends EventObject {
     /**
      * The Container on which this event occurred.
      */
-    private Container container = null;
+    private transient Container container = null;
 
 
     /**

@@ -1356,18 +1356,18 @@ public class Connector
         
 
         //START SJSAS 6363251
-        // Initializa adapter
-        //adapter = new CoyoteAdapter(this);
+        // Initializa handler
+        //handler = new CoyoteAdapter(this);
         //END SJSAS 6363251
         // Instantiate Adapter
         //START SJSAS 6363251
-        if ( adapter == null){
+        if ( handler == null){
             try {
                 Class<?> clazz = Class.forName(defaultClassName);
                 Constructor constructor = 
                         clazz.getConstructor(new Class<?>[]{Connector.class});
-                adapter = 
-                        (Adapter)constructor.newInstance(new Object[]{this});
+                handler =
+                        (HttpHandler)constructor.newInstance(new Object[]{this});
             } catch (Exception e) {
                 throw new LifecycleException
                     (rb.getString(LogFacade.FAILED_INSTANCIATE_HTTP_HANDLER_EXCEPTION), e);
@@ -1383,11 +1383,11 @@ public class Connector
                 // use no-arg constructor for JkCoyoteHandler
                 if (protocolHandlerClassName.equals("org.apache.jk.server.JkCoyoteHandler")) {
                     protocolHandler = (ProtocolHandler) clazz.newInstance();
-                    if (adapter instanceof CoyoteAdapter){
-                        ((CoyoteAdapter) adapter).setCompatWithTomcat(true);
+                    if (handler instanceof CoyoteAdapter){
+                        ((CoyoteAdapter) handler).setCompatWithTomcat(true);
                     } else {
                         String msg = MessageFormat.format(rb.getString(LogFacade.INVALID_ADAPTER_IMPLEMENTATION_EXCEPTION),
-                                                          adapter);
+                                                          handler);
                         throw new IllegalStateException
                           (msg);
 
@@ -1411,7 +1411,7 @@ public class Connector
             }
         }
 
-        protocolHandler.setAdapter(adapter);
+        protocolHandler.setHandler(handler);
 
         IntrospectionUtils.setProperty(protocolHandler, "jkHome",
                                        System.getProperty("catalina.base"));
@@ -1601,7 +1601,6 @@ public class Connector
 
     public void setKeystoreFile(String keystoreFile) {
         setProperty("keystore", keystoreFile);
-        ServerSocketFactory factory = this.getFactory();
         if (factory instanceof CoyoteServerSocketFactory) {
             ((CoyoteServerSocketFactory)factory).setKeystoreFile(keystoreFile);
         }
@@ -1613,7 +1612,6 @@ public class Connector
     public String getKeystorePass() {
         String ret = getProperty("keypass");
         if (ret == null) {
-            ServerSocketFactory factory = getFactory();
             if (factory instanceof CoyoteServerSocketFactory ) {
                 return ((CoyoteServerSocketFactory)factory).getKeystorePass();
             }
@@ -1875,15 +1873,17 @@ public class Connector
     /**
      * Set the <code>Adapter</code> used by this connector.
      */
-    public void setAdapter(Adapter adapter){
-        this.adapter = adapter;
+    @Override
+    public void setHandler(HttpHandler handler){
+        this.handler = handler;
     }
     
     /**
      * Get the <code>Adapter</code> used by this connector.
      */    
-    public Adapter getAdapter(){
-        return adapter;
+    @Override
+    public HttpHandler getHandler(){
+        return handler;
     }
  
     /**

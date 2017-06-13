@@ -62,6 +62,7 @@ import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -101,9 +102,7 @@ import org.glassfish.web.valve.ServletContainerInterceptor;
  * @version $Revision: 1.34 $ $Date: 2007/08/24 18:38:28 $
  */
 
-public class CoyoteAdapter
-    implements Adapter 
- {
+public class CoyoteAdapter extends HttpHandler {
 
     private static final Logger log = LogFacade.getLogger();
     private static final ResourceBundle rb = log.getResourceBundle();
