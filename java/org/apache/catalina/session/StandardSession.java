@@ -1395,7 +1395,7 @@ public class StandardSession
         //so just return false
         if(_sessionLock == null)
             return false;        
-        synchronized(this) {
+        synchronized(sessionLockMonitor) {
             return _sessionLock.isForegroundLocked();
         } 
     }    
@@ -1409,7 +1409,7 @@ public class StandardSession
         //so just return true
         if(_sessionLock == null)
             return true;
-        synchronized(this) {
+        synchronized(sessionLockMonitor) {
             return _sessionLock.lockBackground();
         }
     }
@@ -1423,7 +1423,7 @@ public class StandardSession
         //so just return true
         if(_sessionLock == null)
             return true;
-        synchronized(this) {
+        synchronized(sessionLockMonitor) {
             return _sessionLock.lockForeground();
         }
     }
@@ -1437,7 +1437,7 @@ public class StandardSession
         //so just return true
         if(_sessionLock == null)
             return;
-        synchronized(this) {
+        synchronized(sessionLockMonitor) {
             _sessionLock.unlockForegroundCompletely();
         }
     }
@@ -1450,7 +1450,7 @@ public class StandardSession
         //so just return true
         if(_sessionLock == null)
             return;
-        synchronized(this) {
+        synchronized(sessionLockMonitor) {
             _sessionLock.unlockForeground();
         }
     } 
@@ -1463,7 +1463,7 @@ public class StandardSession
         //so just return true
         if(_sessionLock == null)
             return;
-        synchronized(this) {
+        synchronized(sessionLockMonitor) {
             _sessionLock.unlockBackground();
         }
     }    
@@ -1487,15 +1487,19 @@ public class StandardSession
      * @return true if this session has been locked by any
      * out-of-band (i.e., non-http) request, false otherwise
      */      
-    public synchronized boolean hasNonHttpLockOccurred() {
+    public boolean hasNonHttpLockOccurred() {
         //in this case we are not using locks
         //so just return false
         if(_sessionLock == null)
             return false;
-        return _sessionLock.hasNonHttpLockOccurred();
+        synchronized(sessionLockMonitor) {
+            return _sessionLock.hasNonHttpLockOccurred();
+        }
     }
 
     protected transient SessionLock _sessionLock = new SessionLock();
+
+    protected final Object sessionLockMonitor = new Object();
 
 // ------------------------end session locking ---HERCULES:add--------        
     
