@@ -111,7 +111,7 @@ public class StandardContext
 
     private static final RuntimePermission GET_CLASSLOADER_PERMISSION =
         new RuntimePermission("getClassLoader");
-
+    
     /**
      * GMT timezone - all HTTP dates are on GMT
      */
@@ -3427,7 +3427,7 @@ public class StandardContext
         wrapper.addMapping(pattern);
 
         // Update context mapper
-        mapper.addWrapper(pattern, wrapper, jspWildCard, true);
+        mapper.addWrapper(pattern, wrapper, jspWildCard, name, true);
 
         if (notifyContainerListeners) {
             fireContainerEvent("addServletMapping", pattern);
