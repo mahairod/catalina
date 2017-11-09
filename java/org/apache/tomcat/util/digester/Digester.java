@@ -1615,9 +1615,11 @@ public class Digester extends DefaultHandler {
     public Object parse(File file) throws IOException, SAXException {
 
         configure();
-        InputSource input = new InputSource(new FileInputStream(file));
-        input.setSystemId("file://" + file.getAbsolutePath());
-        getXMLReader().parse(input);
+        try (FileInputStream fis = new FileInputStream(file)) {
+          InputSource input = new InputSource(fis);
+          input.setSystemId("file://" + file.getAbsolutePath());
+          getXMLReader().parse(input);
+        }
         return (root);
 
     }   
