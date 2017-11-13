@@ -44,6 +44,7 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
@@ -1685,7 +1686,7 @@ public class StandardWrapper
      *  to mark this servlet as permanently unavailable
      */
     public void unavailable(UnavailableException unavailable) {
-        String msg = MessageFormat.format(rb.getString(LogFacade.MARK_SERVLET_UNAVAILABLE), getName());
+        String msg = MessageFormat.format(rb.getString(LogFacade.MARK_SERVLET_UNAVAILABLE), neutralizeForLog(getName()));
         getServletContext().log(msg);
         if (unavailable == null)
             setAvailable(Long.MAX_VALUE);
@@ -2053,7 +2054,7 @@ public class StandardWrapper
         try {
             unload();
         } catch (ServletException e) {
-            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_UNLOAD_EXCEPTION), getName());
+            String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_UNLOAD_EXCEPTION), neutralizeForLog(getName()));
             getServletContext().log(msg, e);
         }
 

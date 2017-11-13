@@ -37,6 +37,7 @@ import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
@@ -1449,7 +1450,7 @@ public abstract class ContainerBase
      * @param message Message to be logged
      */
     protected void log(String message) {
-
+            message = neutralizeForLog(message);
 //         Logger logger = getLogger();
 //         if (logger != null)
 //             logger.log(logName() + ": " + message);
@@ -1466,7 +1467,7 @@ public abstract class ContainerBase
      * @param throwable Related exception
      */
     protected void log(String message, Throwable throwable) {
-
+        message = neutralizeForLog(message);
         org.apache.catalina.Logger logger = getLogger();
         if (logger != null)
             logger.log(logName() + ": " + message, throwable);
@@ -1546,7 +1547,7 @@ public abstract class ContainerBase
         throws Exception
     {
         if (log.isLoggable(Level.FINE))
-            log.log(Level.FINE, "Create ObjectName " + domain + " " + parent);
+            log.log(Level.FINE, neutralizeForLog("Create ObjectName " + domain + " " + parent));
         return null;
     }
 

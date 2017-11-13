@@ -21,6 +21,7 @@
 package org.apache.catalina.loader;
 
 import org.apache.catalina.LogFacade;
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import org.apache.naming.JndiPermission;
 import org.glassfish.web.loader.Reloader;
 
@@ -1014,7 +1015,7 @@ public class StandardClassLoader
      * @param message Message to be logged
      */
     private void log(String message) {
-
+        message = neutralizeForLog(message);
         if (log.isLoggable(Level.FINE))
             log.log(Level.FINE, "StandardClassLoader: " + message);
 
@@ -1028,7 +1029,7 @@ public class StandardClassLoader
      * @param throwable Exception to be logged
      */
     private void log(String message, Throwable throwable) {
-
+        message = neutralizeForLog(message);
         if (log.isLoggable(Level.FINE))
             log.log(Level.FINE, "StandardClassLoader: " + message, throwable);
 

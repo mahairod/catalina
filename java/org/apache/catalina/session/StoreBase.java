@@ -22,7 +22,7 @@ package org.apache.catalina.session;
 
 import org.apache.catalina.*;
 import org.apache.catalina.util.LifecycleSupport;
-
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -331,10 +331,10 @@ public abstract class StoreBase
             containerName = container.getName();
         }
         if (logger != null) {
-            logger.log(getStoreName()+"[" + containerName + "]: " +
-                       message);
+            logger.log(neutralizeForLog(getStoreName()+"[" + containerName + "]: " +
+                       message));
         } else {
-            log.log(Level.FINE, getStoreName() + "[" + containerName + "]: " + message);
+            log.log(Level.FINE, neutralizeForLog(getStoreName() + "[" + containerName + "]: " + message));
         }
     }
 
@@ -354,10 +354,10 @@ public abstract class StoreBase
             containerName = container.getName();
         }
         if (logger != null) {
-            logger.log(getStoreName()+"[" + containerName + "]: " +
-                message, t, Logger.WARNING);
+            logger.log(neutralizeForLog(getStoreName()+"[" + containerName + "]: " +
+                message), t, Logger.WARNING);
         } else {
-            log.log(Level.WARNING, getStoreName()+"[" + containerName + "]: " + message, t);
+            log.log(Level.WARNING, neutralizeForLog(getStoreName()+"[" + containerName + "]: " + message), t);
         }
     }
 

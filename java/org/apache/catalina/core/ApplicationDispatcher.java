@@ -20,6 +20,7 @@
 
 package org.apache.catalina.core;
 
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import org.apache.catalina.*;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
@@ -195,9 +196,9 @@ public final class ApplicationDispatcher
         this.name = name;
 
         if (log.isLoggable(Level.FINE))
-            log.log(Level.FINE, "servletPath= " + this.servletPath + ", pathInfo= "
-                    + this.pathInfo + ", queryString= " + queryString + ", name= "
-                    + this.name);
+            log.log(Level.FINE, "servletPath= " + neutralizeForLog(this.servletPath) + ", pathInfo= "
+                    + neutralizeForLog(this.pathInfo) + ", queryString= " + neutralizeForLog(queryString) + ", name= "
+                    + neutralizeForLog(this.name));
     }
 
     // ----------------------------------------------------- Instance Variables

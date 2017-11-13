@@ -20,6 +20,7 @@
 
 package org.apache.catalina.core;
 
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import org.glassfish.grizzly.http.server.util.AlternateDocBase;
 import org.glassfish.grizzly.http.server.util.Mapper;
 import org.glassfish.grizzly.http.server.util.MappingData;
@@ -4933,15 +4934,16 @@ public class StandardContext
         synchronized (filterConfigs) {
             filterConfigs.clear();
             for (String name : filterDefs.keySet()) {
+                String safeName = neutralizeForLog(name);
                 if(log.isLoggable(Level.FINE)) {
-                    log.log(Level.FINE, " Starting filter '" + name + "'");
+                    log.log(Level.FINE, " Starting filter '" + safeName + "'");
                 }
                 try {
                     filterConfigs.put(name,
                         new ApplicationFilterConfig(this,
                                                     filterDefs.get(name)));
                 } catch(Throwable t) {
-                    String msg = MessageFormat.format(rb.getString(LogFacade.STARTING_FILTER_EXCEPTION), name);
+                    String msg = MessageFormat.format(rb.getString(LogFacade.STARTING_FILTER_EXCEPTION), safeName);
                     getServletContext().log(msg, t);
                     ok = false;
                 }
@@ -4965,8 +4967,9 @@ public class StandardContext
         // Release all Filter and FilterConfig instances
         synchronized (filterConfigs) {
             for (String filterName : filterConfigs.keySet()) {
+                String safeFilterName = neutralizeForLog(filterName);
                 if(log.isLoggable(Level.FINE)) {
-                    log.log(Level.FINE, " Stopping filter '" + filterName + "'");
+                    log.log(Level.FINE, " Stopping filter '" + safeFilterName + "'");
                 }
                 ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)filterConfigs.get(filterName);
                 filterConfig.release();
@@ -5052,7 +5055,7 @@ public class StandardContext
             throws Exception {
         if (log.isLoggable(Level.FINE)) {
             log.log(Level.FINE, "Configuring event listener class '" +
-                    listenerClassName + "'");
+                    neutralizeForLog(listenerClassName) + "'");
         }
         return createListener((Class<EventListener>)
             loader.loadClass(listenerClassName));
@@ -5190,11 +5193,11 @@ public class StandardContext
             this.resources = proxyDirContext;
         } catch(Throwable t) {
             if(log.isLoggable(Level.FINE)) {
-                String msg = MessageFormat.format(rb.getString(LogFacade.STARTING_RESOURCES_EXCEPTION), getName());
+                String msg = MessageFormat.format(rb.getString(LogFacade.STARTING_RESOURCES_EXCEPTION), neutralizeForLog(getName()));
                 log.log(Level.SEVERE, msg, t);
             } else {
                 log.log(Level.SEVERE, LogFacade.STARTING_RESOURCE_EXCEPTION_MESSAGE,
-                        new Object[] {getName(), t.getMessage()});
+                        new Object[] {neutralizeForLog(getName()), t.getMessage()});
             }
             ok = false;
         }
@@ -5342,7 +5345,7 @@ public class StandardContext
                 try {
                     wrapper.load();
                 } catch(ServletException e) {
-                    String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_LOAD_EXCEPTION), getName());
+                    String msg = MessageFormat.format(rb.getString(LogFacade.SERVLET_LOAD_EXCEPTION), neutralizeForLog(getName()));
                     getServletContext().log(msg, StandardWrapper.getRootCause(e));
                     // NOTE: load errors (including a servlet that throws
                     // UnavailableException from the init() method) are NOT
@@ -5385,7 +5388,7 @@ public class StandardContext
 
         if (started) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, LogFacade.CONTAINER_ALREADY_STARTED_EXCEPTION, logName());
+                log.log(Level.INFO, LogFacade.CONTAINER_ALREADY_STARTED_EXCEPTION, neutralizeForLog(logName()));
             }
             return;
         }
@@ -5401,7 +5404,7 @@ public class StandardContext
         }
         if (log.isLoggable(Level.FINE)) {
             log.log(Level.FINE, "Starting " +
-                    ("".equals(getName()) ? "ROOT" : getName()));
+                    ("".equals(getName()) ? "ROOT" : neutralizeForLog(getName())));
         }
 
         // Set JMX object name for proper pipeline registration
@@ -7057,6 +7060,7 @@ public class StandardContext
      * Writes the specified message to a servlet log file.
      */
     public void log(String message) {
+        message= neutralizeForLog(message);
         org.apache.catalina.Logger logger = getLogger();
         if (logger != null) {
             /* PWC 6403328
@@ -7072,6 +7076,7 @@ public class StandardContext
      * Writes the specified exception and message to a servlet log file.
      */
     public void log(Exception exception, String message) {
+        message= neutralizeForLog(message);
         org.apache.catalina.Logger logger = getLogger();
         if (logger != null)
             logger.log(exception, logName() + message);
@@ -7081,6 +7086,7 @@ public class StandardContext
      * Writes the specified message and exception to a servlet log file.
      */
     public void log(String message, Throwable throwable) {
+        message= neutralizeForLog(message);
         org.apache.catalina.Logger logger = getLogger();
         if (logger != null)
             logger.log(logName() + message, throwable);

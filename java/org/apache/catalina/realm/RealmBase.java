@@ -20,6 +20,7 @@
 
 package org.apache.catalina.realm;
 
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import org.apache.catalina.*;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.connector.Response;
@@ -27,10 +28,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.util.HexUtils;
-import org.apache.catalina.util.LifecycleSupport;
-import org.apache.catalina.util.MD5Encoder;
-import org.apache.catalina.util.StringManager;
+import org.apache.catalina.util.*;
 
 import javax.management.ObjectName;
 import javax.servlet.http.HttpServletRequest;
@@ -1500,6 +1498,7 @@ public abstract class RealmBase
      * @param message Message to be logged
      */
     protected void log(String message) {
+        message = neutralizeForLog(message);
         org.apache.catalina.Logger logger = null;
         String name = null;
         if (container != null) {
@@ -1523,6 +1522,7 @@ public abstract class RealmBase
      * @param t Associated exception
      */
     protected void log(String message, Throwable t) {
+        message = neutralizeForLog(message);
         org.apache.catalina.Logger logger = null;
         String name = null;
         if (container != null) {

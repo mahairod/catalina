@@ -20,6 +20,7 @@
 
 package org.apache.catalina.authenticator;
 
+import static com.sun.logging.LogCleanerUtil.neutralizeForLog;
 import org.apache.catalina.*;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.deploy.LoginConfig;
@@ -435,7 +436,7 @@ public abstract class AuthenticatorBase
                          ((HttpServletRequest) request.getRequest()).getMethod() + " " +
                          ((HttpServletRequest) request.getRequest()).getRequestURI();
 
-            log.log(Level.FINE, msg);
+            log.log(Level.FINE, neutralizeForLog(msg));
         }
         LoginConfig config = this.context.getLoginConfig();
         
@@ -453,7 +454,7 @@ public abstract class AuthenticatorBase
                                          session.getAuthType() +
                                          " for principal " +
                                          session.getPrincipal();
-                            log.log(Level.FINE, msg);
+                            log.log(Level.FINE, neutralizeForLog(msg));
                         }
                         hrequest.setAuthType(session.getAuthType());
                         hrequest.setUserPrincipal(principal);
@@ -762,6 +763,7 @@ public abstract class AuthenticatorBase
      * @param message Message to be logged
      */
     protected void log(String message) {
+        message = neutralizeForLog(message);
         org.apache.catalina.Logger logger = context.getLogger();
         if (logger != null) {
             logger.log("Authenticator[" + context.getPath() + "]: " +
@@ -781,6 +783,7 @@ public abstract class AuthenticatorBase
      * @param t Associated exception
      */
     protected void log(String message, Throwable t) {
+        message = neutralizeForLog(message);
         org.apache.catalina.Logger logger = context.getLogger();
         if (logger != null) {
             logger.log("Authenticator[" + context.getPath() + "]: " +
@@ -814,7 +817,7 @@ public abstract class AuthenticatorBase
             String pname = ((principal != null) ? principal.getName() : "[null principal]");
             String msg = "Authenticated '" + pname + "' with type '"
                          + authType + "'";
-            log.log(Level.FINE, msg);
+            log.log(Level.FINE, neutralizeForLog(msg));
         }
         // Cache the authentication information in our request
         request.setAuthType(authType);
@@ -947,7 +950,7 @@ public abstract class AuthenticatorBase
             if (!authenticate(hrequest, hresponse, config)) {
                 if (log.isLoggable(Level.FINE)) {
                     String msg = " Failed authenticate() test ??" + requestURI;
-                    log.log(Level.FINE, msg);
+                    log.log(Level.FINE, neutralizeForLog(msg));
                 }
                 return END_PIPELINE;
             }
