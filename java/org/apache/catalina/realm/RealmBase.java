@@ -131,15 +131,9 @@ public abstract class RealmBase
 
 
     /**
-     * The MD5 helper object for this class.
+     * SHA-256 message digest provider.
      */
-    protected static final MD5Encoder md5Encoder = new MD5Encoder();
-
-
-    /**
-     * MD5 message digest provider.
-     */
-    protected static volatile MessageDigest md5Helper;
+    protected static volatile MessageDigest sha256Helper;
 
 
     /**
@@ -397,8 +391,8 @@ public abstract class RealmBase
 
         char[] serverDigest = null;
         // Bugzilla 32137
-        synchronized(md5Helper) {
-            serverDigest = md5Encoder.encode(md5Helper.digest(valueBytes));
+        synchronized(sha256Helper) {
+            serverDigest = new String(sha256Helper.digest(valueBytes)).toCharArray();
         }
 
         if (log.isLoggable(Level.FINE)) {
@@ -1416,9 +1410,9 @@ public abstract class RealmBase
      * Return the digest associated with given principal's user name.
      */
     protected char[] getDigest(String username, String realmName) {
-        if (md5Helper == null) {
+        if (sha256Helper == null) {
             try {
-                md5Helper = MessageDigest.getInstance("MD5");
+                sha256Helper = MessageDigest.getInstance("SHA-256");
             } catch (NoSuchAlgorithmException e) {
                 log.log(Level.SEVERE, LogFacade.CANNOT_GET_MD5_DIGEST_EXCEPTION, e);
                 throw new IllegalStateException(e.getMessage());
@@ -1465,11 +1459,11 @@ public abstract class RealmBase
 
         byte[] digest = null;
         // Bugzilla 32137
-        synchronized(md5Helper) {
-            digest = md5Helper.digest(valueBytes);
+        synchronized(sha256Helper) {
+            digest = sha256Helper.digest(valueBytes);
         }
 
-        return md5Encoder.encode(digest);
+        return new String(digest).toCharArray();
     }
 
 
