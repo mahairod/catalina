@@ -41,6 +41,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.RequestUtil;
+import org.glassfish.common.util.InputValidationUtil;
 import org.glassfish.grizzly.WriteHandler;
 import org.glassfish.grizzly.http.util.ByteChunk;
 
@@ -560,11 +561,27 @@ public class OutputBuffer extends Writer
         }
 
         // Create JSESSIONID cookie that includes jvmRoute
-        Cookie cookie = new Cookie(ctx.getSessionCookieName(),
+        Cookie cookie = getSafeCookie(ctx.getSessionCookieName(),
                 sess.getIdInternal() + "." + ctx.getJvmRoute());
         request.configureSessionCookie(cookie);
         grizzlyResponse.addHeader(SET_COOKIE_HEADER,
                 response.getCookieString(cookie));
+    }
+
+    private Cookie getSafeCookie(String name, String value) {
+        Cookie cookie = null;
+        try {
+            String safeName = InputValidationUtil.getSafeHeaderName(name);
+            String safeValue = InputValidationUtil.getSafeCookieHeaderValue(value);
+            cookie = new Cookie(safeName, safeValue);
+        } catch (Exception e) {
+            try {
+                grizzlyResponse.sendError(403, "Forbidden");
+            } catch (Exception ex) {
+                // just return
+            }
+        }
+        return cookie;
     }
 
     /**
@@ -581,8 +598,7 @@ public class OutputBuffer extends Writer
         }
 
         if (replicaLocation != null) {
-            Cookie cookie = new Cookie(
-                Globals.JREPLICA_COOKIE_NAME, replicaLocation);
+            Cookie cookie = getSafeCookie(Globals.JREPLICA_COOKIE_NAME, replicaLocation);
             request.configureSessionCookie(cookie);
             if (request.isRequestedSessionIdFromCookie()) {
                 cookie.setSecure(
@@ -654,7 +670,7 @@ public class OutputBuffer extends Writer
         if (request.getJrouteId() == null
                 || !request.getJrouteId().equals(jrouteId)) {
             // Initial request or failover
-            Cookie cookie = new Cookie(Constants.JROUTE_COOKIE, jrouteId);
+            Cookie cookie = getSafeCookie(Constants.JROUTE_COOKIE, jrouteId);
             request.configureSessionCookie(cookie);
             if (request.isRequestedSessionIdFromCookie()) {
                 /*
